@@ -1,0 +1,87 @@
+:root {
+    --loa-blue: #003366; /* Deep Navy Blue */
+    --loa-yellow: #FFC72C; /* Golden Yellow */
+    --loa-blue-light: #0055a4;
+    --light-bg: #eef2f7;
+    --dark-text: #212529;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-shadow: 0 8px 32px 0 rgba(0, 51, 102, 0.2);
+    --font-family: 'Poppins', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background: linear-gradient(-45deg, var(--light-bg), var(--loa-blue-light), var(--light-bg), var(--loa-blue));
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    min-height: 100vh;
+    padding: 2rem;
+    perspective: 1000px;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.modern-card {
+    background: var(--card-bg);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    width: 100%;
+    overflow: hidden;
+    animation: fadeInFromBottom 1s ease-out;
+    transition: transform 0.1s ease; 
+}
+
+@keyframes fadeInFromBottom {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-content {
+    padding: 4rem;
+}
+
+.logo-text {
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: var(--loa-blue);
+}
+.logo-text i {
+    color: var(--loa-yellow);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--dark-text);
+}
+
+.btn-primary-modern {
+    background: var(--loa-blue);
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
+    text-decoration: none;
+}
+.btn-primary-modern:hover {
+    background-color: var(--loa-yellow);
+    color: var(--loa-blue);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 199, 44, 0.5);
+}
+.btn-primary-modern i {
+    transition: transform 0.3s ease;
+}
+.btn-primary-modern:hover i {
+    transform: translateX(5px);
+}
