@@ -2,8 +2,9 @@
 Partial Class frmCashierDashboard
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
-    Protected Overrides Sub Dispose(disposing As Boolean)
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
                 components.Dispose()
@@ -13,8 +14,12 @@ Partial Class frmCashierDashboard
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
@@ -29,6 +34,7 @@ Partial Class frmCashierDashboard
         btnLogout = New Button()
         pnlNowServing = New Panel()
         pnlServingDetails = New Panel()
+        btnRecall = New Button()
         btnComplete = New Button()
         btnNoShow = New Button()
         lblPurpose = New Label()
@@ -147,6 +153,7 @@ Partial Class frmCashierDashboard
         ' pnlServingDetails
         ' 
         pnlServingDetails.BackColor = Color.White
+        pnlServingDetails.Controls.Add(btnRecall)
         pnlServingDetails.Controls.Add(btnComplete)
         pnlServingDetails.Controls.Add(btnNoShow)
         pnlServingDetails.Controls.Add(lblPurpose)
@@ -159,6 +166,20 @@ Partial Class frmCashierDashboard
         pnlServingDetails.Name = "pnlServingDetails"
         pnlServingDetails.Size = New Size(400, 283)
         pnlServingDetails.TabIndex = 2
+        '
+        ' btnRecall
+        '
+        btnRecall.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
+        btnRecall.FlatAppearance.BorderSize = 0
+        btnRecall.FlatStyle = FlatStyle.Flat
+        btnRecall.Font = New Font("Poppins", 10.2F, FontStyle.Bold)
+        btnRecall.ForeColor = Color.White
+        btnRecall.Location = New Point(25, 175)
+        btnRecall.Name = "btnRecall"
+        btnRecall.Size = New Size(350, 40)
+        btnRecall.TabIndex = 6
+        btnRecall.Text = "Recall"
+        btnRecall.UseVisualStyleBackColor = False
         ' 
         ' btnComplete
         ' 
@@ -392,4 +413,5 @@ Partial Class frmCashierDashboard
     Friend WithEvents lblWaitingListTitle As Label
     Friend WithEvents btnCallNext As Button
     Friend WithEvents tmrQueueRefresh As Timer
+    Friend WithEvents btnRecall As Button
 End Class

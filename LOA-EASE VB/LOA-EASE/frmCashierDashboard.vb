@@ -157,7 +157,71 @@ Public Class frmCashierDashboard
                         AddressOf OnCallNextSuccess,
                         New MySqlParameter("@counterId", _counterId))
     End Sub
+    Private Sub btnRecall_Click(sender As Object, e As EventArgs) Handles btnRecall.Click
+        If _currentServingQueueId.HasValue Then
+            MessageBox.Show("Please complete the current transaction before recalling another person.", "Action Required", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
 
+        Using recallForm As New Form()
+            recallForm.Text = "Recall a Queue"
+            recallForm.StartPosition = FormStartPosition.CenterParent
+            recallForm.FormBorderStyle = FormBorderStyle.FixedDialog
+            recallForm.ClientSize = New Size(300, 250) ' Increased height for a title label
+
+            Dim lblTitle As New Label()
+            lblTitle.Text = "Select a 'No-Show' ticket to recall:"
+            lblTitle.Dock = DockStyle.Top
+            lblTitle.Padding = New Padding(5)
+            lblTitle.Font = New Font(Me.Font, FontStyle.Bold)
+            recallForm.Controls.Add(lblTitle)
+
+            Dim lstNoShow As New ListBox()
+            lstNoShow.Dock = DockStyle.Fill
+            recallForm.Controls.Add(lstNoShow)
+            lstNoShow.BringToFront() ' Ensure it's on top of the label
+
+            Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                Try
+                    conn.Open()
+                    Dim query As String = "SELECT queue_id, queue_number FROM queues WHERE counter_id = @counterId AND status = 'no-show' AND DATE(schedule_datetime) = CURDATE() ORDER BY called_at DESC LIMIT 10"
+                    Using cmd As New MySqlCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@counterId", _counterId)
+                        Using reader As MySqlDataReader = cmd.ExecuteReader()
+                            While reader.Read()
+                                lstNoShow.Items.Add(New With {.QueueId = reader.GetInt32("queue_id"), .QueueNumber = reader.GetString("queue_number")})
+                            End While
+                        End Using
+                    End Using
+                Catch ex As Exception
+                    MessageBox.Show("Error fetching 'no-show' list: " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            End Using
+
+            lstNoShow.DisplayMember = "QueueNumber"
+            lstNoShow.ValueMember = "QueueId"
+
+            Dim btnOk As New Button()
+            btnOk.Text = "Recall Selected"
+            btnOk.DialogResult = DialogResult.OK
+            btnOk.Dock = DockStyle.Bottom
+            recallForm.Controls.Add(btnOk)
+
+            If lstNoShow.Items.Count = 0 Then
+                MessageBox.Show("There are no recent 'no-show' tickets to recall.", "Recall List Empty", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            If recallForm.ShowDialog() = DialogResult.OK AndAlso lstNoShow.SelectedItem IsNot Nothing Then
+                Dim selectedQueue = lstNoShow.SelectedItem
+                Dim queueIdToRecall = CType(selectedQueue, Object).QueueId
+
+                ExecuteNonQuery("UPDATE queues SET status = 'serving', called_at = NOW() WHERE queue_id = @queueId",
+                                AddressOf RefreshQueueData,
+                                New MySqlParameter("@queueId", queueIdToRecall))
+            End If
+        End Using
+    End Sub
     Private Sub btnComplete_Click(sender As Object, e As EventArgs) Handles btnComplete.Click
         UpdateQueueStatus("completed")
     End Sub
