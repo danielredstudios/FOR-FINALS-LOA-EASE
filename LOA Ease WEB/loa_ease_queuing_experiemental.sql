@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 02, 2025 at 11:18 AM
+-- Generation Time: Oct 14, 2025 at 12:35 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,13 +34,6 @@ CREATE TABLE `admins` (
   `full_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `admins`
---
-
-INSERT INTO `admins` (`admin_id`, `username`, `password_hash`, `full_name`) VALUES
-(1, 'admin', '$2y$10$sDWBtkmB.FPx/1490owM8.NSX9C.IVynpFyKPI67wLyyysnlVBXOW', 'Administrator');
-
 -- --------------------------------------------------------
 
 --
@@ -49,7 +42,7 @@ INSERT INTO `admins` (`admin_id`, `username`, `password_hash`, `full_name`) VALU
 
 CREATE TABLE `cashiers` (
   `cashier_id` int(11) NOT NULL,
-  `counter_id` int(11) NOT NULL,
+  `counter_id` int(11) DEFAULT NULL,
   `username` varchar(100) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `role` enum('admin','cashier') NOT NULL DEFAULT 'cashier',
@@ -65,7 +58,8 @@ INSERT INTO `cashiers` (`cashier_id`, `counter_id`, `username`, `password_hash`,
 (2, 2, 'cashier2', '$2y$10$sDWBtkmB.FPx/1490owM8.NSX9C.IVynpFyKPI67wLyyysnlVBXOW', 'cashier', 'GAVIN PEÑARANDA - Cashier 2'),
 (3, 3, 'cashier3', '$2y$10$sDWBtkmB.FPx/1490owM8.NSX9C.IVynpFyKPI67wLyyysnlVBXOW', 'cashier', 'JEANROMUALD DELA CRUZ -  Cashier 3'),
 (4, 4, 'cashier4', '$2y$10$sDWBtkmB.FPx/1490owM8.NSX9C.IVynpFyKPI67wLyyysnlVBXOW', 'cashier', 'Cashier 4 - Sean Yzer'),
-(7, 5, 'admin', '$2y$10$sDWBtkmB.FPx/1490owM8.NSX9C.IVynpFyKPI67wLyyysnlVBXOW', 'admin', 'Daniel Red - Admin');
+(7, 5, 'admin', '$2y$10$sDWBtkmB.FPx/1490owM8.NSX9C.IVynpFyKPI67wLyyysnlVBXOW', 'admin', 'Daniel Red - Admin'),
+(8, 12, 'Cashier5', '$2b$10$AlNROCAMu5nTr.l1uvzgK.LiYEv4142.M1uVzl7S8JcDD8J.RT2YS', 'cashier', 'Canasna');
 
 -- --------------------------------------------------------
 
@@ -87,7 +81,8 @@ INSERT INTO `counters` (`counter_id`, `counter_name`) VALUES
 (2, 'Cashier 2'),
 (3, 'Cashier 3'),
 (4, 'Cashier 4'),
-(5, 'Admin');
+(5, 'Admin'),
+(12, 'Cashier5 - RED');
 
 -- --------------------------------------------------------
 
@@ -174,66 +169,32 @@ CREATE TABLE `queues` (
 --
 
 INSERT INTO `queues` (`queue_id`, `student_id`, `visitor_id`, `counter_id`, `queue_number`, `purpose`, `schedule_datetime`, `created_at`, `called_at`, `status`, `is_priority`) VALUES
-(50, 45, NULL, 1, 'CCS-0926-001', 'Tuition Payment, Enrollment Concern, Promissory Note', '2025-09-26 08:00:00', '2025-09-26 00:43:02', '2025-09-26 00:43:38', 'completed', 0),
 (51, 21, NULL, 2, 'CCS-0926-001', 'Tuition Payment', '2025-09-26 08:00:00', '2025-09-26 00:45:19', '2025-09-26 00:51:07', 'completed', 0),
-(52, 45, NULL, 1, 'CCS-0926-002', 'Tuition Payment', '2025-09-26 08:30:00', '2025-09-26 00:50:04', '2025-09-26 00:50:12', 'completed', 0),
 (53, 21, NULL, 2, 'CCS-0926-002', 'Tuition Payment', '2025-09-26 08:30:00', '2025-09-26 00:50:24', '2025-09-26 00:51:14', 'completed', 0),
-(54, 21, NULL, 1, 'CCS-0926-003', 'Enrollment Concern', '2025-09-26 09:00:00', '2025-09-26 00:51:22', '2025-09-26 01:48:07', 'completed', 0),
 (55, 45, NULL, 2, 'CCS-0926-006', 'Tuition Payment', '2025-09-26 09:00:00', '2025-09-26 00:54:41', '2025-09-26 00:56:45', 'completed', 0),
-(56, 45, NULL, 1, 'CCS-0926-007', 'Tuition Payment, Enrollment Concern', '2025-09-26 09:30:00', '2025-09-26 01:33:46', NULL, 'completed', 0),
 (57, 45, NULL, 2, 'CCS-0926-008', 'Tuition Payment', '2025-09-26 09:30:00', '2025-09-26 01:36:48', '2025-09-26 01:36:59', 'completed', 0),
 (58, 21, NULL, 2, 'CCS-0926-009', 'Tuition Payment, Enrollment Concern, Promissory Note, Document Request, doc_req:Transcript of Records (TOR)', '2025-09-26 10:00:00', '2025-09-26 01:37:35', '2025-09-26 01:37:47', 'completed', 0),
-(59, 45, NULL, 1, 'CCS-0926-010', 'Tuition Payment, Enrollment Concern, Promissory Note', '2025-09-26 10:00:00', '2025-09-26 02:01:01', '2025-09-26 02:04:55', 'completed', 0),
-(60, 45, NULL, 1, 'CCS-0926-011', 'Tuition Payment', '2025-09-26 10:30:00', '2025-09-26 02:06:49', '2025-09-26 02:09:52', 'completed', 0),
-(61, 45, NULL, 1, 'CCS-0926-012', 'Tuition Payment', '2025-09-26 11:00:00', '2025-09-26 02:07:43', '2025-09-26 02:09:59', 'completed', 0),
-(62, 45, NULL, 1, 'CCS-0926-013', 'Tuition Payment, Enrollment Concern, Promissory Note, Document Request, doc_req:Diploma, Transcript of Records (TOR), Good Moral Certificate', '2025-09-26 11:30:00', '2025-09-26 02:10:48', '2025-09-26 02:11:14', 'completed', 0),
-(63, 22, NULL, 1, 'CCS-0926-014', 'Tuition Payment, Enrollment Concern', '2025-09-26 12:00:00', '2025-09-26 02:11:44', '2025-09-26 02:12:30', 'completed', 0),
-(64, 23, NULL, 1, 'CCS-0926-015', 'Tuition Payment', '2025-09-26 12:30:00', '2025-09-26 02:11:57', '2025-09-26 02:13:36', 'completed', 0),
-(65, 28, NULL, 1, 'CCS-0926-016', 'Tuition Payment', '2025-09-26 13:00:00', '2025-09-26 02:12:07', '2025-09-26 02:15:27', 'completed', 0),
-(66, 30, NULL, 1, 'CCS-0926-017', 'Enrollment Concern', '2025-09-26 13:30:00', '2025-09-26 02:12:23', '2025-09-26 02:22:16', 'completed', 0),
 (67, 45, NULL, 2, 'CCS-0926-018', 'Tuition Payment, Enrollment Concern', '2025-09-26 10:30:00', '2025-09-26 02:14:39', '2025-09-26 02:15:30', 'completed', 0),
 (68, 36, NULL, 2, 'CCS-0926-019', 'Tuition Payment, Enrollment Concern', '2025-09-26 11:00:00', '2025-09-26 02:15:09', '2025-09-26 02:17:02', 'completed', 0),
 (69, 45, NULL, 2, 'CCS-0926-020', 'Tuition Payment', '2025-09-26 11:30:00', '2025-09-26 02:21:42', '2025-09-26 02:23:48', 'completed', 0),
 (70, 38, NULL, 2, 'CCS-0926-021', 'Tuition Payment, Enrollment Concern', '2025-09-26 12:00:00', '2025-09-26 02:22:00', '2025-09-26 02:24:38', 'completed', 0),
 (71, 43, NULL, 2, 'CCS-0926-022', 'Tuition Payment', '2025-09-26 12:30:00', '2025-09-26 02:23:39', '2025-09-26 02:26:15', 'completed', 0),
-(72, NULL, 3, 1, 'VISITOR-20250926-001', 'Tuition Payment', '2025-09-26 04:25:32', '2025-09-26 02:25:32', '2025-09-26 02:25:57', 'completed', 0),
 (73, 45, NULL, 2, 'P-CCS-0926-024', 'Document Request, doc_req:Diploma, Transcript of Records (TOR), Good Moral Certificate', '2025-09-26 13:00:00', '2025-09-26 02:42:36', '2025-09-26 02:58:18', 'completed', 1),
 (74, 45, NULL, 2, 'P-CCS-0926-025', 'Tuition Payment', '2025-09-26 13:30:00', '2025-09-26 02:58:36', '2025-09-26 02:58:46', 'completed', 1),
-(75, 45, NULL, 1, 'CCS-0926-026', 'Document Request', '2025-09-26 14:00:00', '2025-09-26 02:59:49', '2025-09-26 03:00:30', 'completed', 0),
-(76, 45, NULL, 1, 'CCS-0926-027', 'Document Request, doc_req:Diploma, Transcript of Records (TOR), Good Moral Certificate', '2025-09-26 14:30:00', '2025-09-26 03:07:16', '2025-09-26 03:07:47', 'completed', 0),
-(77, 45, NULL, 1, 'CCS-0926-028', 'Document Request, doc_req:Diploma, Transcript of Records (TOR), Good Moral Certificate', '2025-09-26 15:00:00', '2025-09-26 03:10:35', '2025-09-26 03:10:49', 'completed', 0),
 (78, 45, NULL, 4, 'CCS-0926-029', 'Document Request, doc_req:Diploma, Transcript of Records (TOR), Good Moral Certificate', '2025-09-26 08:00:00', '2025-09-26 03:11:19', '2025-09-26 03:18:34', 'completed', 0),
-(79, NULL, 4, 1, 'VISITOR-20250927-001', 'Tuition Payment', '2025-09-27 06:30:56', '2025-09-27 04:30:56', '2025-09-27 04:46:22', 'completed', 0),
-(80, NULL, 5, 1, 'VISITOR-20250927-002', 'Document Request, doc_req:Diploma, doc_req:Transcript of Records (TOR)', '2025-09-27 06:36:28', '2025-09-27 04:36:28', '2025-09-27 04:46:48', 'completed', 0),
-(81, 45, NULL, 1, 'CCS-0927-003', 'Document Request, doc_req:Transcript of Records (TOR), doc_req:Good Moral Certificate', '2025-09-29 00:00:00', '2025-09-27 04:55:43', '2025-09-29 07:10:15', 'completed', 1),
-(82, 1, NULL, 3, 'CCS-0928-001', 'Document Request, doc_req:Diploma, doc_req:Transcript of Records (TOR), doc_req:Good Moral Certificate', '2025-09-28 21:46:11', '2025-09-28 13:46:11', '2025-09-28 13:50:19', 'completed', 0),
-(83, 28, NULL, 3, 'CCS-0928-002', 'Tuition Payment', '2025-09-28 21:52:38', '2025-09-28 13:52:38', '2025-09-29 07:24:45', 'serving', 0),
-(84, 1, NULL, 1, 'CCS-0929-001', 'Document Request, doc_req:Diploma, Enrollment Concern', '2025-09-29 13:55:44', '2025-09-29 05:55:44', '2025-09-29 05:55:54', 'completed', 0),
-(85, 23, NULL, 1, 'CCS-0929-002', 'Tuition Payment', '2025-09-29 13:57:27', '2025-09-29 05:57:27', '2025-09-29 06:25:37', 'completed', 0),
-(86, 23, NULL, 1, 'CCS-0929-003', 'Promissory Note, Tuition Payment', '2025-09-29 14:26:48', '2025-09-29 06:26:48', '2025-09-29 06:27:00', 'completed', 0),
-(87, 1, NULL, 3, 'CCS-0929-004', 'Tuition Payment', '2025-09-29 14:28:39', '2025-09-29 06:28:39', '2025-09-29 07:24:48', 'completed', 0),
-(88, 23, NULL, 1, 'CCS-0929-005', 'Tuition Payment, Enrollment Concern', '2025-09-29 08:00:00', '2025-09-29 06:30:36', '2025-09-29 06:30:49', 'completed', 0),
-(89, 50, NULL, 1, 'CCS-0929-006', 'Tuition Payment', '2025-09-29 14:33:41', '2025-09-29 06:33:41', '2025-09-29 06:34:17', 'expired', 0),
-(90, 23, NULL, 1, 'CCS-0929-007', 'Tuition Payment, Enrollment Concern', '2025-09-29 08:30:00', '2025-09-29 06:34:05', NULL, 'expired', 0),
-(91, 23, NULL, 1, 'CCS-0929-008', 'Enrollment Concern', '2025-09-29 14:53:56', '2025-09-29 06:53:56', '2025-09-29 06:54:07', 'completed', 0),
-(92, 23, NULL, 1, 'CCS-0929-009', 'Tuition Payment', '2025-09-29 15:20:22', '2025-09-29 07:20:22', '2025-09-29 07:20:59', 'completed', 0),
-(93, 45, NULL, 1, 'CCS-0929-010', 'Document Request, Tuition Payment, doc_req:Diploma, doc_req:Transcript of Records (TOR)', '2025-09-29 15:21:15', '2025-09-29 07:21:15', '2025-09-29 07:23:58', 'completed', 0),
-(94, 39, NULL, 1, 'CCS-0929-011', 'Tuition Payment', '2025-09-29 15:34:28', '2025-09-29 07:34:28', '2025-09-29 07:34:56', 'completed', 0),
-(95, 37, NULL, 1, 'CCS-0929-012', 'Enrollment Concern', '2025-09-29 15:34:47', '2025-09-29 07:34:47', '2025-09-29 07:39:01', 'completed', 0),
-(96, 50, NULL, 1, 'P-CCS-0929-013', 'Tuition Payment, Promissory Note', '2025-09-30 00:00:00', '2025-09-29 07:35:23', NULL, 'scheduled', 0),
-(97, 35, NULL, 1, 'P-CCS-0929-014', 'Tuition Payment', '2025-09-29 15:35:49', '2025-09-29 07:35:49', '2025-09-29 07:37:04', 'completed', 1),
-(98, 24, NULL, 1, 'P-CCS-0929-015', 'Others, Enrollment Concern', '2025-09-29 15:36:11', '2025-09-29 07:36:11', '2025-09-29 07:37:22', 'completed', 1),
 (99, 26, NULL, 2, 'CCS-0929-016', 'Tuition Payment', '2025-09-29 15:37:50', '2025-09-29 07:37:50', '2025-09-29 07:38:03', 'completed', 0),
 (100, 41, NULL, 2, 'P-CCS-0929-017', 'Enrollment Concern', '2025-09-29 15:39:28', '2025-09-29 07:39:28', '2025-09-29 07:40:09', 'completed', 1),
-(101, 47, NULL, 1, 'CCS-0929-018', 'Tuition Payment', '2025-09-29 15:41:11', '2025-09-29 07:41:11', '2025-09-29 07:45:16', 'completed', 0),
 (102, 45, NULL, 2, 'CCS-0929-019', 'Promissory Note', '2025-09-29 15:41:40', '2025-09-29 07:41:40', NULL, 'completed', 0),
 (103, 23, NULL, 4, 'CCS-0929-020', 'Promissory Note', '2025-09-29 15:43:27', '2025-09-29 07:43:27', '2025-09-29 07:46:42', 'completed', 0),
-(104, NULL, 6, 1, 'VISITOR-20250929-001', 'Tuition Payment', '2025-09-29 09:47:44', '2025-09-29 07:47:44', NULL, 'completed', 0),
 (105, 28, NULL, 2, 'CCS-0929-022', 'Tuition Payment', '2025-09-29 08:00:00', '2025-09-29 07:48:29', NULL, 'completed', 0),
 (106, 23, NULL, 4, 'P-CCS-0929-023', 'Document Request, doc_req:Diploma', '2025-09-29 08:00:00', '2025-09-29 07:50:08', '2025-09-29 07:50:24', 'completed', 1),
 (107, 21, NULL, 4, 'S NFORMATION ECHNOLO', 'Tuition Payment, Enrollment Concern', '2025-09-30 12:52:48', '2025-09-30 04:52:48', NULL, 'completed', 0),
 (108, 46, NULL, 4, 'BSIT-0930-002', 'Tuition Payment', '2025-09-30 12:57:27', '2025-09-30 04:57:27', NULL, 'completed', 0),
-(109, 45, NULL, 2, 'GEN-0930-003', 'Tuition Payment, Promissory Note', '2025-10-03 00:00:00', '2025-09-30 05:12:51', NULL, 'completed', 0);
+(109, 45, NULL, 2, 'GEN-0930-003', 'Tuition Payment, Promissory Note', '2025-10-03 00:00:00', '2025-09-30 05:12:51', NULL, 'completed', 0),
+(114, 45, NULL, 4, 'GEN-1002-005', 'Document Request, doc_req:Diploma', '2025-10-02 08:00:00', '2025-10-02 12:51:37', '2025-10-02 12:51:49', 'expired', 0),
+(132, 45, NULL, 2, 'BSIT-1009-001', 'Promissory Note', '2025-10-09 13:37:51', '2025-10-09 05:37:51', '2025-10-09 05:38:42', 'completed', 0),
+(133, 28, NULL, 2, 'BSIT-1009-002', 'Tuition Payment, Others', '2025-10-09 14:13:53', '2025-10-09 06:13:53', '2025-10-09 06:14:06', 'completed', 0),
+(134, 28, NULL, 2, 'BSIT-1009-003', 'Tuition Payment', '2025-10-09 14:16:04', '2025-10-09 06:16:04', NULL, 'waiting', 0);
 
 -- --------------------------------------------------------
 
@@ -325,16 +286,15 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `student_id`, `guardian_id`, `username`, `password_hash`, `last_login`, `created_at`) VALUES
-(12, 28, NULL, 'jean.dela cruz', '$2y$10$fzM8RIZxI5F3HoBWC9YKSevzUz1bDVM.MOZH.ELGrmPmoLrKk49oe', '2025-09-16 05:41:51', '2025-09-16 05:17:14'),
 (13, 48, NULL, 'ronnel.vicente', '$2y$10$GduIvCYvA5BDVHCjqOKbRekrtZQFGn83Tup2bApm3cwh.rdocOI1u', '2025-09-16 05:23:05', '2025-09-16 05:22:49'),
-(14, 50, NULL, 'nathan.peñaranda', '$2y$10$LQb8njEYxk9y88WTVoP3e.lM08J4wI3REo9Dx4BzVf3wDIAEv74Eq', '2025-09-29 07:47:45', '2025-09-16 05:33:46'),
+(14, 50, NULL, 'nathan.peñaranda', '$2y$10$LQb8njEYxk9y88WTVoP3e.lM08J4wI3REo9Dx4BzVf3wDIAEv74Eq', '2025-10-09 05:26:36', '2025-09-16 05:33:46'),
 (15, 39, NULL, 'xyrylle.matiga', '$2y$10$0jrKbxIsawxKnx69Ay0JTeg.985Q.8rwXgA1U4rpiSGJ55za5RzgW', '2025-09-16 05:45:26', '2025-09-16 05:45:01'),
 (18, 23, NULL, 'sean.atog', '$2y$10$28E8rK8ZmaCjZ4fnBvuJD.hG5KTYrjB/0MS2cb3k9PWYh0xpxzuPq', '2025-09-16 07:14:53', '2025-09-16 07:14:44'),
 (20, 46, NULL, 'yuan.rodriguez', '$2y$10$Zfw8jsbG.9pNzCXUICnpvO0BmkD6ocwvNYJonyrqrtGpUfK3nUV4y', '2025-09-17 09:37:39', '2025-09-17 09:34:39'),
-(21, 1, NULL, 'rosalyn.escudero', '$2y$10$FRzclJ9Ebcz3jqB0rZxvdOcIgQ9yUcQ1jdIDwiyNhAadyltj4IFf6', '2025-09-22 08:50:38', '2025-09-22 08:50:16'),
-(23, 45, NULL, 'daniel.red', '$2y$10$LiNLkKrVFFqi/C4.PY.6oedZtzIDjn40I/K5385WLUHetLT9xljq.', '2025-10-02 03:29:41', '2025-09-26 00:34:59'),
 (24, 21, NULL, 'drian.abrio', '$2y$10$JTMuAL5A4lfJkEAM9A1VfuVMEiJE6FfWt6j2Ej4JpOIINcOY4sbzy', '2025-09-26 00:45:06', '2025-09-26 00:44:56'),
-(25, 35, NULL, 'jb.lobrico', '$2y$10$ZlshM.p7C/dGUrG.x6.DSO8jJogmbWpkKeMk54dQAiSZNbAatniF.', '2025-09-29 07:42:44', '2025-09-29 07:41:32');
+(25, 35, NULL, 'jb.lobrico', '$2y$10$ZlshM.p7C/dGUrG.x6.DSO8jJogmbWpkKeMk54dQAiSZNbAatniF.', '2025-09-29 07:42:44', '2025-09-29 07:41:32'),
+(28, 45, NULL, 'daniel.red', '$2y$10$jTwkbY0/432N2Uf729VYbe5/UIPTG6WZ92/t9ARVyzlRY.E8zS1Fq', '2025-10-09 06:10:02', '2025-10-02 09:49:46'),
+(29, 28, NULL, 'jean.dela cruz', '$2y$10$uAoTHgN.rA6PNxNg5RUsb.LN9OvYuVP.oF44SZQKzKjNr.Hm2B3pq', '2025-10-09 05:40:05', '2025-10-09 05:39:51');
 
 -- --------------------------------------------------------
 
@@ -461,19 +421,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `cashiers`
 --
 ALTER TABLE `cashiers`
-  MODIFY `cashier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `cashier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `counters`
 --
 ALTER TABLE `counters`
-  MODIFY `counter_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `counter_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `counter_schedules`
 --
 ALTER TABLE `counter_schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `guardians`
@@ -509,7 +469,7 @@ ALTER TABLE `student_guardian_map`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `visitors`
