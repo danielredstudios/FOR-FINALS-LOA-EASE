@@ -39,122 +39,122 @@ Public Class frmAdminDashboard
         dgvCashierStatus.AutoGenerateColumns = False
         dgvCashierStatus.Columns.Clear()
         dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {
-         .Name = "CashierName",
-          .HeaderText = "Cashier Name",
-        .DataPropertyName = "CashierName"
-    })
+            .Name = "CashierName",
+            .HeaderText = "Cashier Name",
+            .DataPropertyName = "CashierName"
+        })
         dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Status",
-        .HeaderText = "Status",
-        .DataPropertyName = "Status"
-     })
+            .Name = "Status",
+            .HeaderText = "Status",
+            .DataPropertyName = "Status"
+        })
         dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Counter",
-        .HeaderText = "Counter",
-        .DataPropertyName = "Counter"
-    })
+            .Name = "Counter",
+            .HeaderText = "Counter",
+            .DataPropertyName = "Counter"
+        })
 
         dgvAllQueues.AutoGenerateColumns = False
         dgvAllQueues.Columns.Clear()
         dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-         .Name = "QueueNumber",
-        .HeaderText = "Queue No.",
-        .DataPropertyName = "QueueNumber"
-    })
+            .Name = "QueueNumber",
+            .HeaderText = "Queue No.",
+            .DataPropertyName = "QueueNumber"
+        })
         dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "FullName",
-        .HeaderText = "Full Name",
-        .DataPropertyName = "FullName"
-    })
+            .Name = "FullName",
+            .HeaderText = "Full Name",
+            .DataPropertyName = "FullName"
+        })
         dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "StudentNo",
-        .HeaderText = "Student No.",
-        .DataPropertyName = "StudentNo"
-    })
+            .Name = "StudentNo",
+            .HeaderText = "Student No.",
+            .DataPropertyName = "StudentNo"
+        })
         dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Counter",
-        .HeaderText = "Counter",
-         .DataPropertyName = "Counter"
-    })
+            .Name = "Counter",
+            .HeaderText = "Counter",
+            .DataPropertyName = "Counter"
+        })
         dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Status",
-        .HeaderText = "Status",
-        .DataPropertyName = "Status"
-    })
+            .Name = "Status",
+            .HeaderText = "Status",
+            .DataPropertyName = "Status"
+        })
 
         dgvQueueLogs.AutoGenerateColumns = False
         dgvQueueLogs.Columns.Clear()
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "QueueNumber",
-        .HeaderText = "Queue No.",
-        .DataPropertyName = "QueueNumber"
-    })
+            .Name = "QueueNumber",
+            .HeaderText = "Queue No.",
+            .DataPropertyName = "QueueNumber"
+        })
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "FullName",
-        .HeaderText = "Full Name",
-        .DataPropertyName = "FullName"
-     })
+            .Name = "FullName",
+            .HeaderText = "Full Name",
+            .DataPropertyName = "FullName"
+        })
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Status",
-        .HeaderText = "Status",
-        .DataPropertyName = "Status"
-    })
+            .Name = "Status",
+            .HeaderText = "Status",
+            .DataPropertyName = "Status"
+        })
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "CreatedAt",
-        .HeaderText = "Date Created",
-        .DataPropertyName = "CreatedAt"
-    })
+            .Name = "CreatedAt",
+            .HeaderText = "Date Created",
+            .DataPropertyName = "CreatedAt"
+        })
 
         dgvUsers.AutoGenerateColumns = False
         dgvUsers.Columns.Clear()
         dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "FullName",
-         .HeaderText = "Full Name",
-        .DataPropertyName = "FullName"
-    })
+            .Name = "FullName",
+            .HeaderText = "Full Name",
+            .DataPropertyName = "FullName"
+        })
         dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Username",
-         .HeaderText = "Username",
-        .DataPropertyName = "Username"
-    })
+            .Name = "Username",
+            .HeaderText = "Username",
+            .DataPropertyName = "Username"
+        })
         dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "StudentNo",
-        .HeaderText = "Student No.",
-        .DataPropertyName = "StudentNo"
-    })
+            .Name = "StudentNo",
+            .HeaderText = "Student No.",
+            .DataPropertyName = "StudentNo"
+        })
         dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Role",
-        .HeaderText = "Role",
-        .DataPropertyName = "Role"
-    })
+            .Name = "Role",
+            .HeaderText = "Role",
+            .DataPropertyName = "Role"
+        })
         dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "LastLogin",
-        .HeaderText = "Last Login",
-        .DataPropertyName = "LastLogin"
-    })
+            .Name = "LastLogin",
+            .HeaderText = "Last Login",
+            .DataPropertyName = "LastLogin"
+        })
         dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "LastSession",
-        .HeaderText = "Last Session",
-        .DataPropertyName = "LastSession"
-    })
+            .Name = "LastSession",
+            .HeaderText = "Last Session",
+            .DataPropertyName = "LastSession"
+        })
         dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "LastQueueDateTime",
-        .HeaderText = "Last Queue",
-        .DataPropertyName = "LastQueueDateTime"
-    })
+            .Name = "LastQueueDateTime",
+            .HeaderText = "Last Queue",
+            .DataPropertyName = "LastQueueDateTime"
+        })
 
         dgvCounters.AutoGenerateColumns = False
         dgvCounters.Columns.Clear()
         dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "CounterName",
-        .HeaderText = "Counter Name",
-        .DataPropertyName = "CounterName"
-    })
+            .Name = "CounterName",
+            .HeaderText = "Counter Name",
+            .DataPropertyName = "CounterName"
+        })
         dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "AssignedCashier",
-        .HeaderText = "Assigned Cashier",
-        .DataPropertyName = "AssignedCashier"
-    })
+            .Name = "Cashier",
+            .HeaderText = "Cashier",
+            .DataPropertyName = "Cashier"
+        })
     End Sub
 
     Private Sub RefreshAllData()
@@ -193,7 +193,7 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-                 SELECT
+                    SELECT
                     q.queue_number,
                     COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
                     s.student_number AS StudentNo,
@@ -241,7 +241,13 @@ Public Class frmAdminDashboard
                 FROM queues q
                 LEFT JOIN students s ON q.student_id = s.student_id
                 LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
-                ORDER BY q.created_at DESC"
+                ORDER BY
+                    CASE
+                        WHEN q.status = 'serving' THEN 1
+                        WHEN q.status = 'waiting' THEN 2
+                        ELSE 3
+                    END,
+                    q.created_at DESC"
 
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
@@ -325,7 +331,7 @@ Public Class frmAdminDashboard
                 SELECT
                     c.counter_id,
                     c.counter_name,
-                    COALESCE(ch.full_name, 'N/A') AS assigned_cashier
+                    COALESCE(ch.full_name, 'N/A') AS cashier
                 FROM counters c
                 LEFT JOIN cashiers ch ON c.counter_id = ch.counter_id
                 ORDER BY c.counter_name"
@@ -336,7 +342,7 @@ Public Class frmAdminDashboard
                             counterList.Add(New Counter With {
                                 .CounterID = Convert.ToInt32(reader("counter_id")),
                                 .CounterName = reader("counter_name").ToString(),
-                                .AssignedCashier = reader("assigned_cashier").ToString()
+                                .Cashier = reader("cashier").ToString()
                             })
                         End While
                     End Using
@@ -462,7 +468,7 @@ Public Class frmAdminDashboard
     Private Sub btnEditCounter_Click(sender As Object, e As EventArgs) Handles btnEditCounter.Click
         If dgvCounters.SelectedRows.Count > 0 Then
             Dim selectedCounter As Counter = CType(dgvCounters.SelectedRows(0).DataBoundItem, Counter)
-            Using frm As New frmAddEditCounter(selectedCounter.CounterID, selectedCounter.CounterName, selectedCounter.AssignedCashier)
+            Using frm As New frmAddEditCounter(selectedCounter.CounterID)
                 If frm.ShowDialog() = DialogResult.OK Then
                     FetchCounters()
                 End If
@@ -539,14 +545,16 @@ Public Class frmAdminDashboard
                     conn.Open()
                     Dim transaction As MySqlTransaction = conn.BeginTransaction()
                     Try
-                        Dim updateQuery As String = "UPDATE cashiers SET counter_id = NULL WHERE counter_id = @counterId"
-                        Using cmd As New MySqlCommand(updateQuery, conn, transaction)
+                        ' First, delete the cashier associated with the counter
+                        Dim deleteCashierQuery As String = "DELETE FROM cashiers WHERE counter_id = @counterId"
+                        Using cmd As New MySqlCommand(deleteCashierQuery, conn, transaction)
                             cmd.Parameters.AddWithValue("@counterId", selectedCounter.CounterID)
                             cmd.ExecuteNonQuery()
                         End Using
 
-                        Dim deleteQuery As String = "DELETE FROM counters WHERE counter_id = @counterId"
-                        Using cmd As New MySqlCommand(deleteQuery, conn, transaction)
+                        ' Then, delete the counter itself
+                        Dim deleteCounterQuery As String = "DELETE FROM counters WHERE counter_id = @counterId"
+                        Using cmd As New MySqlCommand(deleteCounterQuery, conn, transaction)
                             cmd.Parameters.AddWithValue("@counterId", selectedCounter.CounterID)
                             cmd.ExecuteNonQuery()
                         End Using
@@ -629,6 +637,81 @@ Public Class frmAdminDashboard
             End Try
         End Using
     End Sub
+
+    Private Sub dgvQueueLogs_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvQueueLogs.CellFormatting
+        If e.ColumnIndex = dgvQueueLogs.Columns("Status").Index AndAlso e.Value IsNot Nothing Then
+            Dim status As String = e.Value.ToString()
+            Select Case status
+                Case "completed"
+                    e.CellStyle.BackColor = Color.LimeGreen
+                    e.CellStyle.ForeColor = Color.White
+                Case "serving"
+                    e.CellStyle.BackColor = Color.Blue
+                    e.CellStyle.ForeColor = Color.White
+                Case "waiting"
+                    e.CellStyle.BackColor = Color.Orange
+                    e.CellStyle.ForeColor = Color.White
+                Case "cancelled"
+                    e.CellStyle.BackColor = Color.Red
+                    e.CellStyle.ForeColor = Color.White
+                Case "no-show"
+                    e.CellStyle.BackColor = Color.Gray
+                    e.CellStyle.ForeColor = Color.White
+                Case "scheduled"
+                    e.CellStyle.BackColor = Color.Purple
+                    e.CellStyle.ForeColor = Color.White
+                Case "expired"
+                    e.CellStyle.BackColor = Color.DarkGray
+                    e.CellStyle.ForeColor = Color.White
+            End Select
+        End If
+    End Sub
+
+    Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvAllQueues.CellFormatting
+        If e.ColumnIndex = dgvAllQueues.Columns("Status").Index AndAlso e.Value IsNot Nothing Then
+            Dim status As String = e.Value.ToString()
+            Select Case status
+                Case "completed"
+                    e.CellStyle.BackColor = Color.Green
+                    e.CellStyle.ForeColor = Color.White
+                Case "serving"
+                    e.CellStyle.BackColor = Color.Blue
+                    e.CellStyle.ForeColor = Color.White
+                Case "waiting"
+                    e.CellStyle.BackColor = Color.Orange
+                    e.CellStyle.ForeColor = Color.White
+                Case "cancelled"
+                    e.CellStyle.BackColor = Color.Red
+                    e.CellStyle.ForeColor = Color.White
+                Case "no-show"
+                    e.CellStyle.BackColor = Color.Gray
+                    e.CellStyle.ForeColor = Color.White
+                Case "scheduled"
+                    e.CellStyle.BackColor = Color.Purple
+                    e.CellStyle.ForeColor = Color.White
+                Case "expired"
+                    e.CellStyle.BackColor = Color.DarkGray
+                    e.CellStyle.ForeColor = Color.White
+            End Select
+        End If
+    End Sub
+
+    Private Sub dgvCashierStatus_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvCashierStatus.CellFormatting
+        If e.ColumnIndex = dgvCashierStatus.Columns("Status").Index AndAlso e.Value IsNot Nothing Then
+            Dim status As String = e.Value.ToString()
+            Select Case status
+                Case "Open"
+                    e.CellStyle.BackColor = Color.Green
+                    e.CellStyle.ForeColor = Color.White
+                Case "Offline"
+                    e.CellStyle.BackColor = Color.Gray
+                    e.CellStyle.ForeColor = Color.White
+                Case Else
+                    e.CellStyle.BackColor = Color.Orange
+                    e.CellStyle.ForeColor = Color.White
+            End Select
+        End If
+    End Sub
 End Class
 
 Public Class CashierStatusItem
@@ -667,5 +750,5 @@ End Class
 Public Class Counter
     Public Property CounterID As Integer
     Public Property CounterName As String
-    Public Property AssignedCashier As String
+    Public Property Cashier As String
 End Class

@@ -2,6 +2,7 @@
 Partial Class frmAddEditCounter
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,15 +14,24 @@ Partial Class frmAddEditCounter
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         lblTitle = New Label()
         lblCounterName = New Label()
         txtCounterName = New TextBox()
-        lblCashier = New Label()
-        cboCashier = New ComboBox()
+        lblCashierFullName = New Label()
+        txtCashierFullName = New TextBox()
+        lblUsername = New Label()
+        txtUsername = New TextBox()
+        lblPassword = New Label()
+        txtPassword = New TextBox()
+        chkShowPassword = New CheckBox()
         btnSave = New Button()
         btnCancel = New Button()
         SuspendLayout()
@@ -54,25 +64,71 @@ Partial Class frmAddEditCounter
         txtCounterName.Size = New Size(354, 27)
         txtCounterName.TabIndex = 2
         ' 
-        ' lblCashier
+        ' lblCashierFullName
         ' 
-        lblCashier.AutoSize = True
-        lblCashier.Font = New Font("Poppins", 9.75F)
-        lblCashier.Location = New Point(29, 153)
-        lblCashier.Name = "lblCashier"
-        lblCashier.Size = New Size(119, 23)
-        lblCashier.TabIndex = 3
-        lblCashier.Text = "Assign a Cashier"
+        lblCashierFullName.AutoSize = True
+        lblCashierFullName.Font = New Font("Poppins", 9.75F)
+        lblCashierFullName.Location = New Point(29, 153)
+        lblCashierFullName.Name = "lblCashierFullName"
+        lblCashierFullName.Size = New Size(125, 23)
+        lblCashierFullName.TabIndex = 3
+        lblCashierFullName.Text = "Cashier Full Name"
         ' 
-        ' cboCashier
+        ' txtCashierFullName
         ' 
-        cboCashier.DropDownStyle = ComboBoxStyle.DropDownList
-        cboCashier.Font = New Font("Poppins", 9.75F)
-        cboCashier.FormattingEnabled = True
-        cboCashier.Location = New Point(31, 179)
-        cboCashier.Name = "cboCashier"
-        cboCashier.Size = New Size(354, 31)
-        cboCashier.TabIndex = 4
+        txtCashierFullName.Font = New Font("Poppins", 9.75F)
+        txtCashierFullName.Location = New Point(31, 179)
+        txtCashierFullName.Name = "txtCashierFullName"
+        txtCashierFullName.Size = New Size(354, 27)
+        txtCashierFullName.TabIndex = 4
+        ' 
+        ' lblUsername
+        ' 
+        lblUsername.AutoSize = True
+        lblUsername.Font = New Font("Poppins", 9.75F)
+        lblUsername.Location = New Point(29, 226)
+        lblUsername.Name = "lblUsername"
+        lblUsername.Size = New Size(77, 23)
+        lblUsername.TabIndex = 5
+        lblUsername.Text = "Username"
+        ' 
+        ' txtUsername
+        ' 
+        txtUsername.Font = New Font("Poppins", 9.75F)
+        txtUsername.Location = New Point(31, 252)
+        txtUsername.Name = "txtUsername"
+        txtUsername.Size = New Size(354, 27)
+        txtUsername.TabIndex = 6
+        ' 
+        ' lblPassword
+        ' 
+        lblPassword.AutoSize = True
+        lblPassword.Font = New Font("Poppins", 9.75F)
+        lblPassword.Location = New Point(29, 299)
+        lblPassword.Name = "lblPassword"
+        lblPassword.Size = New Size(74, 23)
+        lblPassword.TabIndex = 7
+        lblPassword.Text = "Password"
+        ' 
+        ' txtPassword
+        ' 
+        txtPassword.Font = New Font("Poppins", 9.75F)
+        txtPassword.Location = New Point(31, 325)
+        txtPassword.Name = "txtPassword"
+        txtPassword.Size = New Size(354, 27)
+        txtPassword.TabIndex = 8
+        txtPassword.UseSystemPasswordChar = True
+        ' 
+        ' chkShowPassword
+        ' 
+        chkShowPassword.AutoSize = True
+        chkShowPassword.Font = New Font("Poppins", 8.25F)
+        chkShowPassword.Location = New Point(270, 358)
+        chkShowPassword.Name = "chkShowPassword"
+        chkShowPassword.Size = New Size(115, 23)
+        chkShowPassword.TabIndex = 9
+        chkShowPassword.Text = "Show Password"
+        chkShowPassword.UseVisualStyleBackColor = True
         ' 
         ' btnSave
         ' 
@@ -81,10 +137,10 @@ Partial Class frmAddEditCounter
         btnSave.FlatStyle = FlatStyle.Flat
         btnSave.Font = New Font("Poppins", 9.75F, FontStyle.Bold)
         btnSave.ForeColor = Color.White
-        btnSave.Location = New Point(265, 240)
+        btnSave.Location = New Point(265, 400)
         btnSave.Name = "btnSave"
         btnSave.Size = New Size(120, 36)
-        btnSave.TabIndex = 5
+        btnSave.TabIndex = 10
         btnSave.Text = "Save"
         btnSave.UseVisualStyleBackColor = False
         ' 
@@ -95,10 +151,10 @@ Partial Class frmAddEditCounter
         btnCancel.FlatStyle = FlatStyle.Flat
         btnCancel.Font = New Font("Poppins", 9.75F, FontStyle.Bold)
         btnCancel.ForeColor = Color.White
-        btnCancel.Location = New Point(139, 240)
+        btnCancel.Location = New Point(139, 400)
         btnCancel.Name = "btnCancel"
         btnCancel.Size = New Size(120, 36)
-        btnCancel.TabIndex = 6
+        btnCancel.TabIndex = 11
         btnCancel.Text = "Cancel"
         btnCancel.UseVisualStyleBackColor = False
         ' 
@@ -107,11 +163,16 @@ Partial Class frmAddEditCounter
         AutoScaleDimensions = New SizeF(7.0F, 15.0F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.White
-        ClientSize = New Size(417, 301)
+        ClientSize = New Size(417, 461)
         Controls.Add(btnCancel)
         Controls.Add(btnSave)
-        Controls.Add(cboCashier)
-        Controls.Add(lblCashier)
+        Controls.Add(chkShowPassword)
+        Controls.Add(txtPassword)
+        Controls.Add(lblPassword)
+        Controls.Add(txtUsername)
+        Controls.Add(lblUsername)
+        Controls.Add(txtCashierFullName)
+        Controls.Add(lblCashierFullName)
         Controls.Add(txtCounterName)
         Controls.Add(lblCounterName)
         Controls.Add(lblTitle)
@@ -128,8 +189,13 @@ Partial Class frmAddEditCounter
     Friend WithEvents lblTitle As Label
     Friend WithEvents lblCounterName As Label
     Friend WithEvents txtCounterName As TextBox
-    Friend WithEvents lblCashier As Label
-    Friend WithEvents cboCashier As ComboBox
+    Friend WithEvents lblCashierFullName As Label
+    Friend WithEvents txtCashierFullName As TextBox
+    Friend WithEvents lblUsername As Label
+    Friend WithEvents txtUsername As TextBox
+    Friend WithEvents lblPassword As Label
+    Friend WithEvents txtPassword As TextBox
+    Friend WithEvents chkShowPassword As CheckBox
     Friend WithEvents btnSave As Button
     Friend WithEvents btnCancel As Button
 End Class
