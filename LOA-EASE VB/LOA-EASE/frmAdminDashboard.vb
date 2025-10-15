@@ -7,15 +7,32 @@ Public Class frmAdminDashboard
     Private _activeButton As Button
     Private queueLogsTable As DataTable
     Private _lastQueueLogTimestamp As DateTime
+    Private lblNoResultsFound As Label
 
     Public Sub New(adminFullName As String)
         InitializeComponent()
         _adminFullName = adminFullName
+        Me.WindowState = FormWindowState.Maximized
+
     End Sub
 
 
     Private Sub frmAdminDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.WindowState = FormWindowState.Maximized
+
         lblWelcome.Text = $"Welcome, {_adminFullName}"
+        lblNoResultsFound = New Label()
+        lblNoResultsFound.AutoSize = True
+        lblNoResultsFound.Font = New Font("Poppins", 9.0F, FontStyle.Bold)
+        lblNoResultsFound.ForeColor = Color.Red
+        lblNoResultsFound.Location = New Point(350, 19)
+        lblNoResultsFound.Name = "lblNoResultsFound"
+        lblNoResultsFound.Size = New Size(150, 22)
+        lblNoResultsFound.Text = "No results found"
+        lblNoResultsFound.Visible = False
+        pnlUserControls.Controls.Add(lblNoResultsFound)
+
+        ' Continue with the rest of your initialization code
         SetupDataGridViews()
         RefreshAllData()
 
@@ -29,7 +46,6 @@ Public Class frmAdminDashboard
         cboSortQueueLogs.Items.Add("Full Name")
         cboSortQueueLogs.Items.Add("Status")
         cboSortQueueLogs.SelectedIndex = 0
-
 
         ShowPanel(pnlDashboard, btnDashboard)
 
@@ -65,7 +81,6 @@ Public Class frmAdminDashboard
                     End If
                 End Using
             Catch ex As Exception
-                ' Silent fail to avoid timer spam
             End Try
         End Using
     End Sub
@@ -178,6 +193,12 @@ Public Class frmAdminDashboard
             .DataPropertyName = "LastQueueDateTime"
         })
 
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
+        .Name = "Course",
+        .HeaderText = "Course",
+        .DataPropertyName = "Course"
+    })
+
 
         dgvUsersWithoutAccount.AutoGenerateColumns = False
         dgvUsersWithoutAccount.Columns.Clear()
@@ -191,6 +212,17 @@ Public Class frmAdminDashboard
             .HeaderText = "Student No.",
             .DataPropertyName = "StudentNo"
         })
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
+        .Name = "Course",
+        .HeaderText = "Course",
+        .DataPropertyName = "Course"
+    })
+
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
+        .Name = "LastQueueDateTime",
+        .HeaderText = "Last Queue",
+        .DataPropertyName = "LastQueueDateTime"
+    })
 
 
         dgvCounters.AutoGenerateColumns = False
@@ -205,6 +237,7 @@ Public Class frmAdminDashboard
             .HeaderText = "Cashier",
             .DataPropertyName = "Cashier"
         })
+
     End Sub
 
     Private Sub RefreshAllData()
@@ -320,12 +353,88 @@ Public Class frmAdminDashboard
         End Using
     End Sub
 
-    ' === Live search support ===
     Private Sub txtSearchQueueLogs_TextChanged(sender As Object, e As EventArgs) Handles txtSearchQueueLogs.TextChanged
         If queueLogsTable Is Nothing Then Return
         Dim filterText As String = txtSearchQueueLogs.Text.Replace("'", "''")
         Dim view As DataView = queueLogsTable.DefaultView
         view.RowFilter = $"[Queue Number] LIKE '%{filterText}%' OR [Full Name] LIKE '%{filterText}%' OR [Status] LIKE '%{filterText}%'"
+    End Sub
+
+    Private Sub txtSearchUsers_TextChanged(sender As Object, e As EventArgs) Handles txtSearchUsers.TextChanged
+        Dim searchText As String = txtSearchUsers.Text.Trim().ToLower()
+
+        ' Always hide the "no results" label when the search text changes
+        lblNoResultsFound.Visible = False
+
+        ' If search box is empty, restore the original data
+        If String.IsNullOrEmpty(searchText) Then
+            If tabUserManagement.SelectedTab Is tpWithAccount AndAlso dgvUsersWithAccount.Tag IsNot Nothing Then
+                dgvUsersWithAccount.DataSource = dgvUsersWithAccount.Tag
+                dgvUsersWithAccount.Tag = Nothing
+            ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount AndAlso dgvUsersWithoutAccount.Tag IsNot Nothing Then
+                dgvUsersWithoutAccount.DataSource = dgvUsersWithoutAccount.Tag
+                dgvUsersWithoutAccount.Tag = Nothing
+            End If
+            Return
+        End If
+
+        ' Check which tab is currently active
+        If tabUserManagement.SelectedTab Is tpWithAccount Then
+            ' Filter the users with account
+            Dim source As BindingList(Of User) = TryCast(dgvUsersWithAccount.DataSource, BindingList(Of User))
+            If source IsNot Nothing Then
+                Dim filteredList As New BindingList(Of User)
+
+                ' Clear and repopulate the filtered list
+                For Each user As User In source
+                    If user.FullName.ToLower().Contains(searchText) OrElse
+                   user.Username.ToLower().Contains(searchText) OrElse
+                   user.StudentNo.ToLower().Contains(searchText) OrElse
+                   (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
+                   user.Role.ToLower().Contains(searchText) Then
+                        filteredList.Add(user)
+                    End If
+                Next
+
+                ' Store the original source if this is the first search
+                If dgvUsersWithAccount.Tag Is Nothing Then
+                    dgvUsersWithAccount.Tag = source
+                End If
+
+                ' Update the DataGridView with filtered results
+                dgvUsersWithAccount.DataSource = filteredList
+
+                ' Show label if no results found
+                lblNoResultsFound.Visible = (filteredList.Count = 0)
+            End If
+        ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount Then
+            ' Filter the users without account
+            Dim source As BindingList(Of User) = TryCast(dgvUsersWithoutAccount.DataSource, BindingList(Of User))
+            If source IsNot Nothing Then
+                Dim filteredList As New BindingList(Of User)
+
+                ' Clear and repopulate the filtered list
+                For Each user As User In source
+                    If user.FullName.ToLower().Contains(searchText) OrElse
+                   user.StudentNo.ToLower().Contains(searchText) OrElse
+                   (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
+                   user.LastQueueDateTime.ToLower().Contains(searchText) Then
+                        filteredList.Add(user)
+                    End If
+                Next
+
+                ' Store the original source if this is the first search
+                If dgvUsersWithoutAccount.Tag Is Nothing Then
+                    dgvUsersWithoutAccount.Tag = source
+                End If
+
+                ' Update the DataGridView with filtered results
+                dgvUsersWithoutAccount.DataSource = filteredList
+
+                ' Show label if no results found
+                lblNoResultsFound.Visible = (filteredList.Count = 0)
+            End If
+        End If
     End Sub
 
     Private Sub cboSortQueueLogs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSortQueueLogs.SelectedIndexChanged
@@ -340,7 +449,6 @@ Public Class frmAdminDashboard
             Case "Status"
                 sortColumn = "[Status]"
             Case Else
-                ' Default sort
                 queueLogsTable.DefaultView.Sort = ""
                 Return
         End Select
@@ -355,36 +463,38 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-                SELECT
-                    s.student_id,
-                    s.student_number,
-                    CONCAT(s.first_name, ' ', s.last_name) AS full_name,
-                    u.user_id,
-                    u.username,
-                    u.last_login,
-                    u.created_at AS user_created_at,
-                    q.last_queue_time
-                FROM
-                    students s
-                LEFT JOIN
-                    users u ON s.student_id = u.student_id
-                LEFT JOIN
-                    (SELECT student_id, MAX(created_at) AS last_queue_time FROM queues GROUP BY student_id) q ON s.student_id = q.student_id"
+            SELECT
+                s.student_id,
+                s.student_number,
+                CONCAT(s.first_name, ' ', s.last_name) AS full_name,
+                s.course,
+                u.user_id,
+                u.username,
+                u.last_login,
+                u.created_at AS user_created_at,
+                q.last_queue_time
+            FROM
+                students s
+            LEFT JOIN
+                users u ON s.student_id = u.student_id
+            LEFT JOIN
+                (SELECT student_id, MAX(created_at) AS last_queue_time FROM queues GROUP BY student_id) q ON s.student_id = q.student_id"
 
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
                             Dim user As New User With {
-                                .StudentID = Convert.ToInt32(reader("student_id")),
-                                .UserID = If(reader.IsDBNull(reader.GetOrdinal("user_id")), 0, Convert.ToInt32(reader("user_id"))),
-                                .FullName = reader("full_name").ToString(),
-                                .Username = If(reader.IsDBNull(reader.GetOrdinal("username")), "N/A", reader("username").ToString()),
-                                .StudentNo = reader("student_number").ToString(),
-                                .Role = If(reader.IsDBNull(reader.GetOrdinal("user_id")), "No Account", "Student"),
-                                .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
-                                .LastSession = If(reader.IsDBNull(reader.GetOrdinal("user_created_at")), "N/A", Convert.ToDateTime(reader("user_created_at")).ToString("g")),
-                                .LastQueueDateTime = If(reader.IsDBNull(reader.GetOrdinal("last_queue_time")), "N/A", Convert.ToDateTime(reader("last_queue_time")).ToString("g"))
-                            }
+                            .StudentID = Convert.ToInt32(reader("student_id")),
+                            .UserID = If(reader.IsDBNull(reader.GetOrdinal("user_id")), 0, Convert.ToInt32(reader("user_id"))),
+                            .FullName = reader("full_name").ToString(),
+                            .Username = If(reader.IsDBNull(reader.GetOrdinal("username")), "N/A", reader("username").ToString()),
+                            .StudentNo = reader("student_number").ToString(),
+                            .Course = If(reader.IsDBNull(reader.GetOrdinal("course")), "N/A", reader("course").ToString()),
+                            .Role = If(reader.IsDBNull(reader.GetOrdinal("user_id")), "No Account", "Student"),
+                            .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
+                            .LastSession = If(reader.IsDBNull(reader.GetOrdinal("user_created_at")), "N/A", Convert.ToDateTime(reader("user_created_at")).ToString("g")),
+                            .LastQueueDateTime = If(reader.IsDBNull(reader.GetOrdinal("last_queue_time")), "N/A", Convert.ToDateTime(reader("last_queue_time")).ToString("g"))
+                        }
                             If user.Role = "No Account" Then
                                 usersWithoutAccount.Add(user)
                             Else
@@ -822,19 +932,24 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub tabUserManagement_SelectedIndexChanged(sender As Object, e As EventArgs)
+        lblNoResultsFound.Visible = False
+
         If tabUserManagement.SelectedTab Is tpWithAccount Then
-            ' Show Edit and Delete, hide Add
             btnAddUser.Visible = False
             btnEditUser.Visible = True
             btnDeleteUser.Visible = True
         ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount Then
-            ' Show Add, hide Edit and Delete
             btnAddUser.Visible = True
             btnEditUser.Visible = False
             btnDeleteUser.Visible = False
         End If
+        If Not String.IsNullOrEmpty(txtSearchUsers.Text) Then
+            txtSearchUsers_TextChanged(txtSearchUsers, EventArgs.Empty)
+        End If
     End Sub
+
 End Class
+
 
 Public Class CashierStatusItem
     Public Property CashierName As String
@@ -868,6 +983,7 @@ Public Class User
     Public Property LastLogin As String
     Public Property LastSession As String
     Public Property LastQueueDateTime As String
+    Public Property Course As String
 End Class
 
 Public Class Counter

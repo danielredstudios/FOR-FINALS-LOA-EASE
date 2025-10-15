@@ -909,6 +909,7 @@ Partial Class frmAdminDashboard
         pnlUserControls.Padding = New Padding(0, 10, 0, 10)
         pnlUserControls.Size = New Size(1010, 60)
         pnlUserControls.TabIndex = 8
+
         ' 
         ' btnDeleteUser
         ' 
