@@ -5,11 +5,14 @@ Imports System.Data
 Public Class frmAdminDashboard
     Private ReadOnly _adminFullName As String
     Private _activeButton As Button
+    Private queueLogsTable As DataTable
+    Private _lastQueueLogTimestamp As DateTime
 
     Public Sub New(adminFullName As String)
         InitializeComponent()
         _adminFullName = adminFullName
     End Sub
+
 
     Private Sub frmAdminDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         lblWelcome.Text = $"Welcome, {_adminFullName}"
@@ -20,7 +23,18 @@ Public Class frmAdminDashboard
         AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
         tmrRefresh.Start()
 
+        ' Populate Sort ComboBox
+        cboSortQueueLogs.Items.Add("Default")
+        cboSortQueueLogs.Items.Add("Queue Number")
+        cboSortQueueLogs.Items.Add("Full Name")
+        cboSortQueueLogs.Items.Add("Status")
+        cboSortQueueLogs.SelectedIndex = 0
+
+
         ShowPanel(pnlDashboard, btnDashboard)
+
+        ' Add event handler for tab selection
+        AddHandler tabUserManagement.SelectedIndexChanged, AddressOf tabUserManagement_SelectedIndexChanged
     End Sub
 
     Private Sub tmrRefresh_Tick(sender As Object, e As EventArgs)
@@ -31,8 +45,29 @@ Public Class frmAdminDashboard
         ElseIf pnlCounterManagement.Visible Then
             FetchCounters()
         ElseIf pnlQueueLogs.Visible Then
-            FetchAllQueueLogs()
+            CheckForQueueLogUpdates()
         End If
+    End Sub
+
+    Private Sub CheckForQueueLogUpdates()
+        Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+            Try
+                conn.Open()
+                Dim query As String = "SELECT MAX(created_at) FROM queues"
+                Using cmd As New MySqlCommand(query, conn)
+                    Dim result As Object = cmd.ExecuteScalar()
+                    If result IsNot DBNull.Value Then
+                        Dim latest As DateTime = Convert.ToDateTime(result)
+                        If latest > _lastQueueLogTimestamp Then
+                            _lastQueueLogTimestamp = latest
+                            FetchAllQueueLogs()
+                        End If
+                    End If
+                End Using
+            Catch ex As Exception
+                ' Silent fail to avoid timer spam
+            End Try
+        End Using
     End Sub
 
     Private Sub SetupDataGridViews()
@@ -87,12 +122,12 @@ Public Class frmAdminDashboard
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "QueueNumber",
             .HeaderText = "Queue No.",
-            .DataPropertyName = "QueueNumber"
+            .DataPropertyName = "Queue Number"
         })
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "FullName",
             .HeaderText = "Full Name",
-            .DataPropertyName = "FullName"
+            .DataPropertyName = "Full Name"
         })
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Status",
@@ -102,46 +137,61 @@ Public Class frmAdminDashboard
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "CreatedAt",
             .HeaderText = "Date Created",
-            .DataPropertyName = "CreatedAt"
+            .DataPropertyName = "Date Created"
         })
 
-        dgvUsers.AutoGenerateColumns = False
-        dgvUsers.Columns.Clear()
-        dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
+        dgvUsersWithAccount.AutoGenerateColumns = False
+        dgvUsersWithAccount.Columns.Clear()
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "FullName",
             .HeaderText = "Full Name",
             .DataPropertyName = "FullName"
         })
-        dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Username",
             .HeaderText = "Username",
             .DataPropertyName = "Username"
         })
-        dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "StudentNo",
             .HeaderText = "Student No.",
             .DataPropertyName = "StudentNo"
         })
-        dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "Role",
             .HeaderText = "Role",
             .DataPropertyName = "Role"
         })
-        dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "LastLogin",
             .HeaderText = "Last Login",
             .DataPropertyName = "LastLogin"
         })
-        dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "LastSession",
             .HeaderText = "Last Session",
             .DataPropertyName = "LastSession"
         })
-        dgvUsers.Columns.Add(New DataGridViewTextBoxColumn With {
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "LastQueueDateTime",
             .HeaderText = "Last Queue",
             .DataPropertyName = "LastQueueDateTime"
         })
+
+
+        dgvUsersWithoutAccount.AutoGenerateColumns = False
+        dgvUsersWithoutAccount.Columns.Clear()
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "FullName",
+            .HeaderText = "Full Name",
+            .DataPropertyName = "FullName"
+        })
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "StudentNo",
+            .HeaderText = "Student No.",
+            .DataPropertyName = "StudentNo"
+        })
+
 
         dgvCounters.AutoGenerateColumns = False
         dgvCounters.Columns.Clear()
@@ -178,7 +228,7 @@ Public Class frmAdminDashboard
                     .CashierName = row("full_name").ToString(),
                     .Status = statusText,
                     .Counter = row("counter_name").ToString()
-                 })
+                })
             Next
             dgvCashierStatus.DataSource = cashierStatusList
             lblActiveCashiers.Text = $"(Active: {activeCashiers})"
@@ -193,18 +243,18 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-                    SELECT
-                    q.queue_number,
-                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
-                    s.student_number AS StudentNo,
-                    c.counter_name,
-                    q.status
-                FROM queues q
-                LEFT JOIN students s ON q.student_id = s.student_id
-                LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
-                JOIN counters c ON q.counter_id = c.counter_id
-                WHERE DATE(q.created_at) = CURDATE()
-                ORDER BY q.created_at DESC"
+                        SELECT
+                            q.queue_number,
+                        COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
+                        s.student_number AS StudentNo,
+                        c.counter_name,
+                            q.status
+                    FROM queues q
+                    LEFT JOIN students s ON q.student_id = s.student_id
+                    LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
+                    JOIN counters c ON q.counter_id = c.counter_id
+                    WHERE DATE(q.created_at) = CURDATE()
+                    ORDER BY q.created_at DESC"
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
@@ -214,7 +264,7 @@ Public Class frmAdminDashboard
                                 .StudentNo = If(reader("StudentNo") IsNot DBNull.Value, reader("StudentNo").ToString(), "N/A"),
                                 .Counter = reader("counter_name").ToString(),
                                 .Status = reader("status").ToString()
-                             })
+                            })
                         End While
                     End Using
                 End Using
@@ -227,17 +277,17 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub FetchAllQueueLogs()
-        Dim queueLogList As New BindingList(Of QueueLogAdminItem)()
+        queueLogsTable = New DataTable()
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
                 Dim query As String = "
                 SELECT
                     q.queue_id,
-                    q.queue_number,
-                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
-                    q.status,
-                    q.created_at
+                    q.queue_number AS 'Queue Number',
+                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS 'Full Name',
+                    q.status AS 'Status',
+                    q.created_at AS 'Date Created'
                 FROM queues q
                 LEFT JOIN students s ON q.student_id = s.student_id
                 LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
@@ -248,74 +298,104 @@ Public Class frmAdminDashboard
                         ELSE 3
                     END,
                     q.created_at DESC"
-
-                Using cmd As New MySqlCommand(query, conn)
-                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                        While reader.Read()
-                            queueLogList.Add(New QueueLogAdminItem With {
-                                .QueueID = Convert.ToInt32(reader("queue_id")),
-                                .QueueNumber = reader("queue_number").ToString(),
-                                .FullName = reader("FullName").ToString(),
-                                .Status = reader("status").ToString(),
-                                .CreatedAt = Convert.ToDateTime(reader("created_at")).ToString("g")
-                            })
-                        End While
-                    End Using
+                Using adapter As New MySqlDataAdapter(query, conn)
+                    adapter.Fill(queueLogsTable)
                 End Using
-                dgvQueueLogs.DataSource = queueLogList
-                lblQueueLogsTotal.Text = $"(Total: {queueLogList.Count})"
+
+                dgvQueueLogs.DataSource = queueLogsTable
+                dgvQueueLogs.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                dgvQueueLogs.AllowUserToOrderColumns = True
+                dgvQueueLogs.ReadOnly = True
+                dgvQueueLogs.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+
+                lblQueueLogsTotal.Text = $"(Total: {queueLogsTable.Rows.Count})"
+
+                If queueLogsTable.Rows.Count > 0 Then
+                    _lastQueueLogTimestamp = Convert.ToDateTime(queueLogsTable.Rows(0)("Date Created"))
+                End If
+
             Catch ex As Exception
                 HandleDbError("fetching queue logs", ex)
             End Try
         End Using
     End Sub
 
+    ' === Live search support ===
+    Private Sub txtSearchQueueLogs_TextChanged(sender As Object, e As EventArgs) Handles txtSearchQueueLogs.TextChanged
+        If queueLogsTable Is Nothing Then Return
+        Dim filterText As String = txtSearchQueueLogs.Text.Replace("'", "''")
+        Dim view As DataView = queueLogsTable.DefaultView
+        view.RowFilter = $"[Queue Number] LIKE '%{filterText}%' OR [Full Name] LIKE '%{filterText}%' OR [Status] LIKE '%{filterText}%'"
+    End Sub
+
+    Private Sub cboSortQueueLogs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSortQueueLogs.SelectedIndexChanged
+        If queueLogsTable Is Nothing Then Return
+
+        Dim sortColumn As String = ""
+        Select Case cboSortQueueLogs.SelectedItem.ToString()
+            Case "Queue Number"
+                sortColumn = "[Queue Number]"
+            Case "Full Name"
+                sortColumn = "[Full Name]"
+            Case "Status"
+                sortColumn = "[Status]"
+            Case Else
+                ' Default sort
+                queueLogsTable.DefaultView.Sort = ""
+                Return
+        End Select
+        queueLogsTable.DefaultView.Sort = $"{sortColumn} ASC"
+    End Sub
+
+
     Private Sub FetchUsers()
-        Dim userList As New BindingList(Of User)()
+        Dim usersWithAccount As New BindingList(Of User)()
+        Dim usersWithoutAccount As New BindingList(Of User)()
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
                 Dim query As String = "
                 SELECT
+                    s.student_id,
+                    s.student_number,
+                    CONCAT(s.first_name, ' ', s.last_name) AS full_name,
                     u.user_id,
                     u.username,
                     u.last_login,
-                    u.created_at,
-                    s.student_number,
-                    CASE
-                        WHEN u.student_id IS NOT NULL THEN 'Student'
-                        WHEN u.guardian_id IS NOT NULL THEN 'Guardian'
-                        ELSE 'Other'
-                    END AS role,
-                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), g.full_name, 'N/A') AS full_name,
+                    u.created_at AS user_created_at,
                     q.last_queue_time
                 FROM
-                    users u
+                    students s
                 LEFT JOIN
-                    students s ON u.student_id = s.student_id
+                    users u ON s.student_id = u.student_id
                 LEFT JOIN
-                    guardians g ON u.guardian_id = g.guardian_id
-                LEFT JOIN
-                    (SELECT student_id, MAX(created_at) AS last_queue_time FROM queues GROUP BY student_id) q ON u.student_id = q.student_id"
+                    (SELECT student_id, MAX(created_at) AS last_queue_time FROM queues GROUP BY student_id) q ON s.student_id = q.student_id"
 
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
-                            userList.Add(New User With {
-                                .UserID = Convert.ToInt32(reader("user_id")),
+                            Dim user As New User With {
+                                .StudentID = Convert.ToInt32(reader("student_id")),
+                                .UserID = If(reader.IsDBNull(reader.GetOrdinal("user_id")), 0, Convert.ToInt32(reader("user_id"))),
                                 .FullName = reader("full_name").ToString(),
-                                .Username = reader("username").ToString(),
-                                .StudentNo = If(reader.IsDBNull(reader.GetOrdinal("student_number")), "N/A", reader("student_number").ToString()),
-                                .Role = reader("role").ToString(),
-                                .LastLogin = If(reader("last_login") IsNot DBNull.Value, Convert.ToDateTime(reader("last_login")).ToString("g"), "N/A"),
-                                .LastSession = If(reader("created_at") IsNot DBNull.Value, Convert.ToDateTime(reader("created_at")).ToString("g"), "N/A"),
-                                .LastQueueDateTime = If(reader("last_queue_time") IsNot DBNull.Value, Convert.ToDateTime(reader("last_queue_time")).ToString("g"), "N/A")
-                            })
+                                .Username = If(reader.IsDBNull(reader.GetOrdinal("username")), "N/A", reader("username").ToString()),
+                                .StudentNo = reader("student_number").ToString(),
+                                .Role = If(reader.IsDBNull(reader.GetOrdinal("user_id")), "No Account", "Student"),
+                                .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
+                                .LastSession = If(reader.IsDBNull(reader.GetOrdinal("user_created_at")), "N/A", Convert.ToDateTime(reader("user_created_at")).ToString("g")),
+                                .LastQueueDateTime = If(reader.IsDBNull(reader.GetOrdinal("last_queue_time")), "N/A", Convert.ToDateTime(reader("last_queue_time")).ToString("g"))
+                            }
+                            If user.Role = "No Account" Then
+                                usersWithoutAccount.Add(user)
+                            Else
+                                usersWithAccount.Add(user)
+                            End If
                         End While
                     End Using
                 End Using
-                dgvUsers.DataSource = userList
-                lblUsersTotal.Text = $"(Total: {userList.Count})"
+                dgvUsersWithAccount.DataSource = usersWithAccount
+                dgvUsersWithoutAccount.DataSource = usersWithoutAccount
+                lblUsersTotal.Text = $"(With Account: {usersWithAccount.Count}, Without Account: {usersWithoutAccount.Count})"
             Catch ex As Exception
                 HandleDbError("fetching users", ex)
             End Try
@@ -383,6 +463,7 @@ Public Class frmAdminDashboard
     Private Sub btnUserManagement_Click(sender As Object, e As EventArgs) Handles btnUserManagement.Click
         ShowPanel(pnlUserManagement, btnUserManagement)
         FetchUsers()
+        tabUserManagement_SelectedIndexChanged(Nothing, Nothing)
     End Sub
 
     Private Sub btnCounterManagement_Click(sender As Object, e As EventArgs) Handles btnCounterManagement.Click
@@ -406,30 +487,49 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub btnAddUser_Click(sender As Object, e As EventArgs) Handles btnAddUser.Click
-        Using frm As New frmAddEditUser()
-            If frm.ShowDialog() = DialogResult.OK Then
-                FetchUsers()
+        If dgvUsersWithoutAccount.SelectedRows.Count > 0 Then
+            Dim selectedUser As User = CType(dgvUsersWithoutAccount.SelectedRows(0).DataBoundItem, User)
+            If selectedUser.Role = "No Account" Then
+                Using frm As New frmAddEditUser(selectedUser.StudentID, selectedUser.FullName)
+                    If frm.ShowDialog() = DialogResult.OK Then
+                        FetchUsers()
+                    End If
+                End Using
+            Else
+                MessageBox.Show("This student already has an account.", "Account Exists", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
-        End Using
+        Else
+            MessageBox.Show("Please select a student from the 'Without Account' tab to create an account for.", "No Student Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End If
     End Sub
 
     Private Sub btnEditUser_Click(sender As Object, e As EventArgs) Handles btnEditUser.Click
-        If dgvUsers.SelectedRows.Count > 0 Then
-            Dim selectedUser As User = CType(dgvUsers.SelectedRows(0).DataBoundItem, User)
-            Using frm As New frmAddEditUser(selectedUser.UserID, selectedUser.FullName, selectedUser.Username, selectedUser.Role)
-                If frm.ShowDialog() = DialogResult.OK Then
-                    FetchUsers()
-                End If
-            End Using
+        If dgvUsersWithAccount.SelectedRows.Count > 0 Then
+            Dim selectedUser As User = CType(dgvUsersWithAccount.SelectedRows(0).DataBoundItem, User)
+            If selectedUser.Role <> "No Account" Then
+                Using frm As New frmAddEditUser(selectedUser.UserID, selectedUser.FullName, selectedUser.Username, selectedUser.Role)
+                    If frm.ShowDialog() = DialogResult.OK Then
+                        FetchUsers()
+                    End If
+                End Using
+            Else
+                MessageBox.Show("This student does not have an account to edit.", "No Account", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
         Else
-            MessageBox.Show("Please select a user to edit.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Please select a user from the 'With Account' tab to edit.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
 
     Private Sub btnDeleteUser_Click(sender As Object, e As EventArgs) Handles btnDeleteUser.Click
-        If dgvUsers.SelectedRows.Count > 0 Then
-            Dim selectedUser As User = CType(dgvUsers.SelectedRows(0).DataBoundItem, User)
-            If MessageBox.Show($"Are you sure you want to delete the user '{selectedUser.FullName}'?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+        If dgvUsersWithAccount.SelectedRows.Count > 0 Then
+            Dim selectedUser As User = CType(dgvUsersWithAccount.SelectedRows(0).DataBoundItem, User)
+
+            If selectedUser.Role = "No Account" Then
+                MessageBox.Show("This student does not have an account to delete.", "No Account", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            If MessageBox.Show($"Are you sure you want to delete the user account for '{selectedUser.FullName}'?{vbCrLf}This will not delete the student record.", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
                 Using conn As MySqlConnection = DatabaseHelper.GetConnection()
                     Try
                         conn.Open()
@@ -440,20 +540,20 @@ Public Class frmAdminDashboard
                             Dim result = cmd.ExecuteNonQuery()
 
                             If result > 0 Then
-                                MessageBox.Show("User deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                MessageBox.Show("User account deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
                                 FetchUsers()
                             Else
-                                MessageBox.Show("Could not find the user to delete. The list will be refreshed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                                MessageBox.Show("Could not find the user account to delete. The list will be refreshed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                                 FetchUsers()
                             End If
                         End Using
                     Catch ex As Exception
-                        MessageBox.Show($"Error deleting user: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        MessageBox.Show($"Error deleting user account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     End Try
                 End Using
             End If
         Else
-            MessageBox.Show("Please select a user to delete.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Please select a user from the 'With Account' tab to delete.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
 
@@ -480,58 +580,66 @@ Public Class frmAdminDashboard
 
     Private Sub btnChangeStatus_Click(sender As Object, e As EventArgs) Handles btnChangeStatus.Click
         If dgvQueueLogs.SelectedRows.Count > 0 Then
-            Dim selectedQueue As QueueLogAdminItem = CType(dgvQueueLogs.SelectedRows(0).DataBoundItem, QueueLogAdminItem)
+            ' The DataBoundItem is a DataRowView when the DataSource is a DataTable.
+            Dim selectedRow As DataRowView = TryCast(dgvQueueLogs.SelectedRows(0).DataBoundItem, DataRowView)
 
-            Using statusForm As New Form()
-                statusForm.Text = "Change Queue Status"
-                statusForm.StartPosition = FormStartPosition.CenterParent
-                statusForm.FormBorderStyle = FormBorderStyle.FixedDialog
-                statusForm.ClientSize = New Size(250, 150)
+            If selectedRow IsNot Nothing Then
+                Dim queueId As Integer = Convert.ToInt32(selectedRow("queue_id"))
+                Dim queueNumber As String = selectedRow("Queue Number").ToString()
+                Dim currentStatus As String = selectedRow("Status").ToString()
 
-                Dim lbl As New Label()
-                lbl.Text = $"Change status for {selectedQueue.QueueNumber}:"
-                lbl.Location = New Point(10, 10)
-                lbl.AutoSize = True
-                statusForm.Controls.Add(lbl)
 
-                Dim cboStatus As New ComboBox()
-                cboStatus.DropDownStyle = ComboBoxStyle.DropDownList
-                cboStatus.Items.AddRange(New String() {"waiting", "serving", "completed", "cancelled", "no-show", "scheduled", "expired"})
-                cboStatus.SelectedItem = selectedQueue.Status
-                cboStatus.Location = New Point(10, 40)
-                cboStatus.Width = 230
-                statusForm.Controls.Add(cboStatus)
+                Using statusForm As New Form()
+                    statusForm.Text = "Change Queue Status"
+                    statusForm.StartPosition = FormStartPosition.CenterParent
+                    statusForm.FormBorderStyle = FormBorderStyle.FixedDialog
+                    statusForm.ClientSize = New Size(250, 150)
 
-                Dim btnOk As New Button()
-                btnOk.Text = "OK"
-                btnOk.DialogResult = DialogResult.OK
-                btnOk.Location = New Point(80, 80)
-                statusForm.Controls.Add(btnOk)
+                    Dim lbl As New Label()
+                    lbl.Text = $"Change status for {queueNumber}:"
+                    lbl.Location = New Point(10, 10)
+                    lbl.AutoSize = True
+                    statusForm.Controls.Add(lbl)
 
-                Dim btnCancel As New Button()
-                btnCancel.Text = "Cancel"
-                btnCancel.DialogResult = DialogResult.Cancel
-                btnCancel.Location = New Point(160, 80)
-                statusForm.Controls.Add(btnCancel)
+                    Dim cboStatus As New ComboBox()
+                    cboStatus.DropDownStyle = ComboBoxStyle.DropDownList
+                    cboStatus.Items.AddRange(New String() {"waiting", "serving", "completed", "cancelled", "no-show", "scheduled", "expired"})
+                    cboStatus.SelectedItem = currentStatus
+                    cboStatus.Location = New Point(10, 40)
+                    cboStatus.Width = 230
+                    statusForm.Controls.Add(cboStatus)
 
-                If statusForm.ShowDialog() = DialogResult.OK Then
-                    Dim newStatus As String = cboStatus.SelectedItem.ToString()
-                    Using conn As MySqlConnection = DatabaseHelper.GetConnection()
-                        Try
-                            conn.Open()
-                            Dim query As String = "UPDATE queues SET status = @status WHERE queue_id = @queueId"
-                            Using cmd As New MySqlCommand(query, conn)
-                                cmd.Parameters.AddWithValue("@status", newStatus)
-                                cmd.Parameters.AddWithValue("@queueId", selectedQueue.QueueID)
-                                cmd.ExecuteNonQuery()
-                            End Using
-                            FetchAllQueueLogs()
-                        Catch ex As Exception
-                            MessageBox.Show($"Error updating status: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                        End Try
-                    End Using
-                End If
-            End Using
+                    Dim btnOk As New Button()
+                    btnOk.Text = "OK"
+                    btnOk.DialogResult = DialogResult.OK
+                    btnOk.Location = New Point(80, 80)
+                    statusForm.Controls.Add(btnOk)
+
+                    Dim btnCancel As New Button()
+                    btnCancel.Text = "Cancel"
+                    btnCancel.DialogResult = DialogResult.Cancel
+                    btnCancel.Location = New Point(160, 80)
+                    statusForm.Controls.Add(btnCancel)
+
+                    If statusForm.ShowDialog() = DialogResult.OK Then
+                        Dim newStatus As String = cboStatus.SelectedItem.ToString()
+                        Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                            Try
+                                conn.Open()
+                                Dim query As String = "UPDATE queues SET status = @status WHERE queue_id = @queueId"
+                                Using cmd As New MySqlCommand(query, conn)
+                                    cmd.Parameters.AddWithValue("@status", newStatus)
+                                    cmd.Parameters.AddWithValue("@queueId", queueId)
+                                    cmd.ExecuteNonQuery()
+                                End Using
+                                FetchAllQueueLogs()
+                            Catch ex As Exception
+                                MessageBox.Show($"Error updating status: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                            End Try
+                        End Using
+                    End If
+                End Using
+            End If
         Else
             MessageBox.Show("Please select a queue entry to change its status.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
@@ -590,16 +698,16 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-            SELECT
-                q.queue_id,
-                q.queue_number,
-                COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
-                q.status,
-                q.created_at
-            FROM queues q
-            LEFT JOIN students s ON q.student_id = s.student_id
-            LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
-            WHERE "
+                SELECT
+                    q.queue_id,
+                    q.queue_number,
+                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
+                    q.status,
+                    q.created_at
+                FROM queues q
+                LEFT JOIN students s ON q.student_id = s.student_id
+                LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
+                WHERE "
 
                 Select Case reportType
                     Case "Daily"
@@ -712,6 +820,20 @@ Public Class frmAdminDashboard
             End Select
         End If
     End Sub
+
+    Private Sub tabUserManagement_SelectedIndexChanged(sender As Object, e As EventArgs)
+        If tabUserManagement.SelectedTab Is tpWithAccount Then
+            ' Show Edit and Delete, hide Add
+            btnAddUser.Visible = False
+            btnEditUser.Visible = True
+            btnDeleteUser.Visible = True
+        ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount Then
+            ' Show Add, hide Edit and Delete
+            btnAddUser.Visible = True
+            btnEditUser.Visible = False
+            btnDeleteUser.Visible = False
+        End If
+    End Sub
 End Class
 
 Public Class CashierStatusItem
@@ -738,6 +860,7 @@ End Class
 
 Public Class User
     Public Property UserID As Integer
+    Public Property StudentID As Integer
     Public Property FullName As String
     Public Property Username As String
     Public Property StudentNo As String

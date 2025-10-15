@@ -3,6 +3,7 @@
 Public Class frmAddEditUser
     Private ReadOnly _isEditMode As Boolean
     Private ReadOnly _userId As Integer
+    Private ReadOnly _studentId As Integer
     Private ReadOnly _initialUsername As String
 
     Public Sub New()
@@ -26,6 +27,20 @@ Public Class frmAddEditUser
         ' Password field is left blank for security
     End Sub
 
+    Public Sub New(studentId As Integer, fullName As String)
+        InitializeComponent()
+        _isEditMode = False
+        _studentId = studentId
+        Me.Text = "Create Account"
+        lblTitle.Text = "Create Account for Student"
+
+        txtFullName.Text = fullName
+        txtFullName.ReadOnly = True ' Full name is from the student record and cannot be changed here.
+        cboRole.SelectedItem = "Student"
+        cboRole.Enabled = False ' The role is fixed to Student for this case.
+    End Sub
+
+
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         If String.IsNullOrWhiteSpace(txtFullName.Text) OrElse
            String.IsNullOrWhiteSpace(txtUsername.Text) OrElse
@@ -42,11 +57,12 @@ Public Class frmAddEditUser
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
-                Dim tableName As String = If(cboRole.SelectedItem.ToString() = "Admin", "admins", "cashiers")
-                Dim idColumn As String = If(cboRole.SelectedItem.ToString() = "Admin", "admin_id", "cashier_id")
 
                 If _isEditMode Then
                     ' --- UPDATE LOGIC ---
+                    Dim tableName As String = If(cboRole.SelectedItem.ToString() = "Admin", "admins", "cashiers")
+                    Dim idColumn As String = If(cboRole.SelectedItem.ToString() = "Admin", "admin_id", "cashier_id")
+
                     Dim query As New System.Text.StringBuilder()
                     query.Append($"UPDATE {tableName} SET full_name = @fullName, username = @username")
                     If Not String.IsNullOrWhiteSpace(txtPassword.Text) Then
@@ -65,14 +81,26 @@ Public Class frmAddEditUser
                     End Using
                 Else
                     ' --- ADD LOGIC ---
-                    Dim query As String = $"INSERT INTO {tableName} (full_name, username, password_hash, role) VALUES (@fullName, @username, @passwordHash, @role)"
-                    Using cmd As New MySqlCommand(query, conn)
-                        cmd.Parameters.AddWithValue("@fullName", txtFullName.Text.Trim())
-                        cmd.Parameters.AddWithValue("@username", txtUsername.Text.Trim())
-                        cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
-                        cmd.Parameters.AddWithValue("@role", cboRole.SelectedItem.ToString().ToLower())
-                        cmd.ExecuteNonQuery()
-                    End Using
+                    Dim query As String
+                    If _studentId > 0 Then ' Creating account for an existing student
+                        query = "INSERT INTO users (student_id, username, password_hash, role) VALUES (@studentId, @username, @passwordHash, 'student')"
+                        Using cmd As New MySqlCommand(query, conn)
+                            cmd.Parameters.AddWithValue("@studentId", _studentId)
+                            cmd.Parameters.AddWithValue("@username", txtUsername.Text.Trim())
+                            cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
+                            cmd.ExecuteNonQuery()
+                        End Using
+                    Else ' Original logic for adding admins/cashiers
+                        Dim tableName As String = If(cboRole.SelectedItem.ToString() = "Admin", "admins", "cashiers")
+                        query = $"INSERT INTO {tableName} (full_name, username, password_hash, role) VALUES (@fullName, @username, @passwordHash, @role)"
+                        Using cmd As New MySqlCommand(query, conn)
+                            cmd.Parameters.AddWithValue("@fullName", txtFullName.Text.Trim())
+                            cmd.Parameters.AddWithValue("@username", txtUsername.Text.Trim())
+                            cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
+                            cmd.Parameters.AddWithValue("@role", cboRole.SelectedItem.ToString().ToLower())
+                            cmd.ExecuteNonQuery()
+                        End Using
+                    End If
                 End If
 
                 Me.DialogResult = DialogResult.OK
