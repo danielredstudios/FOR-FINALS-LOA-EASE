@@ -8,6 +8,7 @@ Public Class frmAdminDashboard
     Private queueLogsTable As DataTable
     Private _lastQueueLogTimestamp As DateTime
     Private lblNoResultsFound As Label
+    Private WithEvents tmrUserManagementRefresh As New Timer()
 
     Public Sub New(adminFullName As String)
         InitializeComponent()
@@ -31,26 +32,115 @@ Public Class frmAdminDashboard
         lblNoResultsFound.Text = "No results found"
         lblNoResultsFound.Visible = False
         pnlUserControls.Controls.Add(lblNoResultsFound)
-
-        ' Continue with the rest of your initialization code
         SetupDataGridViews()
         RefreshAllData()
 
-        tmrRefresh.Interval = 5000
+        tmrRefresh.Interval = 15000
+        tmrUserManagementRefresh.Enabled = False
         AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
         tmrRefresh.Start()
-
-        ' Populate Sort ComboBox
         cboSortQueueLogs.Items.Add("Default")
         cboSortQueueLogs.Items.Add("Queue Number")
         cboSortQueueLogs.Items.Add("Full Name")
         cboSortQueueLogs.Items.Add("Status")
         cboSortQueueLogs.SelectedIndex = 0
 
-        ShowPanel(pnlDashboard, btnDashboard)
+        Dim cboSortUsers As New ComboBox()
+        cboSortUsers.DropDownStyle = ComboBoxStyle.DropDownList
+        cboSortUsers.Name = "cboSortUsers"
+        cboSortUsers.Location = New Point(440, 16)
+        cboSortUsers.Size = New Size(180, 30)
+        cboSortUsers.Font = New Font("Poppins", 9.0F)
+        cboSortUsers.Items.Add("Default")
+        cboSortUsers.Items.Add("Name (A-Z)")
+        cboSortUsers.Items.Add("Name (Z-A)")
+        cboSortUsers.Items.Add("Student No.")
+        cboSortUsers.Items.Add("Course")
+        cboSortUsers.Items.Add("Last Activity")
+        cboSortUsers.SelectedIndex = 0
+        AddHandler cboSortUsers.SelectedIndexChanged, AddressOf cboSortUsers_SelectedIndexChanged
+        pnlUserControls.Controls.Add(cboSortUsers)
 
-        ' Add event handler for tab selection
+        ' Add a label for the sort dropdown
+        Dim lblSortUsers As New Label()
+        lblSortUsers.Text = "Sort by:"
+        lblSortUsers.AutoSize = True
+        lblSortUsers.Font = New Font("Poppins", 9.0F)
+        lblSortUsers.Location = New Point(380, 19)
+        lblSortUsers.Name = "lblSortUsers"
+        pnlUserControls.Controls.Add(lblSortUsers)
+
+        ShowPanel(pnlDashboard, btnDashboard)
         AddHandler tabUserManagement.SelectedIndexChanged, AddressOf tabUserManagement_SelectedIndexChanged
+    End Sub
+
+
+    Private Sub tmrUserManagementRefresh_Tick(sender As Object, e As EventArgs) Handles tmrUserManagementRefresh.Tick
+        If pnlUserManagement.Visible Then
+            FetchUsers()
+            Dim cboSortUsers As ComboBox = TryCast(pnlUserControls.Controls("cboSortUsers"), ComboBox)
+            If cboSortUsers IsNot Nothing AndAlso cboSortUsers.SelectedIndex > 0 Then
+                ApplySorting(cboSortUsers.SelectedItem.ToString())
+            End If
+        End If
+    End Sub
+
+    Private Sub cboSortUsers_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim comboBox As ComboBox = DirectCast(sender, ComboBox)
+        ApplySorting(comboBox.SelectedItem.ToString())
+    End Sub
+
+    Private Sub ApplySorting(sortBy As String)
+        ' Check if user management panel is visible
+        If Not pnlUserManagement.Visible Then Return
+
+        ' Check if tab control exists and has a selected tab
+        If tabUserManagement Is Nothing OrElse tabUserManagement.SelectedTab Is Nothing Then Return
+
+        ' Get the currently active tab's DataGridView
+        Dim activeGridView As DataGridView = If(tabUserManagement.SelectedTab Is tpWithAccount, dgvUsersWithAccount, dgvUsersWithoutAccount)
+
+        ' Verify the DataGridView exists
+        If activeGridView Is Nothing Then Return
+
+        ' Get the data source
+        Dim source As BindingList(Of User) = TryCast(activeGridView.DataSource, BindingList(Of User))
+        If source Is Nothing OrElse source.Count = 0 Then Return
+
+        ' Create a list we can sort
+        Dim userList As New List(Of User)(source)
+
+        ' Sort based on selection
+        Select Case sortBy
+            Case "Name (A-Z)"
+                userList.Sort(Function(x, y) String.Compare(x.FullName, y.FullName))
+            Case "Name (Z-A)"
+                userList.Sort(Function(x, y) String.Compare(y.FullName, x.FullName))
+            Case "Student No."
+                userList.Sort(Function(x, y) String.Compare(x.StudentNo, y.StudentNo))
+            Case "Course"
+                userList.Sort(Function(x, y) String.Compare(x.Course, y.Course))
+            Case "Last Activity"
+                userList.Sort(Function(x, y)
+                                  ' Compare last queue time (more recent first)
+                                  If x.LastQueueDateTime = "N/A" AndAlso y.LastQueueDateTime = "N/A" Then
+                                      Return 0
+                                  ElseIf x.LastQueueDateTime = "N/A" Then
+                                      Return 1
+                                  ElseIf y.LastQueueDateTime = "N/A" Then
+                                      Return -1
+                                  Else
+                                      Return DateTime.Compare(DateTime.Parse(y.LastQueueDateTime), DateTime.Parse(x.LastQueueDateTime))
+                                  End If
+                              End Function)
+            Case "Default"
+                ' Do nothing, just reload the data
+            Case Else
+                Return
+        End Select
+
+        ' Update the DataGridView with sorted list
+        activeGridView.DataSource = New BindingList(Of User)(userList)
     End Sub
 
     Private Sub tmrRefresh_Tick(sender As Object, e As EventArgs)
@@ -558,6 +648,7 @@ Public Class frmAdminDashboard
 
         panelToShow.Visible = True
         panelToShow.BringToFront()
+        tmrUserManagementRefresh.Enabled = (panelToShow Is pnlUserManagement)
 
         If _activeButton IsNot Nothing Then
             _activeButton.BackColor = Color.FromArgb(45, 52, 54)
@@ -591,6 +682,11 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
+        tmrRefresh.Stop()
+        If tmrUserManagementRefresh IsNot Nothing Then
+            tmrUserManagementRefresh.Stop()
+        End If
+
         Me.Close()
         Dim frmLogin As New frmLogin()
         frmLogin.Show()

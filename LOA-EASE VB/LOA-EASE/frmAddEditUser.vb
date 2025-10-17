@@ -23,7 +23,22 @@ Public Class frmAddEditUser
 
         txtFullName.Text = fullName
         txtUsername.Text = username
-        cboRole.SelectedItem = role
+
+        ' If this is a student account, hide the role fields
+        If role = "Student" Then
+            Label4.Visible = False
+            cboRole.Visible = False
+
+            ' Adjust the layout by moving the Save/Cancel buttons up
+            btnSave.Location = New Point(btnSave.Location.X, cboRole.Location.Y)
+            btnCancel.Location = New Point(btnCancel.Location.X, cboRole.Location.Y)
+
+            ' Resize the form to accommodate the removed fields
+            Me.Height = Me.Height - 50
+        Else
+            cboRole.SelectedItem = role
+        End If
+
         ' Password field is left blank for security
     End Sub
 
@@ -36,8 +51,17 @@ Public Class frmAddEditUser
 
         txtFullName.Text = fullName
         txtFullName.ReadOnly = True ' Full name is from the student record and cannot be changed here.
-        cboRole.SelectedItem = "Student"
-        cboRole.Enabled = False ' The role is fixed to Student for this case.
+
+        ' Hide role fields completely for student accounts
+        Label4.Visible = False
+        cboRole.Visible = False
+
+        ' Adjust the layout by moving the Save/Cancel buttons up
+        btnSave.Location = New Point(btnSave.Location.X, cboRole.Location.Y)
+        btnCancel.Location = New Point(btnCancel.Location.X, cboRole.Location.Y)
+
+        ' Resize the form to accommodate the removed fields
+        Me.Height = Me.Height - 50
     End Sub
 
 
