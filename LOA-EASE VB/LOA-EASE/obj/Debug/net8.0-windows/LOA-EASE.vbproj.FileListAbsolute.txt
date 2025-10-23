@@ -38,7 +38,7 @@ C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\refint\LOA-
 C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\LOA-EASE.pdb
 C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\LOA-EASE.genruntimeconfig.cache
 C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\ref\LOA-EASE.dll
-C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\LOA_EASE.frmKiosk.resources
 C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\LOA_EASE.frmAdminDashboard.resources
 C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\LOA_EASE.frmAddEditCounter.resources
 C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\obj\Debug\net8.0-windows\LOA_EASE.frmAddEditUser.resources
+C:\Users\RED\source\repos\LOA-EASE\LOA-EASE\bin\Debug\net8.0-windows\Notification-Sound.wav

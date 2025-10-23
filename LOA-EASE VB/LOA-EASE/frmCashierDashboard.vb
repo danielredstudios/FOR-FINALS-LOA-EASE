@@ -1,5 +1,6 @@
 ﻿Imports MySql.Data.MySqlClient
 Imports System.ComponentModel
+Imports System.Media
 
 Public Class frmCashierDashboard
     Private ReadOnly _cashierId As Integer
@@ -7,6 +8,10 @@ Public Class frmCashierDashboard
     Private ReadOnly _cashierFullName As String
     Private _currentServingQueueId As Integer? = Nothing
     Private _isBreak As Boolean = False
+
+    Private WithEvents QueueNotifyIcon As New NotifyIcon()
+    Private _soundPlayer As SoundPlayer
+    Private _lastQueueCount As Integer = 0
 
     Public Sub New(cashierId As Integer, counterId As Integer, cashierFullName As String)
         InitializeComponent()
@@ -40,6 +45,20 @@ Public Class frmCashierDashboard
         dgvWaitingList.Columns.Add(purposeColumn)
 
         AddHandler Me.FormClosing, AddressOf frmCashierDashboard_FormClosing
+
+        Try
+            _soundPlayer = New SoundPlayer(Application.StartupPath & "\Notification-Sound.wav")
+            _soundPlayer.Load()
+        Catch ex As Exception
+            MessageBox.Show($"Could not load notification sound: {ex.Message}. " &
+                            "Ensure 'NotificationSound.wav' is in the application folder.",
+                            "Sound Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
+
+        QueueNotifyIcon.Icon = Me.Icon
+        QueueNotifyIcon.Text = "LOA-EASE Queuing"
+        QueueNotifyIcon.Visible = True
+
         RefreshQueueData()
         tmrQueueRefresh.Start()
     End Sub
@@ -65,7 +84,7 @@ Public Class frmCashierDashboard
                            v.full_name AS visitor_name
                     FROM queues q
                     LEFT JOIN students s ON q.student_id = s.student_id
-                    LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
+                     LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
                     WHERE q.counter_id = @counterId AND q.status = 'serving' AND DATE(q.schedule_datetime) = CURDATE()
                     LIMIT 1"
                 Using cmd As New MySqlCommand(query, conn)
@@ -92,7 +111,7 @@ Public Class frmCashierDashboard
                 Dim query As String = "
                     SELECT queue_number, purpose, is_priority
                     FROM queues
-                    WHERE counter_id = @counterId AND status = 'waiting' AND DATE(schedule_datetime) = CURDATE()
+                     WHERE counter_id = @counterId AND status = 'waiting' AND DATE(schedule_datetime) = CURDATE()
                     ORDER BY is_priority DESC, created_at ASC"
                 Using cmd As New MySqlCommand(query, conn)
                     cmd.Parameters.AddWithValue("@counterId", _counterId)
@@ -107,10 +126,33 @@ Public Class frmCashierDashboard
                     End Using
                 End Using
                 dgvWaitingList.DataSource = waitingList
+
+                Dim currentQueueCount As Integer = waitingList.Count
+                If currentQueueCount > _lastQueueCount Then
+                    PlayNotificationSound()
+                    ShowNotification(currentQueueCount)
+                End If
+                _lastQueueCount = currentQueueCount
+
             Catch ex As Exception
                 HandleDbError("fetching waiting list", ex)
             End Try
         End Using
+    End Sub
+
+    Private Sub PlayNotificationSound()
+        Try
+            If _soundPlayer IsNot Nothing Then
+                _soundPlayer.Play()
+            End If
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Sub ShowNotification(queueCount As Integer)
+        Dim title As String = "New Queue"
+        Dim message As String = $"A new person has joined your queue. You now have {queueCount} waiting."
+        QueueNotifyIcon.ShowBalloonTip(3000, title, message, ToolTipIcon.Info)
     End Sub
 
     Private Sub UpdateNowServingUI(reader As MySqlDataReader)
@@ -167,7 +209,7 @@ Public Class frmCashierDashboard
             recallForm.Text = "Recall a Queue"
             recallForm.StartPosition = FormStartPosition.CenterParent
             recallForm.FormBorderStyle = FormBorderStyle.FixedDialog
-            recallForm.ClientSize = New Size(300, 250) ' Increased height for a title label
+            recallForm.ClientSize = New Size(300, 250)
 
             Dim lblTitle As New Label()
             lblTitle.Text = "Select a 'No-Show' ticket to recall:"
@@ -179,7 +221,7 @@ Public Class frmCashierDashboard
             Dim lstNoShow As New ListBox()
             lstNoShow.Dock = DockStyle.Fill
             recallForm.Controls.Add(lstNoShow)
-            lstNoShow.BringToFront() ' Ensure it's on top of the label
+            lstNoShow.BringToFront()
 
             Using conn As MySqlConnection = DatabaseHelper.GetConnection()
                 Try
@@ -298,6 +340,14 @@ Public Class frmCashierDashboard
     End Sub
 
     Private Sub frmCashierDashboard_FormClosing(sender As Object, e As FormClosingEventArgs)
+        tmrQueueRefresh.Stop()
+        If QueueNotifyIcon IsNot Nothing Then
+            QueueNotifyIcon.Dispose()
+        End If
+        If _soundPlayer IsNot Nothing Then
+            _soundPlayer.Dispose()
+        End If
+
         ExecuteNonQuery("UPDATE counter_schedules SET is_open = 0 WHERE counter_id = @counterId", Nothing, New MySqlParameter("@counterId", _counterId))
         Application.OpenForms("frmLogin").Show()
     End Sub

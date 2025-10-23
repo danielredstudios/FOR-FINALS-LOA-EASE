@@ -26,7 +26,7 @@ Public Class frmAdminDashboard
         lblNoResultsFound.AutoSize = True
         lblNoResultsFound.Font = New Font("Poppins", 9.0F, FontStyle.Bold)
         lblNoResultsFound.ForeColor = Color.Red
-        lblNoResultsFound.Location = New Point(350, 19)
+        lblNoResultsFound.Location = New Point(630, 19)
         lblNoResultsFound.Name = "lblNoResultsFound"
         lblNoResultsFound.Size = New Size(150, 22)
         lblNoResultsFound.Text = "No results found"
@@ -36,7 +36,6 @@ Public Class frmAdminDashboard
         RefreshAllData()
 
         tmrRefresh.Interval = 15000
-        tmrUserManagementRefresh.Enabled = False
         AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
         tmrRefresh.Start()
         cboSortQueueLogs.Items.Add("Default")
@@ -56,6 +55,7 @@ Public Class frmAdminDashboard
         cboSortUsers.Items.Add("Name (Z-A)")
         cboSortUsers.Items.Add("Student No.")
         cboSortUsers.Items.Add("Course")
+        cboSortUsers.Items.Add("Year Level")
         cboSortUsers.Items.Add("Last Activity")
         cboSortUsers.SelectedIndex = 0
         AddHandler cboSortUsers.SelectedIndexChanged, AddressOf cboSortUsers_SelectedIndexChanged
@@ -75,15 +75,6 @@ Public Class frmAdminDashboard
     End Sub
 
 
-    Private Sub tmrUserManagementRefresh_Tick(sender As Object, e As EventArgs) Handles tmrUserManagementRefresh.Tick
-        If pnlUserManagement.Visible Then
-            FetchUsers()
-            Dim cboSortUsers As ComboBox = TryCast(pnlUserControls.Controls("cboSortUsers"), ComboBox)
-            If cboSortUsers IsNot Nothing AndAlso cboSortUsers.SelectedIndex > 0 Then
-                ApplySorting(cboSortUsers.SelectedItem.ToString())
-            End If
-        End If
-    End Sub
 
     Private Sub cboSortUsers_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim comboBox As ComboBox = DirectCast(sender, ComboBox)
@@ -91,26 +82,13 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub ApplySorting(sortBy As String)
-        ' Check if user management panel is visible
         If Not pnlUserManagement.Visible Then Return
-
-        ' Check if tab control exists and has a selected tab
         If tabUserManagement Is Nothing OrElse tabUserManagement.SelectedTab Is Nothing Then Return
-
-        ' Get the currently active tab's DataGridView
         Dim activeGridView As DataGridView = If(tabUserManagement.SelectedTab Is tpWithAccount, dgvUsersWithAccount, dgvUsersWithoutAccount)
-
-        ' Verify the DataGridView exists
         If activeGridView Is Nothing Then Return
-
-        ' Get the data source
         Dim source As BindingList(Of User) = TryCast(activeGridView.DataSource, BindingList(Of User))
         If source Is Nothing OrElse source.Count = 0 Then Return
-
-        ' Create a list we can sort
         Dim userList As New List(Of User)(source)
-
-        ' Sort based on selection
         Select Case sortBy
             Case "Name (A-Z)"
                 userList.Sort(Function(x, y) String.Compare(x.FullName, y.FullName))
@@ -120,6 +98,8 @@ Public Class frmAdminDashboard
                 userList.Sort(Function(x, y) String.Compare(x.StudentNo, y.StudentNo))
             Case "Course"
                 userList.Sort(Function(x, y) String.Compare(x.Course, y.Course))
+            Case "Year Level"
+                userList.Sort(Function(x, y) String.Compare(x.YearLevel, y.YearLevel))
             Case "Last Activity"
                 userList.Sort(Function(x, y)
                                   ' Compare last queue time (more recent first)
@@ -146,8 +126,6 @@ Public Class frmAdminDashboard
     Private Sub tmrRefresh_Tick(sender As Object, e As EventArgs)
         If pnlDashboard.Visible Then
             RefreshAllData()
-        ElseIf pnlUserManagement.Visible Then
-            FetchUsers()
         ElseIf pnlCounterManagement.Visible Then
             FetchCounters()
         ElseIf pnlQueueLogs.Visible Then
@@ -193,7 +171,8 @@ Public Class frmAdminDashboard
             .HeaderText = "Counter",
             .DataPropertyName = "Counter"
         })
-
+        dgvCashierStatus.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvCashierStatus.DefaultCellStyle.SelectionForeColor = Color.White
         dgvAllQueues.AutoGenerateColumns = False
         dgvAllQueues.Columns.Clear()
         dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
@@ -221,7 +200,8 @@ Public Class frmAdminDashboard
             .HeaderText = "Status",
             .DataPropertyName = "Status"
         })
-
+        dgvAllQueues.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvAllQueues.DefaultCellStyle.SelectionForeColor = Color.White
         dgvQueueLogs.AutoGenerateColumns = False
         dgvQueueLogs.Columns.Clear()
         dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
@@ -244,7 +224,7 @@ Public Class frmAdminDashboard
             .HeaderText = "Date Created",
             .DataPropertyName = "Date Created"
         })
-
+        dgvQueueLogs.DefaultCellStyle.SelectionForeColor = Color.White
         dgvUsersWithAccount.AutoGenerateColumns = False
         dgvUsersWithAccount.Columns.Clear()
         dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
@@ -288,8 +268,14 @@ Public Class frmAdminDashboard
         .HeaderText = "Course",
         .DataPropertyName = "Course"
     })
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "YearLevel",
+            .HeaderText = "Year Level",
+            .DataPropertyName = "YearLevel"
+        })
 
-
+        dgvUsersWithAccount.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvUsersWithAccount.DefaultCellStyle.SelectionForeColor = Color.White
         dgvUsersWithoutAccount.AutoGenerateColumns = False
         dgvUsersWithoutAccount.Columns.Clear()
         dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
@@ -307,6 +293,11 @@ Public Class frmAdminDashboard
         .HeaderText = "Course",
         .DataPropertyName = "Course"
     })
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "YearLevel",
+            .HeaderText = "Year Level",
+            .DataPropertyName = "YearLevel"
+        })
 
         dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
         .Name = "LastQueueDateTime",
@@ -314,7 +305,8 @@ Public Class frmAdminDashboard
         .DataPropertyName = "LastQueueDateTime"
     })
 
-
+        dgvUsersWithoutAccount.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvUsersWithoutAccount.DefaultCellStyle.SelectionForeColor = Color.White
         dgvCounters.AutoGenerateColumns = False
         dgvCounters.Columns.Clear()
         dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {
@@ -327,6 +319,9 @@ Public Class frmAdminDashboard
             .HeaderText = "Cashier",
             .DataPropertyName = "Cashier"
         })
+        dgvCounters.DefaultCellStyle.SelectionForeColor = Color.White
+
+        dgvReports.DefaultCellStyle.SelectionForeColor = Color.White
 
     End Sub
 
@@ -355,6 +350,7 @@ Public Class frmAdminDashboard
             Next
             dgvCashierStatus.DataSource = cashierStatusList
             lblActiveCashiers.Text = $"(Active: {activeCashiers})"
+            dgvCashierStatus.ClearSelection()
         Catch ex As Exception
             HandleDbError("fetching cashier status", ex)
         End Try
@@ -393,6 +389,7 @@ Public Class frmAdminDashboard
                 End Using
                 dgvAllQueues.DataSource = queueList
                 lblQueueTotal.Text = $"(Total: {queueList.Count})"
+                dgvAllQueues.ClearSelection()
             Catch ex As Exception
                 HandleDbError("fetching all queues", ex)
             End Try
@@ -453,10 +450,7 @@ Public Class frmAdminDashboard
     Private Sub txtSearchUsers_TextChanged(sender As Object, e As EventArgs) Handles txtSearchUsers.TextChanged
         Dim searchText As String = txtSearchUsers.Text.Trim().ToLower()
 
-        ' Always hide the "no results" label when the search text changes
         lblNoResultsFound.Visible = False
-
-        ' If search box is empty, restore the original data
         If String.IsNullOrEmpty(searchText) Then
             If tabUserManagement.SelectedTab Is tpWithAccount AndAlso dgvUsersWithAccount.Tag IsNot Nothing Then
                 dgvUsersWithAccount.DataSource = dgvUsersWithAccount.Tag
@@ -468,42 +462,32 @@ Public Class frmAdminDashboard
             Return
         End If
 
-        ' Check which tab is currently active
         If tabUserManagement.SelectedTab Is tpWithAccount Then
-            ' Filter the users with account
             Dim source As BindingList(Of User) = TryCast(dgvUsersWithAccount.DataSource, BindingList(Of User))
             If source IsNot Nothing Then
                 Dim filteredList As New BindingList(Of User)
 
-                ' Clear and repopulate the filtered list
                 For Each user As User In source
                     If user.FullName.ToLower().Contains(searchText) OrElse
                    user.Username.ToLower().Contains(searchText) OrElse
                    user.StudentNo.ToLower().Contains(searchText) OrElse
                    (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
+                   (user.YearLevel IsNot Nothing AndAlso user.YearLevel.ToLower().Contains(searchText)) OrElse
                    user.Role.ToLower().Contains(searchText) Then
                         filteredList.Add(user)
                     End If
                 Next
 
-                ' Store the original source if this is the first search
                 If dgvUsersWithAccount.Tag Is Nothing Then
                     dgvUsersWithAccount.Tag = source
                 End If
-
-                ' Update the DataGridView with filtered results
                 dgvUsersWithAccount.DataSource = filteredList
-
-                ' Show label if no results found
                 lblNoResultsFound.Visible = (filteredList.Count = 0)
             End If
         ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount Then
-            ' Filter the users without account
             Dim source As BindingList(Of User) = TryCast(dgvUsersWithoutAccount.DataSource, BindingList(Of User))
             If source IsNot Nothing Then
                 Dim filteredList As New BindingList(Of User)
-
-                ' Clear and repopulate the filtered list
                 For Each user As User In source
                     If user.FullName.ToLower().Contains(searchText) OrElse
                    user.StudentNo.ToLower().Contains(searchText) OrElse
@@ -513,15 +497,15 @@ Public Class frmAdminDashboard
                     End If
                 Next
 
-                ' Store the original source if this is the first search
+
                 If dgvUsersWithoutAccount.Tag Is Nothing Then
                     dgvUsersWithoutAccount.Tag = source
                 End If
 
-                ' Update the DataGridView with filtered results
+
                 dgvUsersWithoutAccount.DataSource = filteredList
 
-                ' Show label if no results found
+
                 lblNoResultsFound.Visible = (filteredList.Count = 0)
             End If
         End If
@@ -558,6 +542,7 @@ Public Class frmAdminDashboard
                 s.student_number,
                 CONCAT(s.first_name, ' ', s.last_name) AS full_name,
                 s.course,
+                s.year_level,
                 u.user_id,
                 u.username,
                 u.last_login,
@@ -580,6 +565,7 @@ Public Class frmAdminDashboard
                             .Username = If(reader.IsDBNull(reader.GetOrdinal("username")), "N/A", reader("username").ToString()),
                             .StudentNo = reader("student_number").ToString(),
                             .Course = If(reader.IsDBNull(reader.GetOrdinal("course")), "N/A", reader("course").ToString()),
+                            .YearLevel = If(reader.IsDBNull(reader.GetOrdinal("year_level")), "N/A", reader("year_level").ToString()),
                             .Role = If(reader.IsDBNull(reader.GetOrdinal("user_id")), "No Account", "Student"),
                             .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
                             .LastSession = If(reader.IsDBNull(reader.GetOrdinal("user_created_at")), "N/A", Convert.ToDateTime(reader("user_created_at")).ToString("g")),
@@ -596,6 +582,8 @@ Public Class frmAdminDashboard
                 dgvUsersWithAccount.DataSource = usersWithAccount
                 dgvUsersWithoutAccount.DataSource = usersWithoutAccount
                 lblUsersTotal.Text = $"(With Account: {usersWithAccount.Count}, Without Account: {usersWithoutAccount.Count})"
+                dgvUsersWithAccount.ClearSelection()
+                dgvUsersWithoutAccount.ClearSelection()
             Catch ex As Exception
                 HandleDbError("fetching users", ex)
             End Try
@@ -648,7 +636,7 @@ Public Class frmAdminDashboard
 
         panelToShow.Visible = True
         panelToShow.BringToFront()
-        tmrUserManagementRefresh.Enabled = (panelToShow Is pnlUserManagement)
+
 
         If _activeButton IsNot Nothing Then
             _activeButton.BackColor = Color.FromArgb(45, 52, 54)
@@ -1080,6 +1068,7 @@ Public Class User
     Public Property LastSession As String
     Public Property LastQueueDateTime As String
     Public Property Course As String
+    Public Property YearLevel As String
 End Class
 
 Public Class Counter

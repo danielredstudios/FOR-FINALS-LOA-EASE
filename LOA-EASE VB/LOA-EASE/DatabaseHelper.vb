@@ -13,43 +13,52 @@ Public Class DatabaseHelper
     End Function
 
     Public Shared Function Authenticate(username As String, password As String) As DataRow
-        Using conn As New MySqlConnection(ConnectionString)
+        Using conn As MySqlConnection = GetConnection()
             Try
                 conn.Open()
-                Dim adminQuery As String = "SELECT 'admin' as role, admin_id, password_hash, full_name, NULL as counter_id, NULL as counter_name FROM admins WHERE username = @username"
-                Dim adminCmd As New MySqlCommand(adminQuery, conn)
-                adminCmd.Parameters.AddWithValue("@username", username)
-                Dim adminAdapter As New MySqlDataAdapter(adminCmd)
-                Dim adminDt As New DataTable()
-                adminAdapter.Fill(adminDt)
 
-                If adminDt.Rows.Count > 0 Then
-                    Dim adminRow As DataRow = adminDt.Rows(0)
-                    Dim adminPasswordHash As String = adminRow("password_hash").ToString()
-                    If BCrypt.Net.BCrypt.Verify(password, adminPasswordHash) Then
-                        Return adminRow
+                ' --- MODIFIED QUERY ---
+                ' Added 'BINARY' before username and c.username to enforce
+                ' case-sensitivity in the WHERE clauses.
+                Dim query As String = "
+                    (SELECT admin_id, username, password_hash, full_name, 'admin' AS role, 
+                            NULL AS counter_id, NULL AS cashier_id, NULL as counter_name 
+                     FROM admins 
+                     WHERE BINARY username = @username)
+                    
+                    UNION
+                    
+                    (SELECT c.cashier_id, c.username, c.password_hash, c.full_name, c.role, 
+                            c.counter_id, c.cashier_id, co.counter_name 
+                     FROM cashiers c
+                     JOIN counters co ON c.counter_id = co.counter_id
+                     WHERE BINARY c.username = @username AND c.role = 'cashier')
+                "
+                ' --- END OF MODIFICATION ---
+
+                Using cmd As New MySqlCommand(query, conn)
+                    cmd.Parameters.AddWithValue("@username", username)
+
+                    Dim dt As New DataTable()
+                    Using adapter As New MySqlDataAdapter(cmd)
+                        adapter.Fill(dt)
+                    End Using
+
+                    If dt.Rows.Count > 0 Then
+                        Dim userRow As DataRow = dt.Rows(0)
+                        Dim storedHash As String = userRow("password_hash").ToString()
+
+                        If BCrypt.Net.BCrypt.Verify(password, storedHash) Then
+                            Return userRow
+                        End If
                     End If
-                End If
 
-                Dim cashierQuery As String = "SELECT c.role, c.cashier_id, c.password_hash, c.full_name, co.counter_id, co.counter_name FROM cashiers c JOIN counters co ON c.counter_id = co.counter_id WHERE c.username = @username"
-                Dim cashierCmd As New MySqlCommand(cashierQuery, conn)
-                cashierCmd.Parameters.AddWithValue("@username", username)
-                Dim cashierAdapter As New MySqlDataAdapter(cashierCmd)
-                Dim cashierDt As New DataTable()
-                cashierAdapter.Fill(cashierDt)
-
-                If cashierDt.Rows.Count > 0 Then
-                    Dim cashierRow As DataRow = cashierDt.Rows(0)
-                    Dim cashierPasswordHash As String = cashierRow("password_hash").ToString()
-                    If BCrypt.Net.BCrypt.Verify(password, cashierPasswordHash) Then
-                        Return cashierRow
-                    End If
-                End If
-
+                End Using
             Catch ex As Exception
-                MessageBox.Show("An error occurred during authentication: " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show("Error during authentication: " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Using
+
         Return Nothing
     End Function
 
