@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\documents\\github\\for-finals-loa-ease\\loa-ease vb\\loa-ease\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\documents\\github\\for-finals-loa-ease\\loa-ease vb\\loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
@@ -22,40 +26,52 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "frmLogin.vb",
-              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmLogin.vb",
-              "RelativeDocumentMoniker": "LOA-EASE\\frmLogin.vb",
-              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmLogin.vb*",
-              "RelativeToolTip": "LOA-EASE\\frmLogin.vb*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEgAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-10-14T12:00:46.516Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DatabaseHelper.vb",
+              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\DatabaseHelper.vb",
+              "RelativeDocumentMoniker": "LOA-EASE\\DatabaseHelper.vb",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\DatabaseHelper.vb",
+              "RelativeToolTip": "LOA-EASE\\DatabaseHelper.vb",
+              "ViewState": "AgIAAFgAAAAAAAAAAAAUwHMAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-10-14T12:08:41.041Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "frmLogin.vb",
+              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmLogin.vb",
+              "RelativeDocumentMoniker": "LOA-EASE\\frmLogin.vb",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmLogin.vb",
+              "RelativeToolTip": "LOA-EASE\\frmLogin.vb",
+              "ViewState": "AgIAACoAAAAAAAAAAAAAAEQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-10-14T12:00:46.516Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "frmLogin.vb [Design]",
               "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmLogin.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmLogin.vb",
-              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmLogin.vb [Design]*",
-              "RelativeToolTip": "LOA-EASE\\frmLogin.vb [Design]*",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmLogin.vb [Design]",
+              "RelativeToolTip": "LOA-EASE\\frmLogin.vb [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2025-10-14T12:00:37.951Z",
               "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "frmAdminDashboard.vb [Design]",
               "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE VB\\LOA-EASE\\frmAdminDashboard.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAdminDashboard.vb",

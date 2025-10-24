@@ -25,8 +25,6 @@ $result = $stmt->get_result();
 if ($ticket = $result->fetch_assoc()) {
     echo json_encode(['success' => true, 'status' => $ticket['status']]);
 } else {
-    // If the ticket is completed or cancelled, it might not be found by the active ticket query.
-    // We can send a generic 'inactive' status to tell the page to update.
     echo json_encode(['success' => false, 'status' => 'inactive']);
 }
 

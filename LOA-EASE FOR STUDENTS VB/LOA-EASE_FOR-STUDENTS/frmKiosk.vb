@@ -16,7 +16,6 @@ Public Class frmKiosk
     Private resetStep As Integer = 0
     Private soundPlayer As New SoundPlayer()
 
-    ' API for drop shadow
     <DllImport("dwmapi.dll")>
     Private Shared Function DwmSetWindowAttribute(hwnd As IntPtr, attr As Integer, ByRef attrValue As Integer, attrSize As Integer) As Integer
     End Function
@@ -30,18 +29,14 @@ Public Class frmKiosk
         tcKiosk.ItemSize = New Size(0, 1)
         tcKiosk.SizeMode = TabSizeMode.Fixed
         Me.ResizeRedraw = True
-
-        ' Apply rounded corners
         ApplyRoundedCorners()
 
-        ' Load sound file
         LoadSoundFile()
 
         CenterPanel()
     End Sub
 
     Private Sub frmKiosk_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        ' Clean up sound player
         If soundPlayer IsNot Nothing Then
             soundPlayer.Dispose()
         End If
@@ -73,17 +68,10 @@ Public Class frmKiosk
     End Sub
 
     Private Sub ApplyRoundedCorners()
-        ' Round the main input panel
         SetRoundedCorners(pnlMainInput, 15)
-
-        ' Round the ticket card panel
         SetRoundedCorners(pnlTicketCard, 15)
-
-        ' Round buttons
         SetRoundedCorners(btnGetTicket, 10)
         SetRoundedCorners(btnNewTransaction, 10)
-
-        ' Round group boxes
         SetRoundedCorners(gbStudentInfo, 10)
         SetRoundedCorners(gbPurpose, 10)
         SetRoundedCorners(gbDocumentRequest, 10)
@@ -512,8 +500,6 @@ Public Class frmKiosk
                             txtLastName.Text = reader.GetString("last_name")
                             txtFirstName.Text = reader.GetString("first_name")
                             txtCourse.Text = reader.GetString("course")
-
-                            ' Fetch and display year level
                             If Not reader.IsDBNull(reader.GetOrdinal("year_level")) Then
                                 txtYearLevel.Text = reader.GetString("year_level")
                             Else
@@ -552,7 +538,6 @@ Public Class frmKiosk
         lblAssignedCashier.Text = $"Cashier: {selectedCashierName}"
         tcKiosk.SelectedTab = tpTicket
 
-        ' Play notification sound when ticket is displayed
         PlayNotificationSound()
 
         resetStep = 1
@@ -567,7 +552,6 @@ Public Class frmKiosk
             lblAssignedCounter.Text = ""
             lblAssignedCashier.Text = ""
 
-            ' Play notification sound when showing Thank You message
             PlayNotificationSound()
 
             resetStep = 2
@@ -577,5 +561,9 @@ Public Class frmKiosk
             resetStep = 0
             ResetForm()
         End If
+    End Sub
+
+    Private Sub pnlHeader_Paint(sender As Object, e As PaintEventArgs) Handles pnlHeader.Paint
+
     End Sub
 End Class

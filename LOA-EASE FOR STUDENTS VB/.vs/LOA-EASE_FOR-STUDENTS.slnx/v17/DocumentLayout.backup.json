@@ -1,0 +1,106 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\documents\\github\\for-finals-loa-ease\\loa-ease for students vb\\loa-ease_for-students\\frmkiosk.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\documents\\github\\for-finals-loa-ease\\loa-ease for students vb\\loa-ease_for-students\\frmkiosk.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\documents\\github\\for-finals-loa-ease\\loa-ease for students vb\\loa-ease_for-students\\frmkiosk.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\documents\\github\\for-finals-loa-ease\\loa-ease for students vb\\loa-ease_for-students\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\documents\\github\\for-finals-loa-ease\\loa-ease for students vb\\loa-ease_for-students\\frmkiosk.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
+      "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "frmKiosk.vb",
+              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
+              "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.vb*",
+              "RelativeToolTip": "LOA-EASE_FOR-STUDENTS\\frmKiosk.vb*",
+              "ViewState": "AgIAACwCAAAAAAAAAAAuwDgCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-10-23T09:46:56.843Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DatabaseHelper.vb",
+              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\DatabaseHelper.vb",
+              "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\DatabaseHelper.vb",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\DatabaseHelper.vb",
+              "RelativeToolTip": "LOA-EASE_FOR-STUDENTS\\DatabaseHelper.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-10-23T09:46:37.776Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "frmKiosk.resx",
+              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.resx",
+              "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\frmKiosk.resx",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.resx*",
+              "RelativeToolTip": "LOA-EASE_FOR-STUDENTS\\frmKiosk.resx*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2025-10-23T09:46:26.049Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "frmKiosk.Designer.vb",
+              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb",
+              "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb*",
+              "RelativeToolTip": "LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb*",
+              "ViewState": "AgIAAGYCAAAAAAAAAAAcwHcCAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-10-23T09:45:59.258Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "frmKiosk.vb [Design]",
+              "DocumentMoniker": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
+              "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
+              "ToolTip": "C:\\Users\\RED\\Documents\\GitHub\\FOR-FINALS-LOA-EASE\\LOA-EASE FOR STUDENTS VB\\LOA-EASE_FOR-STUDENTS\\frmKiosk.vb [Design]*",
+              "RelativeToolTip": "LOA-EASE_FOR-STUDENTS\\frmKiosk.vb [Design]*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-10-23T09:45:56.123Z",
+              "EditorCaption": " [Design]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

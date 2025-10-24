@@ -85,3 +85,86 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary-modern:hover i {
     transform: translateX(5px);
 }
+
+/* Dark Mode Styles */
+body.dark-mode {
+    --light-bg: #1a1a1a;
+    --dark-text: #ffffff;
+    --card-bg: rgba(0, 0, 0, 0.5);
+    --loa-blue: #003366; /* Deep Navy Blue */
+    --loa-yellow: #FFC72C; /* Golden Yellow */
+    --loa-blue-light: #0055a4;
+}
+
+body.dark-mode .modern-card {
+    box-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .logo-text {
+    color: var(--loa-yellow);
+}
+
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode h5, 
+body.dark-mode h6 {
+    color: var(--dark-text);
+}
+
+body.dark-mode .btn-primary-modern {
+    background: var(--loa-yellow);
+    color: var(--loa-blue);
+    box-shadow: 0 4px 15px rgba(255, 199, 44, 0.3);
+}
+
+body.dark-mode .btn-primary-modern:hover {
+    background-color: var(--loa-blue);
+    color: var(--loa-yellow);
+    box-shadow: 0 8px 25px rgba(0, 51, 102, 0.5);
+}
+
+.styled-card {
+    max-width: 500px;
+}
+
+.purpose-item-container {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px dotted #aab8c2;
+}
+
+.purpose-item-container:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.purpose-main-title {
+    font-size: 1rem;
+    font-weight: 500;
+    display: block;
+    color: var(--dark-text);
+}
+
+.purpose-sub-list {
+    padding-left: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.purpose-sub-item {
+    display: block;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.ticket-icon {
+    width: 80px;
+    height: 80px;
+}
+
+.edit-ticket-icon {
+    width: 14px;
+    height: 14px;
+}

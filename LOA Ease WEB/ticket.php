@@ -30,6 +30,7 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.2/fetch.min.js"></script>
     <style>
         :root {
             --loa-blue: #003366; --loa-yellow: #FFC72C; --loa-blue-light: #0055a4;
@@ -39,7 +40,7 @@ $conn->close();
         body {
             font-family: var(--font-family); background: linear-gradient(-45deg, var(--light-bg), var(--loa-blue-light), var(--light-bg), var(--loa-blue));
             background-size: 400% 400%; animation: gradientBG 15s ease infinite; display: flex;
-            justify-content: center; align-items-center; min-height: 100vh; padding: 2rem;
+            justify-content: center; align-items: center; min-height: 100vh; padding: 2rem;
         }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .styled-card {
@@ -76,43 +77,62 @@ $conn->close();
             <?php endif; ?>
         </div>
     </div>
+
+    <audio id="notification-sound" src="/Music/NotificationKiosk.mp3" preload="auto"></audio>
+
     <script>
         lucide.createIcons();
 
+        if ('Notification' in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+
+        function showNotification(title, body) {
+            if ('Notification' in window && Notification.permission === "granted") {
+                new Notification(title, { body: body });
+            }
+        }
+
         <?php if ($ticket): ?>
-        const queueNumber = "<?php echo $ticket['queue_number']; ?>";
-        const viewContainer = document.getElementById('ticket-view-container');
+        var queueNumber = "<?php echo $ticket['queue_number']; ?>";
+        var viewContainer = document.getElementById('ticket-view-container');
+        var notificationSound = document.getElementById('notification-sound');
+        
+        var currentTicketStatus = null;
 
         function updateTicketView(ticketData) {
-            // This is the fallback view if the ticket is completed or no longer active
             if (!ticketData) {
-                viewContainer.innerHTML = `
-                    <div class="text-center p-5">
-                        <i data-lucide="ticket-check" class="text-success" style="width: 80px; height: 80px;"></i>
-                        <h3 class="mt-3">Ticket Processed</h3>
-                        <p class="text-muted">Your transaction is complete or has been cancelled.</p>
-                        <a href="dashboard.php" class="btn btn-primary mt-3 d-inline-flex align-items-center">Back to Dashboard</a>
-                    </div>`;
+                viewContainer.innerHTML = '<div class="text-center p-5">' +
+                    '<i data-lucide="ticket-check" class="text-success" style="width: 80px; height: 80px;"></i>' +
+                    '<h3 class="mt-3">Ticket Processed</h3>' +
+                    '<p class="text-muted">Your transaction is complete or has been cancelled.</p>' +
+                    '<a href="dashboard.php" class="btn btn-primary mt-3 d-inline-flex align-items-center">Back to Dashboard</a>' +
+                    '</div>';
                 lucide.createIcons();
                 return;
             }
 
-            const { status, queue_number, counter_name, schedule_datetime, purpose } = ticketData;
+            var status = ticketData.status;
+            var queue_number = ticketData.queue_number;
+            var counter_name = ticketData.counter_name;
+            var schedule_datetime = ticketData.schedule_datetime;
+            var purpose = ticketData.purpose;
+            var created_at = ticketData.created_at;
             
-            let badgeClass = '', badgeText = '', alertHTML = '', showEditButton = false;
+            var badgeClass = '', badgeText = '', alertHTML = '', showEditButton = false;
             switch(status) {
                 case 'scheduled':
                     badgeClass = 'bg-info'; badgeText = 'Scheduled';
-                    alertHTML = `<div class="alert alert-warning mt-4"><strong>On your scheduled date,</strong> please check in at a kiosk to enter the queue.</div>`;
+                    alertHTML = '<div class="alert alert-warning mt-4"><strong>On your scheduled date,</strong> please check in at a kiosk to enter the queue.</div>';
                     showEditButton = true;
                     break;
                 case 'waiting':
                     badgeClass = 'bg-primary'; badgeText = 'Waiting in Queue';
-                    alertHTML = `<div class="alert alert-success mt-4"><strong>You are now in the queue!</strong> Please wait for your number to be called.</div>`;
+                    alertHTML = '<div class="alert alert-success mt-4"><strong>You are now in the queue!</strong> Please wait for your number to be called.</div>';
                     break;
                 case 'serving':
                     badgeClass = 'bg-success'; badgeText = 'Now Serving';
-                    alertHTML = `<div class="alert alert-success mt-4"><strong>Your number has been called!</strong> Please proceed to the counter.</div>`;
+                    alertHTML = '<div class="alert alert-success mt-4"><strong>Your number has been called!</strong> Please proceed to the counter.</div>';
                     break;
                 default:
                     updateTicketView(null); 
@@ -120,65 +140,98 @@ $conn->close();
             }
 
             // Format Purposes
-            let purposeHTML = '';
-            const all_purposes = purpose.split(', ');
-            const doc_requests = all_purposes.filter(p => p.startsWith('doc_req:')).map(p => p.replace('doc_req:', ''));
-            const other_purposes = all_purposes.filter(p => !p.startsWith('doc_req:'));
+            var purposeHTML = '';
+            var all_purposes = purpose.split(', ');
+            var doc_requests = [];
+            var other_purposes = [];
+            
+            for (var i = 0; i < all_purposes.length; i++) {
+                if (all_purposes[i].indexOf('doc_req:') === 0) {
+                    doc_requests.push(all_purposes[i].replace('doc_req:', ''));
+                } else {
+                    other_purposes.push(all_purposes[i]);
+                }
+            }
 
             if (doc_requests.length > 0) {
-                purposeHTML += `<div class="purpose-item-container"><strong class="purpose-main-title">Document Request</strong><div class="purpose-sub-list">${doc_requests.map(doc => `<span class="purpose-sub-item">- ${doc}</span>`).join('')}</div></div>`;
+                purposeHTML += '<div class="purpose-item-container"><strong class="purpose-main-title">Document Request</strong><div class="purpose-sub-list">';
+                for (var i = 0; i < doc_requests.length; i++) {
+                    purposeHTML += '<span class="purpose-sub-item">- ' + doc_requests[i] + '</span>';
+                }
+                purposeHTML += '</div></div>';
             }
-            other_purposes.forEach(p => {
-                purposeHTML += `<div class="purpose-item-container"><strong class="purpose-main-title">${p}</strong></div>`;
-            });
             
-            const scheduleDate = new Date(schedule_datetime).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            for (var i = 0; i < other_purposes.length; i++) {
+                purposeHTML += '<div class="purpose-item-container"><strong class="purpose-main-title">' + other_purposes[i] + '</strong></div>';
+            }
+            
+            var scheduleDate = new Date(schedule_datetime).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            viewContainer.innerHTML = `
-                <div class="mb-3"><span class="badge rounded-pill fs-6 ${badgeClass}">${badgeText}</span></div>
-                <h2 class="fw-bold mb-3">Your Queue Ticket</h2>
-                <div class="bg-light p-4 rounded-3 mb-4 border">
-                    <h1 class="display-1 fw-bolder text-primary mb-0">${queue_number}</h1>
-                    <p class="text-muted mb-0">Present this number or the QR code</p>
-                </div>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(queue_number)}&qzone=1" alt="QR Code" class="img-fluid rounded-3">
-                <hr class="my-4">
-                <div class="text-start">
-                    <h5 class="fw-bold mb-3 text-center">Appointment Details</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="landmark" class="me-3"></i><div><strong class="d-block">Counter/Office</strong>${counter_name}</div></li>
-                        <li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="calendar-check" class="me-3"></i><div><strong class="d-block">Scheduled Date</strong>${scheduleDate}</div></li>
-                        <li class="list-group-item bg-transparent">
-                            <div class="d-flex align-items-center"><i data-lucide="edit" class="me-3"></i><strong class="d-block">Purpose(s)</strong></div>
-                            <div class="ps-4 ms-3 mt-2">${purposeHTML}</div>
-                        </li>
-                    </ul>
-                </div>
-                ${alertHTML}
-                <div class="text-center mt-4">
-                    ${showEditButton ? `<a href="dashboard.php" class="btn btn-outline-secondary btn-sm"><i data-lucide="edit-3" style="width:14px; height:14px;"></i> Edit Ticket</a>` : ''}
-                </div>
-            `;
+            viewContainer.innerHTML = 
+                '<div class="mb-3"><span class="badge rounded-pill fs-6 ' + badgeClass + '">' + badgeText + '</span></div>' +
+                '<h2 class="fw-bold mb-3">Your Queue Ticket</h2>' +
+                '<div class="bg-light p-4 rounded-3 mb-4 border">' +
+                    '<h1 class="display-1 fw-bolder text-primary mb-0">' + queue_number + '</h1>' +
+                    '<p class="text-muted mb-0">Present this number or the QR code</p>' +
+                '</div>' +
+                '<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(queue_number) + '&qzone=1" alt="QR Code" class="img-fluid rounded-3">' +
+                '<hr class="my-4">' +
+                '<div class="text-start">' +
+                    '<h5 class="fw-bold mb-3 text-center">Appointment Details</h5>' +
+                    '<ul class="list-group list-group-flush">' +
+                        '<li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="landmark" class="me-3"></i><div><strong class="d-block">Counter/Office</strong>' + counter_name + '</div></li>' +
+                        '<li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="calendar-check" class="me-3"></i><div><strong class="d-block">Scheduled Date</strong>' + scheduleDate + '</div></li>' +
+                        '<li class="list-group-item bg-transparent">' +
+                            '<div class="d-flex align-items-center"><i data-lucide="edit" class="me-3"></i><strong class="d-block">Purpose(s)</strong></div>' +
+                            '<div class="ps-4 ms-3 mt-2">' + purposeHTML + '</div>' +
+                        '</li>' +
+                    '</ul>' +
+                '</div>' +
+                alertHTML +
+                '<div class="text-center mt-4">' +
+                    (showEditButton ? '<a href="dashboard.php" class="btn btn-outline-secondary btn-sm"><i data-lucide="edit-3" style="width:14px; height:14px;"></i> Edit Ticket</a>' : '') +
+                '</div>';
+            
             lucide.createIcons();
         }
 
         function fetchTicketDetails() {
-            fetch(`api/get_ticket_details.php?queue_number=${queueNumber}`)
-               .then(res => res.json())
-               .then(data => {
-                   if (data.success && ['scheduled', 'waiting', 'serving'].includes(data.ticket.status)) {
+            fetch('api/get_ticket_details.php?queue_number=' + queueNumber)
+               .then(function(res) {
+                   if (!res.ok) {
+                       throw new Error('Network response was not ok');
+                   }
+                   return res.json();
+               })
+               .then(function(data) {
+                   if (data.success && ['scheduled', 'waiting', 'serving'].indexOf(data.ticket.status) !== -1) {
+                       var newStatus = data.ticket.status;
+                       if (currentTicketStatus === 'waiting' && newStatus === 'serving') {
+                           if (notificationSound) {
+                               notificationSound.play().catch(function(e) { console.error("Audio play failed", e); });
+                           }
+                           showNotification("It's your turn!", 'Your ticket ' + data.ticket.queue_number + ' is now being served.');
+                       }
+                       currentTicketStatus = newStatus; 
+
                        updateTicketView(data.ticket);
                    } else {
+                       currentTicketStatus = null; 
                        updateTicketView(null);
                    }
                })
-               .catch(error => {
+               .catch(function(error) {
                     console.error('Error fetching ticket details:', error);
+                    currentTicketStatus = null;
                     updateTicketView(null);
                });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            if (notificationSound) {
+                notificationSound.play().catch(function(e) { console.error("Audio play failed. User may need to interact with the page first."); });
+            }
+
             fetchTicketDetails();
             setInterval(fetchTicketDetails, 5000);
         });

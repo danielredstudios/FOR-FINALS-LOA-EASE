@@ -90,10 +90,10 @@ Partial Class frmKiosk
         ' 
         tpMain.BackColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
         tpMain.Controls.Add(pnlMainInput)
-        tpMain.Location = New Point(4, 46)
+        tpMain.Location = New Point(4, 55)
         tpMain.Name = "tpMain"
         tpMain.Padding = New Padding(20)
-        tpMain.Size = New Size(1256, 691)
+        tpMain.Size = New Size(1256, 682)
         tpMain.TabIndex = 0
         tpMain.Text = "Main"
         ' 
@@ -107,7 +107,7 @@ Partial Class frmKiosk
         pnlMainInput.Location = New Point(228, 70)
         pnlMainInput.Name = "pnlMainInput"
         pnlMainInput.Padding = New Padding(25)
-        pnlMainInput.Size = New Size(800, 580)
+        pnlMainInput.Size = New Size(800, 604)
         pnlMainInput.TabIndex = 0
         ' 
         ' tlpPurpose
@@ -150,7 +150,7 @@ Partial Class frmKiosk
         chkGMC.Location = New Point(20, 115)
         chkGMC.Name = "chkGMC"
         chkGMC.Padding = New Padding(5, 5, 0, 5)
-        chkGMC.Size = New Size(207, 40)
+        chkGMC.Size = New Size(246, 45)
         chkGMC.TabIndex = 2
         chkGMC.Text = "Good Moral Certificate"
         chkGMC.UseVisualStyleBackColor = True
@@ -163,7 +163,7 @@ Partial Class frmKiosk
         chkTOR.Location = New Point(20, 75)
         chkTOR.Name = "chkTOR"
         chkTOR.Padding = New Padding(5, 5, 0, 5)
-        chkTOR.Size = New Size(244, 40)
+        chkTOR.Size = New Size(289, 45)
         chkTOR.TabIndex = 1
         chkTOR.Text = "Transcript of Records (TOR)"
         chkTOR.UseVisualStyleBackColor = True
@@ -176,7 +176,7 @@ Partial Class frmKiosk
         chkDiploma.Location = New Point(20, 35)
         chkDiploma.Name = "chkDiploma"
         chkDiploma.Padding = New Padding(5, 5, 0, 5)
-        chkDiploma.Size = New Size(101, 40)
+        chkDiploma.Size = New Size(117, 45)
         chkDiploma.TabIndex = 0
         chkDiploma.Text = "Diploma"
         chkDiploma.UseVisualStyleBackColor = True
@@ -209,7 +209,7 @@ Partial Class frmKiosk
         chkIsPriority.Location = New Point(20, 165)
         chkIsPriority.Name = "chkIsPriority"
         chkIsPriority.Padding = New Padding(5, 5, 0, 5)
-        chkIsPriority.Size = New Size(138, 40)
+        chkIsPriority.Size = New Size(155, 45)
         chkIsPriority.TabIndex = 4
         chkIsPriority.Text = "Priority Lane"
         chkIsPriority.UseVisualStyleBackColor = True
@@ -222,7 +222,7 @@ Partial Class frmKiosk
         chkDocRequest.Location = New Point(20, 130)
         chkDocRequest.Name = "chkDocRequest"
         chkDocRequest.Padding = New Padding(5, 5, 0, 5)
-        chkDocRequest.Size = New Size(181, 40)
+        chkDocRequest.Size = New Size(216, 45)
         chkDocRequest.TabIndex = 3
         chkDocRequest.Text = "Document Request"
         chkDocRequest.UseVisualStyleBackColor = True
@@ -235,7 +235,7 @@ Partial Class frmKiosk
         chkPromissory.Location = New Point(20, 95)
         chkPromissory.Name = "chkPromissory"
         chkPromissory.Padding = New Padding(5, 5, 0, 5)
-        chkPromissory.Size = New Size(163, 40)
+        chkPromissory.Size = New Size(188, 45)
         chkPromissory.TabIndex = 2
         chkPromissory.Text = "Promissory Note"
         chkPromissory.UseVisualStyleBackColor = True
@@ -248,7 +248,7 @@ Partial Class frmKiosk
         chkEnrollment.Location = New Point(20, 60)
         chkEnrollment.Name = "chkEnrollment"
         chkEnrollment.Padding = New Padding(5, 5, 0, 5)
-        chkEnrollment.Size = New Size(190, 40)
+        chkEnrollment.Size = New Size(222, 45)
         chkEnrollment.TabIndex = 1
         chkEnrollment.Text = "Enrollment Concern"
         chkEnrollment.UseVisualStyleBackColor = True
@@ -261,7 +261,7 @@ Partial Class frmKiosk
         chkTuition.Location = New Point(20, 25)
         chkTuition.Name = "chkTuition"
         chkTuition.Padding = New Padding(5, 5, 0, 5)
-        chkTuition.Size = New Size(161, 40)
+        chkTuition.Size = New Size(188, 45)
         chkTuition.TabIndex = 0
         chkTuition.Text = "Tuition Payment"
         chkTuition.UseVisualStyleBackColor = True
@@ -275,7 +275,7 @@ Partial Class frmKiosk
         btnGetTicket.FlatStyle = FlatStyle.Flat
         btnGetTicket.Font = New Font("Poppins", 18.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         btnGetTicket.ForeColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
-        btnGetTicket.Location = New Point(25, 505)
+        btnGetTicket.Location = New Point(25, 529)
         btnGetTicket.Name = "btnGetTicket"
         btnGetTicket.Size = New Size(750, 55)
         btnGetTicket.TabIndex = 2
@@ -314,7 +314,7 @@ Partial Class frmKiosk
         txtYearLevel.Location = New Point(155, 190)
         txtYearLevel.Name = "txtYearLevel"
         txtYearLevel.ReadOnly = True
-        txtYearLevel.Size = New Size(575, 28)
+        txtYearLevel.Size = New Size(575, 34)
         txtYearLevel.TabIndex = 9
         ' 
         ' Label5
@@ -323,7 +323,7 @@ Partial Class frmKiosk
         Label5.Font = New Font("Poppins", 10.5F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label5.Location = New Point(20, 192)
         Label5.Name = "Label5"
-        Label5.Size = New Size(87, 25)
+        Label5.Size = New Size(108, 31)
         Label5.TabIndex = 8
         Label5.Text = "Year Level:"
         ' 
@@ -336,7 +336,7 @@ Partial Class frmKiosk
         txtCourse.Location = New Point(155, 153)
         txtCourse.Name = "txtCourse"
         txtCourse.ReadOnly = True
-        txtCourse.Size = New Size(575, 28)
+        txtCourse.Size = New Size(575, 34)
         txtCourse.TabIndex = 7
         ' 
         ' Label4
@@ -345,7 +345,7 @@ Partial Class frmKiosk
         Label4.Font = New Font("Poppins", 10.5F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label4.Location = New Point(20, 155)
         Label4.Name = "Label4"
-        Label4.Size = New Size(66, 25)
+        Label4.Size = New Size(83, 31)
         Label4.TabIndex = 6
         Label4.Text = "Course:"
         ' 
@@ -358,7 +358,7 @@ Partial Class frmKiosk
         txtFirstName.Location = New Point(155, 116)
         txtFirstName.Name = "txtFirstName"
         txtFirstName.ReadOnly = True
-        txtFirstName.Size = New Size(575, 28)
+        txtFirstName.Size = New Size(575, 34)
         txtFirstName.TabIndex = 5
         ' 
         ' Label3
@@ -367,7 +367,7 @@ Partial Class frmKiosk
         Label3.Font = New Font("Poppins", 10.5F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label3.Location = New Point(20, 118)
         Label3.Name = "Label3"
-        Label3.Size = New Size(92, 25)
+        Label3.Size = New Size(114, 31)
         Label3.TabIndex = 4
         Label3.Text = "First Name:"
         ' 
@@ -380,7 +380,7 @@ Partial Class frmKiosk
         txtLastName.Location = New Point(155, 79)
         txtLastName.Name = "txtLastName"
         txtLastName.ReadOnly = True
-        txtLastName.Size = New Size(575, 28)
+        txtLastName.Size = New Size(575, 34)
         txtLastName.TabIndex = 3
         ' 
         ' Label2
@@ -389,7 +389,7 @@ Partial Class frmKiosk
         Label2.Font = New Font("Poppins", 10.5F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label2.Location = New Point(20, 81)
         Label2.Name = "Label2"
-        Label2.Size = New Size(92, 25)
+        Label2.Size = New Size(114, 31)
         Label2.TabIndex = 2
         Label2.Text = "Last Name:"
         ' 
@@ -401,7 +401,7 @@ Partial Class frmKiosk
         txtStudentID.Font = New Font("Poppins", 10.5F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         txtStudentID.Location = New Point(155, 42)
         txtStudentID.Name = "txtStudentID"
-        txtStudentID.Size = New Size(575, 28)
+        txtStudentID.Size = New Size(575, 34)
         txtStudentID.TabIndex = 1
         ' 
         ' Label1
@@ -410,7 +410,7 @@ Partial Class frmKiosk
         Label1.Font = New Font("Poppins", 10.5F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label1.Location = New Point(20, 44)
         Label1.Name = "Label1"
-        Label1.Size = New Size(90, 25)
+        Label1.Size = New Size(112, 31)
         Label1.TabIndex = 0
         Label1.Text = "Student ID:"
         ' 
@@ -418,10 +418,10 @@ Partial Class frmKiosk
         ' 
         tpTicket.BackColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
         tpTicket.Controls.Add(pnlTicketResult)
-        tpTicket.Location = New Point(4, 46)
+        tpTicket.Location = New Point(4, 55)
         tpTicket.Name = "tpTicket"
         tpTicket.Padding = New Padding(20)
-        tpTicket.Size = New Size(1256, 691)
+        tpTicket.Size = New Size(1256, 682)
         tpTicket.TabIndex = 1
         tpTicket.Text = "Ticket"
         ' 
@@ -431,7 +431,7 @@ Partial Class frmKiosk
         pnlTicketResult.BackColor = Color.Transparent
         pnlTicketResult.Controls.Add(pnlTicketCard)
         pnlTicketResult.Controls.Add(btnNewTransaction)
-        pnlTicketResult.Location = New Point(228, 70)
+        pnlTicketResult.Location = New Point(228, 57)
         pnlTicketResult.Name = "pnlTicketResult"
         pnlTicketResult.Size = New Size(800, 550)
         pnlTicketResult.TabIndex = 0
@@ -472,7 +472,7 @@ Partial Class frmKiosk
         lblAssignedCashier.Name = "lblAssignedCashier"
         lblAssignedCashier.Size = New Size(740, 50)
         lblAssignedCashier.TabIndex = 3
-        lblAssignedCashier.Text = "Cashier: John Doe"
+        lblAssignedCashier.Text = "Cashier:"
         lblAssignedCashier.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' lblAssignedCounter
@@ -490,7 +490,7 @@ Partial Class frmKiosk
         ' lblQueueNumber
         ' 
         lblQueueNumber.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        lblQueueNumber.Font = New Font("Poppins", 56.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        lblQueueNumber.Font = New Font("Poppins", 49.8000031F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         lblQueueNumber.ForeColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
         lblQueueNumber.Location = New Point(30, 50)
         lblQueueNumber.Name = "lblQueueNumber"
@@ -535,7 +535,7 @@ Partial Class frmKiosk
         lblAppName.ForeColor = Color.FromArgb(CByte(255), CByte(199), CByte(44))
         lblAppName.Location = New Point(130, 55)
         lblAppName.Name = "lblAppName"
-        lblAppName.Size = New Size(206, 61)
+        lblAppName.Size = New Size(254, 78)
         lblAppName.TabIndex = 2
         lblAppName.Text = "LOA-EASE"
         ' 
@@ -546,7 +546,7 @@ Partial Class frmKiosk
         lblSystemName.ForeColor = Color.White
         lblSystemName.Location = New Point(135, 18)
         lblSystemName.Name = "lblSystemName"
-        lblSystemName.Size = New Size(379, 36)
+        lblSystemName.Size = New Size(473, 44)
         lblSystemName.TabIndex = 1
         lblSystemName.Text = "Lyceum of Alabang Queuing System"
         ' 
@@ -562,7 +562,7 @@ Partial Class frmKiosk
         ' 
         ' frmKiosk
         ' 
-        AutoScaleDimensions = New SizeF(13.0F, 37.0F)
+        AutoScaleDimensions = New SizeF(16.0F, 46.0F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
         ClientSize = New Size(1264, 861)

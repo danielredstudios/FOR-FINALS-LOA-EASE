@@ -37,6 +37,7 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.2/fetch.min.js"></script>
     <style>
         .purpose-badge { font-size: 0.9em; padding: 0.5em 0.75em; }
         .styled-card {
@@ -95,7 +96,8 @@ $conn->close();
                 <div class="card-content">
                     <h3 class="fw-bold text-center mb-3">Lane Status</h3>
                     <div id="lane-status-graph" class="d-flex justify-content-around p-3 rounded" style="background-color: #f8f9fa;">
-                         </div>
+                         <p class="text-muted">Loading lane status...</p>
+                    </div>
                 </div>
             </div>
 
@@ -243,42 +245,52 @@ $conn->close();
             let statusCheckInterval = null;
             let currentLaneStatus = {};
 
-            if (Notification.permission !== "granted") {
+            if ('Notification' in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
                 Notification.requestPermission();
             }
 
             function showNotification(title, body) {
-                if (Notification.permission === "granted") {
+                if ('Notification' in window && Notification.permission === "granted") {
                     new Notification(title, { body: body });
                 }
             }
 
             function setMinimumDate() {
+                const scheduleInput = document.getElementById('schedule_datetime');
                 const now = new Date();
-                const manilaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Manila"}));
-                let minDate = new Date(manilaTime);
-                minDate.setDate(minDate.getDate() + 1);
-                scheduleInput.setAttribute('min', minDate.toISOString().split('T')[0]);
+                
+                now.setDate(now.getDate() + 1);
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                
+                const minDateString = year + '-' + month + '-' + day;
+                scheduleInput.setAttribute('min', minDateString);
             }
 
             function loadLaneStatus() {
                 fetch('api/get_live_status.php')
-                    .then(response => response.json())
-                    .then(data => {
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(function(data) {
                         const graphContainer = document.getElementById('lane-status-graph');
                         graphContainer.innerHTML = '';
-                        if (data.counters) {
-                            data.counters.forEach(counter => {
+                        if (data.counters && data.counters.length > 0) {
+                            data.counters.forEach(function(counter) {
                                 const oldStatus = currentLaneStatus[counter.counter_id];
                                 if (oldStatus) {
                                     if (oldStatus.is_open == '1' && counter.is_open == '0') {
-                                        showNotification('Counter Update', `${counter.counter_name} has gone offline.`);
+                                        showNotification('Counter Update', counter.counter_name + ' has gone offline.');
                                     } else if (oldStatus.is_open == '0' && counter.is_open == '1') {
-                                        showNotification('Counter Update', `${counter.counter_name} is now online.`);
+                                        showNotification('Counter Update', counter.counter_name + ' is now online.');
                                     } else if (oldStatus.status === 'open' && counter.status === 'break') {
-                                        showNotification('Counter Update', `${counter.counter_name} is now on a break.`);
+                                        showNotification('Counter Update', counter.counter_name + ' is now on a break.');
                                     } else if (oldStatus.status === 'break' && counter.status === 'open') {
-                                        showNotification('Counter Update', `${counter.counter_name} is back from break.`);
+                                        showNotification('Counter Update', counter.counter_name + ' is back from break.');
                                     }
                                 }
                                 currentLaneStatus[counter.counter_id] = { is_open: counter.is_open, status: counter.status };
@@ -306,42 +318,49 @@ $conn->close();
                                     statusText = 'On Break';
                                 }
 
-                                const laneHtml = `
-                                    <div class="text-center">
-                                        <div class="progress" style="height: 20px; width: 100px; margin: auto; background-color: #e9ecef;">
-                                            <div class="progress-bar" role="progressbar" style="width: 100%; background-color: ${color};" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                        <div class="mt-2 small">${counter.counter_name}</div>
-                                        <div class="small text-muted">${statusText}</div>
-                                    </div>
-                                `;
+                                const laneHtml = '<div class="text-center">' +
+                                    '<div class="progress" style="height: 20px; width: 100px; margin: auto; background-color: #e9ecef;">' +
+                                    '<div class="progress-bar" role="progressbar" style="width: 100%; background-color: ' + color + ';" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>' +
+                                    '</div>' +
+                                    '<div class="mt-2 small">' + counter.counter_name + '</div>' +
+                                    '<div class="small text-muted">' + statusText + '</div>' +
+                                    '</div>';
                                 graphContainer.innerHTML += laneHtml;
                             });
+                        } else {
+                            graphContainer.innerHTML = '<p class="text-muted">No lane status available.</p>';
                         }
                     })
-                    .catch(error => {
+                    .catch(function(error) {
                         console.error('Error fetching lane status:', error);
+                        const graphContainer = document.getElementById('lane-status-graph');
+                        graphContainer.innerHTML = '<p class="text-danger">Failed to load lane status.</p>';
                     });
             }
             
             function checkMyTicketStatus() {
                 fetch('api/get_my_ticket_status.php')
-                    .then(response => response.json())
-                    .then(data => {
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
                         if (data.success && data.ticket) {
                             const newStatus = data.ticket.status;
                             if (currentTicketStatus === 'waiting' && newStatus === 'serving') {
                                 document.getElementById('modal_queue_number').textContent = data.ticket.queue_number;
                                 document.getElementById('modal_counter_name').textContent = data.ticket.counter_name;
                                 notificationModal.show();
-                                notificationSound.play().catch(e => console.error("Audio play failed", e));
-                                showNotification("It's your turn!", `Please proceed to ${data.ticket.counter_name}. Your queue number is ${data.ticket.queue_number}.`);
+                                notificationSound.play().catch(function(e) { console.error("Audio play failed", e); });
+                                showNotification("It's your turn!", "Please proceed to " + data.ticket.counter_name + ". Your queue number is " + data.ticket.queue_number + ".");
                                 if (statusCheckInterval) clearInterval(statusCheckInterval);
                             }
                             currentTicketStatus = newStatus;
                         } else {
                             if (statusCheckInterval) clearInterval(statusCheckInterval);
                         }
+                    })
+                    .catch(function(error) {
+                        console.error('Error checking ticket status:', error);
                     });
             }
 
@@ -350,11 +369,11 @@ $conn->close();
                 if (selectedPurposes.length === 0) {
                     selectedContainer.innerHTML = '<p class="text-muted small mb-0 p-2">Selected purposes will appear here.</p>';
                 } else {
-                    selectedPurposes.forEach(purpose => {
+                    selectedPurposes.forEach(function(purpose) {
                         const badge = document.createElement('span');
                         badge.className = 'badge purpose-badge bg-primary d-inline-flex align-items-center me-2 mb-2';
-                        const displayName = purpose.startsWith('doc_req:') ? `Doc Req: ${purpose.substring(8)}` : purpose;
-                        badge.innerHTML = `<span>${displayName}</span><button type="button" class="btn-close btn-close-white ms-2" style="transform: scale(0.8);" onclick="removePurpose('${purpose}')"></button>`;
+                        const displayName = purpose.startsWith('doc_req:') ? 'Doc Req: ' + purpose.substring(8) : purpose;
+                        badge.innerHTML = '<span>' + displayName + '</span><button type="button" class="btn-close btn-close-white ms-2" style="transform: scale(0.8);" onclick="removePurpose(\'' + purpose + '\')"></button>';
                         selectedContainer.appendChild(badge);
                     });
                 }
@@ -362,7 +381,7 @@ $conn->close();
             }
 
             window.removePurpose = function(purpose) {
-                selectedPurposes = selectedPurposes.filter(p => p !== purpose);
+                selectedPurposes = selectedPurposes.filter(function(p) { return p !== purpose; });
                 updateSelectedPurposesDisplay();
             }
 
@@ -372,7 +391,7 @@ $conn->close();
 
                 if (selectedValue === 'Document Request') {
                     docuRequestModal.show();
-                } else if (!selectedPurposes.includes(selectedValue)) {
+                } else if (selectedPurposes.indexOf(selectedValue) === -1) {
                     selectedPurposes.push(selectedValue);
                     updateSelectedPurposesDisplay();
                 }
@@ -381,11 +400,11 @@ $conn->close();
 
             document.getElementById('add_documents_btn').addEventListener('click', function() {
                 const checkboxes = document.querySelectorAll('#document_checklist .form-check-input:checked');
-                let isFirstDocReq = !selectedPurposes.some(p => p === 'Document Request');
+                let isFirstDocReq = selectedPurposes.indexOf('Document Request') === -1;
 
-                checkboxes.forEach(cb => {
-                    const docPurpose = `doc_req:${cb.value}`;
-                    if (!selectedPurposes.includes(docPurpose)) {
+                checkboxes.forEach(function(cb) {
+                    const docPurpose = 'doc_req:' + cb.value;
+                    if (selectedPurposes.indexOf(docPurpose) === -1) {
                         selectedPurposes.push(docPurpose);
                     }
                 });
@@ -398,33 +417,39 @@ $conn->close();
                 docuRequestModal.hide();
             });
             
-            fetch('api/get_active_ticket.php').then(response => response.json()).then(data => {
-                if (data.success && data.ticket) {
-                    notificationDiv.style.display = 'block';
-                    formContainerDiv.style.display = 'none';
-                    const ticket = data.ticket;
-                    document.getElementById('form_title').textContent = 'Edit Your Active Ticket';
-                    document.getElementById('button_text').textContent = 'Update My Ticket';
-                    queueIdInput.value = ticket.queue_id;
-                    scheduleInput.value = ticket.schedule_datetime;
-                    selectedPurposes = ticket.purpose.split(',').map(p => p.trim()).filter(p => p);
-                    updateSelectedPurposesDisplay();
-                    
-                    const scheduleDate = new Date(ticket.schedule_datetime + "T00:00:00");
-                    const today = new Date();
-                    today.setHours(0,0,0,0);
+            fetch('api/get_active_ticket.php')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success && data.ticket) {
+                        notificationDiv.style.display = 'block';
+                        formContainerDiv.style.display = 'none';
+                        const ticket = data.ticket;
+                        document.getElementById('form_title').textContent = 'Edit Your Active Ticket';
+                        document.getElementById('button_text').textContent = 'Update My Ticket';
+                        queueIdInput.value = ticket.queue_id;
+                        scheduleInput.value = ticket.schedule_datetime;
+                        selectedPurposes = ticket.purpose.split(',').map(function(p) { return p.trim(); }).filter(function(p) { return p; });
+                        updateSelectedPurposesDisplay();
+                        
+                        const parts = ticket.schedule_datetime.split('-');
+                        const scheduleDate = new Date(parts[0], parts[1] - 1, parts[2]); 
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
 
-                    if(scheduleDate.getTime() === today.getTime()){
-                        showNotification("Appointment Today!", "You have an appointment scheduled for today. Please check in at the kiosk.");
+                        if(scheduleDate.getTime() === today.getTime()){
+                            showNotification("Appointment Today!", "You have an appointment scheduled for today. Please check in at the kiosk.");
+                        }
+
+                        checkMyTicketStatus();
+                        statusCheckInterval = setInterval(checkMyTicketStatus, 5000);
+                    } else {
+                        formContainerDiv.style.display = 'block';
                     }
-
-                    checkMyTicketStatus();
-                    statusCheckInterval = setInterval(checkMyTicketStatus, 5000);
-                } else {
-                    formContainerDiv.style.display = 'block';
-                }
-                lucide.createIcons();
-            });
+                    lucide.createIcons();
+                })
+                .catch(function(error) {
+                    console.error('Error fetching active ticket:', error);
+                });
             
             viewEditButton.addEventListener('click', function() {
                 notificationDiv.style.display = 'none';
@@ -435,7 +460,7 @@ $conn->close();
                 e.preventDefault();
                 
                 if (selectedPurposes.length === 0) {
-                    messageDiv.innerHTML = `<div class="alert alert-warning">Please select at least one purpose.</div>`;
+                    messageDiv.innerHTML = '<div class="alert alert-warning">Please select at least one purpose.</div>';
                     return;
                 }
                 
@@ -444,15 +469,19 @@ $conn->close();
                 let apiEndpoint = queueIdInput.value ? 'api/update_ticket.php' : 'api/create_ticket.php';
                 
                 fetch(apiEndpoint, { method: 'POST', body: formData })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = 'ticket.php';
-                    } else {
-                        messageDiv.innerHTML = `<div class="alert alert-danger d-flex align-items-center"><i data-lucide="x-circle" class="me-2"></i>${data.message}</div>`;
-                        lucide.createIcons();
-                    }
-                });
+                    .then(function(response) { return response.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            window.location.href = 'ticket.php';
+                        } else {
+                            messageDiv.innerHTML = '<div class="alert alert-danger d-flex align-items-center"><i data-lucide="x-circle" class="me-2"></i>' + data.message + '</div>';
+                            lucide.createIcons();
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error submitting form:', error);
+                        messageDiv.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+                    });
             });
 
             updateSelectedPurposesDisplay();
