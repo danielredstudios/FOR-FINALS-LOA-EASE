@@ -5,24 +5,50 @@ Public Class frmAddEditUser
     Private ReadOnly _userId As Integer
     Private ReadOnly _studentId As Integer
     Private ReadOnly _initialUsername As String
-    Private ReadOnly _initialRole As String
-    Private _role As String
+    Private _role As String ' Store the specific role (Admin, Cashier, Student)
 
-    Public Sub New()
+    Public Sub New() ' Constructor for adding Admin/Cashier
         InitializeComponent()
         _isEditMode = False
-        Me.Text = "Add New User"
-        lblTitle.Text = "Add New User"
+        _role = "Admin" ' Default to Admin for this constructor
+        Me.Text = "Add New Admin" ' Dynamic Text
+        lblTitle.Text = "Add New Admin" ' Dynamic Text
+        cboRole.SelectedIndex = 0 ' Default to Admin
+        txtFullName.ReadOnly = False
+        Label4.Visible = True ' Show Role selection
+        cboRole.Visible = True
     End Sub
 
-    Public Sub New(userId As Integer, fullName As String, username As String, role As String)
+    ' Overload constructor to specify role when adding
+    Public Sub New(addRole As String)
+        InitializeComponent()
+        _isEditMode = False
+        _role = addRole ' Set role based on parameter
+        Me.Text = $"Add New {addRole}" ' Dynamic Text
+        lblTitle.Text = $"Add New {addRole}" ' Dynamic Text
+
+        If addRole = "Admin" Then
+            cboRole.SelectedIndex = 0
+        ElseIf addRole = "Cashier" Then
+            cboRole.SelectedIndex = 1
+        Else
+            cboRole.SelectedIndex = -1 ' Should not happen via dashboard buttons
+        End If
+
+        txtFullName.ReadOnly = False
+        Label4.Visible = True ' Show Role selection
+        cboRole.Visible = True
+    End Sub
+
+
+    Public Sub New(userId As Integer, fullName As String, username As String, role As String) ' Constructor for editing any role
         InitializeComponent()
         _isEditMode = True
         _userId = userId
         _initialUsername = username
-        _role = role
-        Me.Text = "Edit User"
-        lblTitle.Text = "Edit User"
+        _role = role ' Store the specific role being edited
+        Me.Text = $"Edit {role}" ' Dynamic Text
+        lblTitle.Text = $"Edit {role}" ' Dynamic Text
 
         txtFullName.Text = fullName
         txtUsername.Text = username
@@ -30,45 +56,64 @@ Public Class frmAddEditUser
         If role = "Student" Then
             Label4.Visible = False
             cboRole.Visible = False
+            txtFullName.ReadOnly = True
 
-            btnSave.Location = New Point(btnSave.Location.X, cboRole.Location.Y)
-            btnCancel.Location = New Point(btnCancel.Location.X, cboRole.Location.Y)
-            Me.Height = Me.Height - 50
+            ' Adjust layout if role controls are hidden
+            Dim roleControlTop As Integer = If(Label4.Visible, Label4.Top, cboRole.Top)
+            Dim heightDifference As Integer = btnSave.Top - roleControlTop
+            btnSave.Top -= heightDifference
+            btnCancel.Top -= heightDifference
+            Me.Height -= heightDifference
+
         Else
-            cboRole.SelectedItem = role
+            If role = "Admin" Then
+                cboRole.SelectedItem = "Admin"
+            ElseIf role = "Cashier" Then
+                cboRole.SelectedItem = "Cashier"
+            End If
+            txtFullName.ReadOnly = False
+            Label4.Visible = True ' Ensure role controls are visible
+            cboRole.Visible = True
         End If
     End Sub
 
-    Public Sub New(studentId As Integer, fullName As String)
+    Public Sub New(studentId As Integer, fullName As String) ' Constructor for creating Student account
         InitializeComponent()
         _isEditMode = False
         _studentId = studentId
-        Me.Text = "Create Account"
-        lblTitle.Text = "Create Account for Student"
+        _role = "Student"
+        Me.Text = "Create Student Account" ' Specific Text
+        lblTitle.Text = "Create Account for Student" ' Specific Text
 
         txtFullName.Text = fullName
         txtFullName.ReadOnly = True
         Label4.Visible = False
         cboRole.Visible = False
 
-        btnSave.Location = New Point(btnSave.Location.X, cboRole.Location.Y)
-        btnCancel.Location = New Point(btnCancel.Location.X, cboRole.Location.Y)
+        ' Adjust layout consistently
+        Dim roleControlTop As Integer = If(Label4.Visible, Label4.Top, cboRole.Top)
+        Dim heightDifference As Integer = btnSave.Top - roleControlTop
+        btnSave.Top -= heightDifference
+        btnCancel.Top -= heightDifference
+        Me.Height -= heightDifference
 
-        Me.Height = Me.Height - 50
     End Sub
 
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         If String.IsNullOrWhiteSpace(txtFullName.Text) OrElse
        String.IsNullOrWhiteSpace(txtUsername.Text) OrElse
-       (cboRole.Visible AndAlso cboRole.SelectedIndex = -1) Then
-            MessageBox.Show("Please fill in all fields.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+       (cboRole.Visible AndAlso cboRole.SelectedIndex = -1 AndAlso _role <> "Student") Then
+            MessageBox.Show("Please fill in all required fields.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
         If Not _isEditMode AndAlso String.IsNullOrWhiteSpace(txtPassword.Text) Then
             MessageBox.Show("Password is required for new users.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
+
+        Dim selectedRole As String = If(_role = "Student", "Student", cboRole.SelectedItem?.ToString())
+        If String.IsNullOrEmpty(selectedRole) Then selectedRole = _role ' Fallback if ComboBox is hidden/invalid
 
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
@@ -92,14 +137,15 @@ Public Class frmAddEditUser
                             cmd.ExecuteNonQuery()
                         End Using
                     Else
-                        Dim tableName As String = If(cboRole.SelectedItem.ToString() = "Admin", "admins", "cashiers")
-                        Dim idColumn As String = If(cboRole.SelectedItem.ToString() = "Admin", "admin_id", "cashier_id")
+                        Dim tableName As String = If(selectedRole = "Admin", "admins", "cashiers")
+                        Dim idColumn As String = If(selectedRole = "Admin", "admin_id", "cashier_id")
 
                         Dim query As New System.Text.StringBuilder()
                         query.Append($"UPDATE {tableName} SET full_name = @fullName, username = @username")
                         If Not String.IsNullOrWhiteSpace(txtPassword.Text) Then
                             query.Append(", password_hash = @passwordHash")
                         End If
+
                         query.Append($" WHERE {idColumn} = @userId")
 
                         Using cmd As New MySqlCommand(query.ToString(), conn)
@@ -109,28 +155,28 @@ Public Class frmAddEditUser
                             If Not String.IsNullOrWhiteSpace(txtPassword.Text) Then
                                 cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
                             End If
+
                             cmd.ExecuteNonQuery()
                         End Using
                     End If
-                Else
-                    ' --- ADD LOGIC (Unchanged from your original file) ---
+                Else ' Add Mode
                     Dim query As String
-                    If _studentId > 0 Then
-                        query = "INSERT INTO users (student_id, username, password_hash, role) VALUES (@studentId, @username, @passwordHash, 'student')"
+                    If _studentId > 0 Then ' Adding account for existing student
+                        query = "INSERT INTO users (student_id, username, password_hash) VALUES (@studentId, @username, @passwordHash)"
                         Using cmd As New MySqlCommand(query, conn)
                             cmd.Parameters.AddWithValue("@studentId", _studentId)
                             cmd.Parameters.AddWithValue("@username", txtUsername.Text.Trim())
                             cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
                             cmd.ExecuteNonQuery()
                         End Using
-                    Else
-                        Dim tableName As String = If(cboRole.SelectedItem.ToString() = "Admin", "admins", "cashiers")
-                        query = $"INSERT INTO {tableName} (full_name, username, password_hash, role) VALUES (@fullName, @username, @passwordHash, @role)"
+                    Else ' Adding new Admin or Cashier
+                        Dim tableName As String = If(selectedRole = "Admin", "admins", "cashiers")
+                        query = $"INSERT INTO {tableName} (full_name, username, password_hash) VALUES (@fullName, @username, @passwordHash)"
                         Using cmd As New MySqlCommand(query, conn)
                             cmd.Parameters.AddWithValue("@fullName", txtFullName.Text.Trim())
                             cmd.Parameters.AddWithValue("@username", txtUsername.Text.Trim())
                             cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
-                            cmd.Parameters.AddWithValue("@role", cboRole.SelectedItem.ToString().ToLower())
+
                             cmd.ExecuteNonQuery()
                         End Using
                     End If
@@ -138,14 +184,22 @@ Public Class frmAddEditUser
 
                 Me.DialogResult = DialogResult.OK
                 Me.Close()
+            Catch ex As MySqlException
+                If ex.Number = 1062 Then
+                    MessageBox.Show($"Error saving user: The username '{txtUsername.Text.Trim()}' already exists. Please choose a different username.", "Duplicate Username", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Else
+                    MessageBox.Show($"Error saving user: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
             Catch ex As Exception
-                MessageBox.Show($"Error saving user: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show($"Error saving user: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Using
     End Sub
+
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
         Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
 End Class
+

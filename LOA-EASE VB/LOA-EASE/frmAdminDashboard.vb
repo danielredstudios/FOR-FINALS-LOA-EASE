@@ -9,31 +9,61 @@ Public Class frmAdminDashboard
     Private _lastQueueLogTimestamp As DateTime
     Private lblNoResultsFound As Label
     Private WithEvents tmrUserManagementRefresh As New Timer()
-    Private btnAddNewStudent As Button
-    Private btnDeleteStudent As Button
+    Private WithEvents btnAddNewStudent As Button
+    Private WithEvents btnDeleteStudent As Button
+    Private _activePanel As Panel
+    Private WithEvents cboSortUsers As ComboBox
 
     Public Sub New(adminFullName As String)
         InitializeComponent()
         _adminFullName = adminFullName
         Me.WindowState = FormWindowState.Maximized
-
     End Sub
-
 
     Private Sub frmAdminDashboard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.WindowState = FormWindowState.Maximized
-
         lblWelcome.Text = $"Welcome, {_adminFullName}"
-        lblNoResultsFound = New Label()
-        lblNoResultsFound.AutoSize = True
-        lblNoResultsFound.Font = New Font("Poppins", 9.0F, FontStyle.Bold)
-        lblNoResultsFound.ForeColor = Color.Red
-        lblNoResultsFound.Location = New Point(630, 19)
-        lblNoResultsFound.Name = "lblNoResultsFound"
-        lblNoResultsFound.Size = New Size(150, 22)
-        lblNoResultsFound.Text = "No results found"
-        lblNoResultsFound.Visible = False
-        pnlUserControls.Controls.Add(lblNoResultsFound)
+
+        lblNoResultsFound = New Label() With {
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .ForeColor = Color.Red,
+            .Name = "lblNoResultsFound",
+            .Size = New Size(150, 22),
+            .Text = "No results found",
+            .Visible = False,
+            .Anchor = AnchorStyles.Left,
+            .Margin = New Padding(3, 15, 3, 3)
+        }
+
+        Dim lblNoResultsAdmins As New Label() With {
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .ForeColor = Color.Red,
+            .Name = "lblNoResultsAdmins",
+            .Size = New Size(150, 22),
+            .Text = "No results found",
+            .Visible = False,
+            .Anchor = AnchorStyles.Left,
+            .Margin = New Padding(3, 15, 3, 3)
+        }
+        flpAdminControls.Controls.Add(lblNoResultsAdmins)
+        flpAdminControls.SetFlowBreak(lblNoResultsAdmins, True)
+
+        Dim lblNoResultsCashiers As New Label() With {
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .ForeColor = Color.Red,
+            .Name = "lblNoResultsCashiers",
+            .Size = New Size(150, 22),
+            .Text = "No results found",
+            .Visible = False,
+            .Anchor = AnchorStyles.Left,
+            .Margin = New Padding(3, 15, 3, 3)
+        }
+        flpCounterUserControls.Controls.Add(lblNoResultsCashiers)
+        flpCounterUserControls.SetFlowBreak(lblNoResultsCashiers, True)
+
         SetupDataGridViews()
         RefreshAllData()
 
@@ -46,12 +76,13 @@ Public Class frmAdminDashboard
         cboSortQueueLogs.Items.Add("Status")
         cboSortQueueLogs.SelectedIndex = 0
 
-        Dim cboSortUsers As New ComboBox()
-        cboSortUsers.DropDownStyle = ComboBoxStyle.DropDownList
-        cboSortUsers.Name = "cboSortUsers"
-        cboSortUsers.Location = New Point(440, 16)
-        cboSortUsers.Size = New Size(180, 30)
-        cboSortUsers.Font = New Font("Poppins", 9.0F)
+        cboSortUsers = New ComboBox() With {
+            .DropDownStyle = ComboBoxStyle.DropDownList,
+            .Name = "cboSortUsers",
+            .Size = New Size(180, 30),
+            .Font = New Font("Poppins", 9.0F),
+            .Margin = New Padding(3, 11, 3, 4)
+        }
         cboSortUsers.Items.Add("Default")
         cboSortUsers.Items.Add("Name (A-Z)")
         cboSortUsers.Items.Add("Name (Z-A)")
@@ -61,58 +92,120 @@ Public Class frmAdminDashboard
         cboSortUsers.Items.Add("Last Activity")
         cboSortUsers.SelectedIndex = 0
         AddHandler cboSortUsers.SelectedIndexChanged, AddressOf cboSortUsers_SelectedIndexChanged
-        pnlUserControls.Controls.Add(cboSortUsers)
-        Dim lblSortUsers As New Label()
-        lblSortUsers.Text = "Sort by:"
-        lblSortUsers.AutoSize = True
-        lblSortUsers.Font = New Font("Poppins", 9.0F)
-        lblSortUsers.Location = New Point(380, 19)
-        lblSortUsers.Name = "lblSortUsers"
-        pnlUserControls.Controls.Add(lblSortUsers)
-        btnAddNewStudent = New Button()
-        btnAddNewStudent.Name = "btnAddNewStudent"
-        btnAddNewStudent.Text = "Add New Student"
-        btnAddNewStudent.Location = New Point(630, 16)  ' Positioned after the sort dropdown
-        btnAddNewStudent.Size = New Size(150, 30)
-        btnAddNewStudent.Font = New Font("Poppins", 9.0F)
-        btnAddNewStudent.BackColor = Color.FromArgb(0, 123, 255)  ' Blue color like other action buttons
-        btnAddNewStudent.ForeColor = Color.White
-        btnAddNewStudent.FlatStyle = FlatStyle.Flat
+
+        Dim lblSortUsers As New Label() With {
+            .Text = "Sort by:",
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F),
+            .Name = "lblSortUsers",
+            .Margin = New Padding(10, 13, 3, 0)
+        }
+
+        btnAddNewStudent = New Button() With {
+            .Name = "btnAddNewStudent",
+            .Text = "➕ Add Student",
+            .Size = New Size(150, 48),
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .BackColor = Color.FromArgb(0, 123, 255),
+            .ForeColor = Color.White,
+            .FlatStyle = FlatStyle.Flat,
+            .Cursor = Cursors.Hand,
+            .Visible = False,
+            .Margin = New Padding(3, 4, 3, 4)
+        }
         btnAddNewStudent.FlatAppearance.BorderSize = 0
-        btnAddNewStudent.Cursor = Cursors.Hand
-        btnAddNewStudent.Visible = False
         AddHandler btnAddNewStudent.Click, AddressOf btnAddNewStudent_Click
-        pnlUserControls.Controls.Add(btnAddNewStudent)
-        btnDeleteStudent = New Button()
-        btnDeleteStudent.Name = "btnDeleteStudent"
-        btnDeleteStudent.Text = "Delete Student"
-        btnDeleteStudent.Location = New Point(790, 16)  ' Positioned after Add New Student button
-        btnDeleteStudent.Size = New Size(150, 30)
-        btnDeleteStudent.Font = New Font("Poppins", 9.0F)
-        btnDeleteStudent.BackColor = Color.FromArgb(220, 53, 69)  ' Red color for delete action
-        btnDeleteStudent.ForeColor = Color.White
-        btnDeleteStudent.FlatStyle = FlatStyle.Flat
+
+
+        btnDeleteStudent = New Button() With {
+            .Name = "btnDeleteStudent",
+            .Text = "🗑️ Delete Student",
+            .Size = New Size(160, 48),
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .BackColor = Color.FromArgb(220, 53, 69),
+            .ForeColor = Color.White,
+            .FlatStyle = FlatStyle.Flat,
+            .Cursor = Cursors.Hand,
+            .Visible = False,
+            .Margin = New Padding(3, 4, 3, 4)
+        }
         btnDeleteStudent.FlatAppearance.BorderSize = 0
-        btnDeleteStudent.Cursor = Cursors.Hand
-        btnDeleteStudent.Visible = False
         AddHandler btnDeleteStudent.Click, AddressOf btnDeleteStudent_Click
-        pnlUserControls.Controls.Add(btnDeleteStudent)
+
+        flpUserControls.FlowDirection = FlowDirection.LeftToRight
+        flpUserControls.Controls.Clear()
+
+        flpUserControls.Controls.Add(btnAddUser)
+        flpUserControls.Controls.Add(lblSearchUsers)
+        flpUserControls.Controls.Add(txtSearchUsers)
+        flpUserControls.Controls.Add(lblSortUsers)
+        flpUserControls.Controls.Add(cboSortUsers)
+
+        Dim spacerPanel As New Panel With {
+            .Margin = New Padding(0),
+            .Size = New Size(0, 0),
+            .AutoSize = True,
+            .AutoSizeMode = AutoSizeMode.GrowAndShrink
+        }
+        flpUserControls.Controls.Add(spacerPanel)
+        flpUserControls.SetFlowBreak(spacerPanel, False)
+
+        flpUserControls.Controls.Add(btnAddNewStudent)
+        flpUserControls.Controls.Add(btnDeleteStudent)
+        flpUserControls.Controls.Add(btnEditUser)
+        flpUserControls.Controls.Add(btnDeleteUser)
+
+
+        flpUserControls.Controls.Add(lblNoResultsFound)
+        flpUserControls.SetFlowBreak(lblNoResultsFound, True)
+
+        AddHandler flpUserControls.Resize, AddressOf flpUserControls_Resize
+
 
         ShowPanel(pnlDashboard, btnDashboard)
         AddHandler tabUserManagement.SelectedIndexChanged, AddressOf tabUserManagement_SelectedIndexChanged
+        AddHandler txtSearchAdmins.TextChanged, AddressOf txtSearchAdmins_TextChanged
+        AddHandler txtSearchCashiers.TextChanged, AddressOf txtSearchCashiers_TextChanged
+
+    End Sub
+
+    Private Sub flpUserControls_Resize(sender As Object, e As EventArgs)
+        Dim flp = DirectCast(sender, FlowLayoutPanel)
+        Dim spacer = flp.Controls.OfType(Of Panel).FirstOrDefault()
+        If spacer IsNot Nothing Then
+            Dim occupiedWidth As Integer = 0
+            For Each ctrl As Control In flp.Controls
+                If ctrl IsNot spacer AndAlso ctrl.Visible Then
+                    occupiedWidth += ctrl.Width + ctrl.Margin.Horizontal
+                End If
+            Next
+            Dim spacerWidth = flp.ClientSize.Width - occupiedWidth - flp.Padding.Horizontal
+            spacer.Width = Math.Max(0, spacerWidth)
+            spacer.Visible = (spacer.Width > 0)
+        End If
     End Sub
 
 
-
-    Private Sub cboSortUsers_SelectedIndexChanged(sender As Object, e As EventArgs)
-        Dim comboBox As ComboBox = DirectCast(sender, ComboBox)
-        ApplySorting(comboBox.SelectedItem.ToString())
+    Private Sub cboSortUsers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSortUsers.SelectedIndexChanged
+        If cboSortUsers.SelectedItem IsNot Nothing Then
+            ApplySorting(cboSortUsers.SelectedItem.ToString())
+        End If
     End Sub
+
 
     Private Sub ApplySorting(sortBy As String)
-        If Not pnlUserManagement.Visible Then Return
+        If _activePanel IsNot pnlUserManagement Then Return
         If tabUserManagement Is Nothing OrElse tabUserManagement.SelectedTab Is Nothing Then Return
-        Dim activeGridView As DataGridView = If(tabUserManagement.SelectedTab Is tpWithAccount, dgvUsersWithAccount, dgvUsersWithoutAccount)
+
+        Dim activeGridView As DataGridView = Nothing
+        If tabUserManagement.SelectedTab Is tpWithAccount Then
+            activeGridView = dgvUsersWithAccount
+        ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount Then
+            activeGridView = dgvUsersWithoutAccount
+        Else
+            Return
+        End If
+
         If activeGridView Is Nothing Then Return
         Dim source As BindingList(Of User) = TryCast(activeGridView.DataSource, BindingList(Of User))
         If source Is Nothing OrElse source.Count = 0 Then Return
@@ -130,7 +223,6 @@ Public Class frmAdminDashboard
                 userList.Sort(Function(x, y) String.Compare(x.YearLevel, y.YearLevel))
             Case "Last Activity"
                 userList.Sort(Function(x, y)
-                                  ' Compare last queue time (more recent first)
                                   If x.LastQueueDateTime = "N/A" AndAlso y.LastQueueDateTime = "N/A" Then
                                       Return 0
                                   ElseIf x.LastQueueDateTime = "N/A" Then
@@ -138,26 +230,39 @@ Public Class frmAdminDashboard
                                   ElseIf y.LastQueueDateTime = "N/A" Then
                                       Return -1
                                   Else
-                                      Return DateTime.Compare(DateTime.Parse(y.LastQueueDateTime), DateTime.Parse(x.LastQueueDateTime))
+                                      Dim format As String = "g"
+                                      Dim dtX As DateTime
+                                      Dim dtY As DateTime
+                                      If DateTime.TryParseExact(x.LastQueueDateTime, format, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, dtX) AndAlso _
+                                         DateTime.TryParseExact(y.LastQueueDateTime, format, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, dtY) Then
+                                          Return DateTime.Compare(dtY, dtX)
+                                      Else
+                                          Return 0
+                                      End If
                                   End If
                               End Function)
             Case "Default"
-                ' Do nothing, just reload the data
+                FetchUsers()
+                Return
             Case Else
                 Return
         End Select
 
-        ' Update the DataGridView with sorted list
         activeGridView.DataSource = New BindingList(Of User)(userList)
     End Sub
 
     Private Sub tmrRefresh_Tick(sender As Object, e As EventArgs)
-        If pnlDashboard.Visible Then
+        If _activePanel Is pnlDashboard Then
             RefreshAllData()
-        ElseIf pnlCounterManagement.Visible Then
+        ElseIf _activePanel Is pnlCounterManagement Then
             FetchCounters()
-        ElseIf pnlQueueLogs.Visible Then
+            FetchCashiers()
+        ElseIf _activePanel Is pnlQueueLogs Then
             CheckForQueueLogUpdates()
+        ElseIf _activePanel Is pnlAdminManagement Then
+            FetchAdmins()
+        ElseIf _activePanel Is pnlUserManagement Then
+            FetchUsers()
         End If
     End Sub
 
@@ -177,192 +282,94 @@ Public Class frmAdminDashboard
                     End If
                 End Using
             Catch ex As Exception
+                Console.WriteLine($"Error checking queue updates: {ex.Message}")
             End Try
         End Using
     End Sub
 
     Private Sub SetupDataGridViews()
-        ' Cashier Status DataGridView
         dgvCashierStatus.AutoGenerateColumns = False
         dgvCashierStatus.Columns.Clear()
-        dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "CashierName",
-        .HeaderText = "Cashier Name",
-        .DataPropertyName = "CashierName"
-    })
-        dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Status",
-        .HeaderText = "Status",
-        .DataPropertyName = "Status"
-    })
-        dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Counter",
-        .HeaderText = "Counter",
-        .DataPropertyName = "Counter"
-    })
+        dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CashierName", .HeaderText = "Cashier Name", .DataPropertyName = "CashierName"})
+        dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Status", .HeaderText = "Status", .DataPropertyName = "Status"})
+        dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Counter", .HeaderText = "Counter", .DataPropertyName = "Counter"})
         dgvCashierStatus.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvCashierStatus.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvCashierStatus.DefaultCellStyle.SelectionForeColor = Color.White
 
-        ' All Queues DataGridView
         dgvAllQueues.AutoGenerateColumns = False
         dgvAllQueues.Columns.Clear()
-        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "QueueNumber",
-        .HeaderText = "Queue No.",
-        .DataPropertyName = "QueueNumber"
-    })
-        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "FullName",
-        .HeaderText = "Full Name",
-        .DataPropertyName = "FullName"
-    })
-        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "StudentNo",
-        .HeaderText = "Student No.",
-        .DataPropertyName = "StudentNo"
-    })
-        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Counter",
-        .HeaderText = "Counter",
-        .DataPropertyName = "Counter"
-    })
-        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Status",
-        .HeaderText = "Status",
-        .DataPropertyName = "Status"
-    })
+        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "QueueNumber", .HeaderText = "Queue No.", .DataPropertyName = "QueueNumber"})
+        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "FullName"})
+        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "StudentNo", .HeaderText = "Student No.", .DataPropertyName = "StudentNo"})
+        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Counter", .HeaderText = "Counter", .DataPropertyName = "Counter"})
+        dgvAllQueues.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Status", .HeaderText = "Status", .DataPropertyName = "Status"})
         dgvAllQueues.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvAllQueues.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvAllQueues.DefaultCellStyle.SelectionForeColor = Color.White
 
-        ' Queue Logs DataGridView
         dgvQueueLogs.AutoGenerateColumns = False
         dgvQueueLogs.Columns.Clear()
-        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "QueueNumber",
-        .HeaderText = "Queue No.",
-        .DataPropertyName = "Queue Number"
-    })
-        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "FullName",
-        .HeaderText = "Full Name",
-        .DataPropertyName = "Full Name"
-    })
-        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Status",
-        .HeaderText = "Status",
-        .DataPropertyName = "Status"
-    })
-        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "CreatedAt",
-        .HeaderText = "Date Created",
-        .DataPropertyName = "Date Created"
-    })
+        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "QueueNumber", .HeaderText = "Queue No.", .DataPropertyName = "Queue Number"})
+        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "Full Name"})
+        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Status", .HeaderText = "Status", .DataPropertyName = "Status"})
+        dgvQueueLogs.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CreatedAt", .HeaderText = "Date Created", .DataPropertyName = "Date Created"})
         dgvQueueLogs.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvQueueLogs.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvQueueLogs.DefaultCellStyle.SelectionForeColor = Color.White
 
-        ' Users With Account DataGridView
         dgvUsersWithAccount.AutoGenerateColumns = False
         dgvUsersWithAccount.Columns.Clear()
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "FullName",
-        .HeaderText = "Full Name",
-        .DataPropertyName = "FullName"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Username",
-        .HeaderText = "Username",
-        .DataPropertyName = "Username"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "StudentNo",
-        .HeaderText = "Student No.",
-        .DataPropertyName = "StudentNo"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Role",
-        .HeaderText = "Role",
-        .DataPropertyName = "Role"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "LastLogin",
-        .HeaderText = "Last Login",
-        .DataPropertyName = "LastLogin"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "LastSession",
-        .HeaderText = "Last Session",
-        .DataPropertyName = "LastSession"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "LastQueueDateTime",
-        .HeaderText = "Last Queue",
-        .DataPropertyName = "LastQueueDateTime"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Course",
-        .HeaderText = "Course",
-        .DataPropertyName = "Course"
-    })
-        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "YearLevel",
-        .HeaderText = "Year Level",
-        .DataPropertyName = "YearLevel"
-    })
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "FullName"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Username", .HeaderText = "Username", .DataPropertyName = "Username"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "StudentNo", .HeaderText = "Student No.", .DataPropertyName = "StudentNo"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Role", .HeaderText = "Role", .DataPropertyName = "Role"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastLogin", .HeaderText = "Last Login", .DataPropertyName = "LastLogin"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastSession", .HeaderText = "Last Session", .DataPropertyName = "LastSession"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastQueueDateTime", .HeaderText = "Last Queue", .DataPropertyName = "LastQueueDateTime"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Course", .HeaderText = "Course", .DataPropertyName = "Course"})
+        dgvUsersWithAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "YearLevel", .HeaderText = "Year Level", .DataPropertyName = "YearLevel"})
         dgvUsersWithAccount.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvUsersWithAccount.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvUsersWithAccount.DefaultCellStyle.SelectionForeColor = Color.White
 
-        ' Users Without Account DataGridView
         dgvUsersWithoutAccount.AutoGenerateColumns = False
         dgvUsersWithoutAccount.Columns.Clear()
-        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "FullName",
-        .HeaderText = "Full Name",
-        .DataPropertyName = "FullName"
-    })
-        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "StudentNo",
-        .HeaderText = "Student No.",
-        .DataPropertyName = "StudentNo"
-    })
-        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Course",
-        .HeaderText = "Course",
-        .DataPropertyName = "Course"
-    })
-        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "YearLevel",
-        .HeaderText = "Year Level",
-        .DataPropertyName = "YearLevel"
-    })
-        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "LastQueueDateTime",
-        .HeaderText = "Last Queue",
-        .DataPropertyName = "LastQueueDateTime"
-    })
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "FullName"})
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "StudentNo", .HeaderText = "Student No.", .DataPropertyName = "StudentNo"})
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Course", .HeaderText = "Course", .DataPropertyName = "Course"})
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "YearLevel", .HeaderText = "Year Level", .DataPropertyName = "YearLevel"})
+        dgvUsersWithoutAccount.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastQueueDateTime", .HeaderText = "Last Queue", .DataPropertyName = "LastQueueDateTime"})
         dgvUsersWithoutAccount.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvUsersWithoutAccount.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvUsersWithoutAccount.DefaultCellStyle.SelectionForeColor = Color.White
 
-        ' Counters DataGridView
         dgvCounters.AutoGenerateColumns = False
         dgvCounters.Columns.Clear()
-        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "CounterName",
-        .HeaderText = "Counter Name",
-        .DataPropertyName = "CounterName"
-    })
-        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {
-        .Name = "Cashier",
-        .HeaderText = "Cashier",
-        .DataPropertyName = "Cashier"
-    })
+        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CounterName", .HeaderText = "Counter Name", .DataPropertyName = "CounterName"})
+        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Cashier", .HeaderText = "Cashier Assigned", .DataPropertyName = "Cashier"})
         dgvCounters.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvCounters.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvCounters.DefaultCellStyle.SelectionForeColor = Color.White
+
+        dgvAdmins.AutoGenerateColumns = False
+        dgvAdmins.Columns.Clear()
+        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "FullName"})
+        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Username", .HeaderText = "Username", .DataPropertyName = "Username"})
+        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastLogin", .HeaderText = "Last Login", .DataPropertyName = "LastLogin"})
+        dgvAdmins.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvAdmins.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        dgvAdmins.DefaultCellStyle.SelectionForeColor = Color.White
+
+        dgvCashiers.AutoGenerateColumns = False
+        dgvCashiers.Columns.Clear()
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "FullName"})
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Username", .HeaderText = "Username", .DataPropertyName = "Username"})
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastLogin", .HeaderText = "Last Login", .DataPropertyName = "LastLogin"})
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Counter", .HeaderText = "Assigned Counter", .DataPropertyName = "Counter"})
+        dgvCashiers.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvCashiers.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        dgvCashiers.DefaultCellStyle.SelectionForeColor = Color.White
 
         dgvReports.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvReports.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
@@ -408,10 +415,10 @@ Public Class frmAdminDashboard
                 Dim query As String = "
                         SELECT
                             q.queue_number,
-                        COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
+                            COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
                         s.student_number AS StudentNo,
                         c.counter_name,
-                            q.status
+                        q.status
                     FROM queues q
                     LEFT JOIN students s ON q.student_id = s.student_id
                     LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
@@ -476,7 +483,10 @@ Public Class frmAdminDashboard
 
                 If queueLogsTable.Rows.Count > 0 Then
                     _lastQueueLogTimestamp = Convert.ToDateTime(queueLogsTable.Rows(0)("Date Created"))
+                Else
+                    _lastQueueLogTimestamp = DateTime.MinValue
                 End If
+                dgvQueueLogs.ClearSelection()
 
             Catch ex As Exception
                 HandleDbError("fetching queue logs", ex)
@@ -486,73 +496,126 @@ Public Class frmAdminDashboard
 
     Private Sub txtSearchQueueLogs_TextChanged(sender As Object, e As EventArgs) Handles txtSearchQueueLogs.TextChanged
         If queueLogsTable Is Nothing Then Return
-        Dim filterText As String = txtSearchQueueLogs.Text.Replace("'", "''")
+        Dim filterText As String = txtSearchQueueLogs.Text.Trim().Replace("'", "''")
         Dim view As DataView = queueLogsTable.DefaultView
-        view.RowFilter = $"[Queue Number] LIKE '%{filterText}%' OR [Full Name] LIKE '%{filterText}%' OR [Status] LIKE '%{filterText}%'"
+
+        Try
+            If String.IsNullOrWhiteSpace(filterText) Then
+                view.RowFilter = String.Empty
+            Else
+                view.RowFilter = $"[Queue Number] LIKE '%{filterText}%' OR [Full Name] LIKE '%{filterText}%' OR [Status] LIKE '%{filterText}%'"
+            End If
+            Dim noResultsLabel = flpQueueLogControls.Controls.OfType(Of Label).FirstOrDefault(Function(lbl) lbl.Name = "lblNoResultsFound")
+            If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = (view.Count = 0 AndAlso Not String.IsNullOrWhiteSpace(filterText))
+        Catch ex As Exception
+            Console.WriteLine($"Filter error: {ex.Message}")
+            view.RowFilter = String.Empty
+        End Try
     End Sub
 
     Private Sub txtSearchUsers_TextChanged(sender As Object, e As EventArgs) Handles txtSearchUsers.TextChanged
         Dim searchText As String = txtSearchUsers.Text.Trim().ToLower()
+        Dim noResultsLabel = flpUserControls.Controls.OfType(Of Label).FirstOrDefault(Function(lbl) lbl.Name = "lblNoResultsFound")
+        If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = False
 
-        lblNoResultsFound.Visible = False
         If String.IsNullOrEmpty(searchText) Then
             If tabUserManagement.SelectedTab Is tpWithAccount AndAlso dgvUsersWithAccount.Tag IsNot Nothing Then
-                dgvUsersWithAccount.DataSource = dgvUsersWithAccount.Tag
+                dgvUsersWithAccount.DataSource = CType(dgvUsersWithAccount.Tag, BindingList(Of User))
                 dgvUsersWithAccount.Tag = Nothing
             ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount AndAlso dgvUsersWithoutAccount.Tag IsNot Nothing Then
-                dgvUsersWithoutAccount.DataSource = dgvUsersWithoutAccount.Tag
+                dgvUsersWithoutAccount.DataSource = CType(dgvUsersWithoutAccount.Tag, BindingList(Of User))
                 dgvUsersWithoutAccount.Tag = Nothing
             End If
             Return
         End If
 
+        Dim resultsFound As Boolean = False
         If tabUserManagement.SelectedTab Is tpWithAccount Then
-            Dim source As BindingList(Of User) = TryCast(dgvUsersWithAccount.DataSource, BindingList(Of User))
+            Dim source = TryCast(dgvUsersWithAccount.DataSource, BindingList(Of User))
             If source IsNot Nothing Then
-                Dim filteredList As New BindingList(Of User)
-
-                For Each user As User In source
-                    If user.FullName.ToLower().Contains(searchText) OrElse
-                   user.Username.ToLower().Contains(searchText) OrElse
-                   user.StudentNo.ToLower().Contains(searchText) OrElse
-                   (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
-                   (user.YearLevel IsNot Nothing AndAlso user.YearLevel.ToLower().Contains(searchText)) OrElse
-                   user.Role.ToLower().Contains(searchText) Then
-                        filteredList.Add(user)
-                    End If
-                Next
-
-                If dgvUsersWithAccount.Tag Is Nothing Then
-                    dgvUsersWithAccount.Tag = source
-                End If
+                If dgvUsersWithAccount.Tag Is Nothing Then dgvUsersWithAccount.Tag = source
+                Dim originalSource = CType(dgvUsersWithAccount.Tag, BindingList(Of User))
+                Dim filteredList = New BindingList(Of User)(originalSource.Where(Function(user)
+                                                                                       Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                              user.Username.ToLower().Contains(searchText) OrElse
+                                                                                              user.StudentNo.ToLower().Contains(searchText) OrElse
+                                                                                              (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
+                                                                                              (user.YearLevel IsNot Nothing AndAlso user.YearLevel.ToLower().Contains(searchText)) OrElse
+                                                                                              user.Role.ToLower().Contains(searchText)
+                                                                                   End Function).ToList())
                 dgvUsersWithAccount.DataSource = filteredList
-                lblNoResultsFound.Visible = (filteredList.Count = 0)
+                resultsFound = filteredList.Any()
             End If
         ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount Then
-            Dim source As BindingList(Of User) = TryCast(dgvUsersWithoutAccount.DataSource, BindingList(Of User))
+            Dim source = TryCast(dgvUsersWithoutAccount.DataSource, BindingList(Of User))
             If source IsNot Nothing Then
-                Dim filteredList As New BindingList(Of User)
-                For Each user As User In source
-                    If user.FullName.ToLower().Contains(searchText) OrElse
-                   user.StudentNo.ToLower().Contains(searchText) OrElse
-                   (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
-                   user.LastQueueDateTime.ToLower().Contains(searchText) Then
-                        filteredList.Add(user)
-                    End If
-                Next
-
-
-                If dgvUsersWithoutAccount.Tag Is Nothing Then
-                    dgvUsersWithoutAccount.Tag = source
-                End If
-
-
+                If dgvUsersWithoutAccount.Tag Is Nothing Then dgvUsersWithoutAccount.Tag = source
+                Dim originalSource = CType(dgvUsersWithoutAccount.Tag, BindingList(Of User))
+                Dim filteredList = New BindingList(Of User)(originalSource.Where(Function(user)
+                                                                                       Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                              user.StudentNo.ToLower().Contains(searchText) OrElse
+                                                                                              (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
+                                                                                              user.LastQueueDateTime.ToLower().Contains(searchText)
+                                                                                   End Function).ToList())
                 dgvUsersWithoutAccount.DataSource = filteredList
-
-
-                lblNoResultsFound.Visible = (filteredList.Count = 0)
+                resultsFound = filteredList.Any()
             End If
         End If
+
+        If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = Not resultsFound AndAlso Not String.IsNullOrEmpty(searchText)
+    End Sub
+
+    Private Sub txtSearchAdmins_TextChanged(sender As Object, e As EventArgs)
+        Dim searchText As String = txtSearchAdmins.Text.Trim().ToLower()
+        Dim noResultsLabel = flpAdminControls.Controls.OfType(Of Label).FirstOrDefault(Function(lbl) lbl.Name = "lblNoResultsAdmins")
+        If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = False
+
+        Dim source = TryCast(dgvAdmins.DataSource, BindingList(Of StaffUser))
+        If source Is Nothing Then Return
+
+        If String.IsNullOrEmpty(searchText) Then
+            If dgvAdmins.Tag IsNot Nothing Then
+                dgvAdmins.DataSource = CType(dgvAdmins.Tag, BindingList(Of StaffUser))
+                dgvAdmins.Tag = Nothing
+            End If
+            Return
+        End If
+
+        If dgvAdmins.Tag Is Nothing Then dgvAdmins.Tag = source
+        Dim originalSource = CType(dgvAdmins.Tag, BindingList(Of StaffUser))
+        Dim filteredList = New BindingList(Of StaffUser)(originalSource.Where(Function(user)
+                                                                               Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                      user.Username.ToLower().Contains(searchText)
+                                                                           End Function).ToList())
+        dgvAdmins.DataSource = filteredList
+        If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = Not filteredList.Any()
+    End Sub
+
+    Private Sub txtSearchCashiers_TextChanged(sender As Object, e As EventArgs)
+        Dim searchText As String = txtSearchCashiers.Text.Trim().ToLower()
+        Dim noResultsLabel = flpCounterUserControls.Controls.OfType(Of Label).FirstOrDefault(Function(lbl) lbl.Name = "lblNoResultsCashiers")
+        If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = False
+
+        Dim source = TryCast(dgvCashiers.DataSource, BindingList(Of StaffUser))
+        If source Is Nothing Then Return
+
+        If String.IsNullOrEmpty(searchText) Then
+            If dgvCashiers.Tag IsNot Nothing Then
+                dgvCashiers.DataSource = CType(dgvCashiers.Tag, BindingList(Of StaffUser))
+                dgvCashiers.Tag = Nothing
+            End If
+            Return
+        End If
+
+        If dgvCashiers.Tag Is Nothing Then dgvCashiers.Tag = source
+        Dim originalSource = CType(dgvCashiers.Tag, BindingList(Of StaffUser))
+        Dim filteredList = New BindingList(Of StaffUser)(originalSource.Where(Function(user)
+                                                                               Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                      user.Username.ToLower().Contains(searchText) OrElse
+                                                                                      (user.Counter IsNot Nothing AndAlso user.Counter.ToLower().Contains(searchText))
+                                                                           End Function).ToList())
+        dgvCashiers.DataSource = filteredList
+        If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = Not filteredList.Any()
     End Sub
 
     Private Sub cboSortQueueLogs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSortQueueLogs.SelectedIndexChanged
@@ -567,12 +630,11 @@ Public Class frmAdminDashboard
             Case "Status"
                 sortColumn = "[Status]"
             Case Else
-                queueLogsTable.DefaultView.Sort = ""
+                queueLogsTable.DefaultView.Sort = "[Date Created] DESC"
                 Return
         End Select
-        queueLogsTable.DefaultView.Sort = $"{sortColumn} ASC"
+        queueLogsTable.DefaultView.Sort = $"{sortColumn} ASC, [Date Created] DESC"
     End Sub
-
 
     Private Sub FetchUsers()
         Dim usersWithAccount As New BindingList(Of User)()
@@ -581,40 +643,33 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-            SELECT
-                s.student_id,
-                s.student_number,
-                CONCAT(s.first_name, ' ', s.last_name) AS full_name,
-                s.course,
-                s.year_level,
-                u.user_id,
-                u.username,
-                u.last_login,
-                u.created_at AS user_created_at,
-                q.last_queue_time
-            FROM
-                students s
-            LEFT JOIN
-                users u ON s.student_id = u.student_id
-            LEFT JOIN
-                (SELECT student_id, MAX(created_at) AS last_queue_time FROM queues GROUP BY student_id) q ON s.student_id = q.student_id"
+                    SELECT
+                        s.student_id, s.student_number, CONCAT(s.first_name, ' ', s.last_name) AS full_name,
+                        s.course, s.year_level,
+                        u.user_id, u.username, u.last_login, u.created_at AS user_created_at,
+                        q.last_queue_time
+                    FROM students s
+                    LEFT JOIN users u ON s.student_id = u.student_id
+                    LEFT JOIN (SELECT student_id, MAX(created_at) AS last_queue_time FROM queues GROUP BY student_id) q
+                        ON s.student_id = q.student_id
+                    ORDER BY s.last_name, s.first_name"
 
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
                             Dim user As New User With {
-                            .StudentID = Convert.ToInt32(reader("student_id")),
-                            .UserID = If(reader.IsDBNull(reader.GetOrdinal("user_id")), 0, Convert.ToInt32(reader("user_id"))),
-                            .FullName = reader("full_name").ToString(),
-                            .Username = If(reader.IsDBNull(reader.GetOrdinal("username")), "N/A", reader("username").ToString()),
-                            .StudentNo = reader("student_number").ToString(),
-                            .Course = If(reader.IsDBNull(reader.GetOrdinal("course")), "N/A", reader("course").ToString()),
-                            .YearLevel = If(reader.IsDBNull(reader.GetOrdinal("year_level")), "N/A", reader("year_level").ToString()),
-                            .Role = If(reader.IsDBNull(reader.GetOrdinal("user_id")), "No Account", "Student"),
-                            .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
-                            .LastSession = If(reader.IsDBNull(reader.GetOrdinal("user_created_at")), "N/A", Convert.ToDateTime(reader("user_created_at")).ToString("g")),
-                            .LastQueueDateTime = If(reader.IsDBNull(reader.GetOrdinal("last_queue_time")), "N/A", Convert.ToDateTime(reader("last_queue_time")).ToString("g"))
-                        }
+                                .StudentID = Convert.ToInt32(reader("student_id")),
+                                .UserID = If(reader.IsDBNull(reader.GetOrdinal("user_id")), 0, Convert.ToInt32(reader("user_id"))),
+                                .FullName = reader("full_name").ToString(),
+                                .Username = If(reader.IsDBNull(reader.GetOrdinal("username")), "N/A", reader("username").ToString()),
+                                .StudentNo = reader("student_number").ToString(),
+                                .Course = If(reader.IsDBNull(reader.GetOrdinal("course")), "N/A", reader("course").ToString()),
+                                .YearLevel = If(reader.IsDBNull(reader.GetOrdinal("year_level")), "N/A", reader("year_level").ToString()),
+                                .Role = If(reader.IsDBNull(reader.GetOrdinal("user_id")), "No Account", "Student"),
+                                .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
+                                .LastSession = If(reader.IsDBNull(reader.GetOrdinal("user_created_at")), "N/A", Convert.ToDateTime(reader("user_created_at")).ToString("g")),
+                                .LastQueueDateTime = If(reader.IsDBNull(reader.GetOrdinal("last_queue_time")), "N/A", Convert.ToDateTime(reader("last_queue_time")).ToString("g"))
+                            }
                             If user.Role = "No Account" Then
                                 usersWithoutAccount.Add(user)
                             Else
@@ -625,14 +680,79 @@ Public Class frmAdminDashboard
                 End Using
                 dgvUsersWithAccount.DataSource = usersWithAccount
                 dgvUsersWithoutAccount.DataSource = usersWithoutAccount
-                lblUsersTotal.Text = $"(With Account: {usersWithAccount.Count}, Without Account: {usersWithoutAccount.Count})"
+                lblUsersTotal.Text = $"(Students: {usersWithAccount.Count + usersWithoutAccount.Count})"
                 dgvUsersWithAccount.ClearSelection()
                 dgvUsersWithoutAccount.ClearSelection()
+                dgvUsersWithAccount.Tag = Nothing
+                dgvUsersWithoutAccount.Tag = Nothing
             Catch ex As Exception
-                HandleDbError("fetching users", ex)
+                HandleDbError("fetching student users", ex)
             End Try
         End Using
     End Sub
+
+    Private Sub FetchAdmins()
+        Dim adminList As New BindingList(Of StaffUser)()
+        Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+            Try
+                conn.Open()
+                Dim query As String = "SELECT admin_id, full_name, username, last_login FROM admins ORDER BY full_name"
+                Using cmd As New MySqlCommand(query, conn)
+                    Using reader As MySqlDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            adminList.Add(New StaffUser With {
+                                .UserID = Convert.ToInt32(reader("admin_id")),
+                                .FullName = reader("full_name").ToString(),
+                                .Username = reader("username").ToString(),
+                                .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
+                                .Role = "Admin"
+                            })
+                        End While
+                    End Using
+                End Using
+                dgvAdmins.DataSource = adminList
+                lblAdminsTotal.Text = $"(Total: {adminList.Count})"
+                dgvAdmins.ClearSelection()
+                dgvAdmins.Tag = Nothing
+            Catch ex As Exception
+                HandleDbError("fetching admins", ex)
+            End Try
+        End Using
+    End Sub
+
+    Private Sub FetchCashiers()
+        Dim cashierList As New BindingList(Of StaffUser)()
+        Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+            Try
+                conn.Open()
+                Dim query As String = "
+                    SELECT csh.cashier_id, csh.full_name, csh.username, csh.last_login, COALESCE(cnt.counter_name, 'Unassigned') AS counter_name
+                    FROM cashiers csh
+                    LEFT JOIN counters cnt ON csh.counter_id = cnt.counter_id
+                    ORDER BY csh.full_name"
+                Using cmd As New MySqlCommand(query, conn)
+                    Using reader As MySqlDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            cashierList.Add(New StaffUser With {
+                                .UserID = Convert.ToInt32(reader("cashier_id")),
+                                .FullName = reader("full_name").ToString(),
+                                .Username = reader("username").ToString(),
+                                .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
+                                .Role = "Cashier",
+                                .Counter = reader("counter_name").ToString()
+                            })
+                        End While
+                    End Using
+                End Using
+                dgvCashiers.DataSource = cashierList
+                dgvCashiers.ClearSelection()
+                dgvCashiers.Tag = Nothing
+            Catch ex As Exception
+                HandleDbError("fetching cashiers", ex)
+            End Try
+        End Using
+    End Sub
+
 
     Private Sub FetchCounters()
         Dim counterList As New BindingList(Of Counter)()
@@ -643,7 +763,7 @@ Public Class frmAdminDashboard
                 SELECT
                     c.counter_id,
                     c.counter_name,
-                    COALESCE(ch.full_name, 'N/A') AS cashier
+                    COALESCE(ch.full_name, 'Unassigned') AS cashier
                 FROM counters c
                 LEFT JOIN cashiers ch ON c.counter_id = ch.counter_id
                 ORDER BY c.counter_name"
@@ -660,6 +780,8 @@ Public Class frmAdminDashboard
                     End Using
                 End Using
                 dgvCounters.DataSource = counterList
+                lblCountersTotal.Text = $"(Total: {counterList.Count})"
+                dgvCounters.ClearSelection()
             Catch ex As Exception
                 HandleDbError("fetching counters", ex)
             End Try
@@ -668,19 +790,20 @@ Public Class frmAdminDashboard
 
     Private Sub HandleDbError(action As String, ex As Exception)
         tmrRefresh.Stop()
-        MessageBox.Show($"Error {action}: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        MessageBox.Show($"Error {action}: {ex.Message}{vbCrLf}{vbCrLf}Please check the database connection and configuration.", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
     End Sub
 
     Private Sub ShowPanel(panelToShow As Panel, clickedButton As Button)
         pnlDashboard.Visible = False
         pnlUserManagement.Visible = False
+        pnlAdminManagement.Visible = False
         pnlCounterManagement.Visible = False
         pnlReports.Visible = False
         pnlQueueLogs.Visible = False
 
         panelToShow.Visible = True
         panelToShow.BringToFront()
-
+        _activePanel = panelToShow
 
         If _activeButton IsNot Nothing Then
             _activeButton.BackColor = Color.FromArgb(45, 52, 54)
@@ -689,8 +812,10 @@ Public Class frmAdminDashboard
         _activeButton = clickedButton
     End Sub
 
+
     Private Sub btnDashboard_Click(sender As Object, e As EventArgs) Handles btnDashboard.Click
         ShowPanel(pnlDashboard, btnDashboard)
+        RefreshAllData()
     End Sub
 
     Private Sub btnUserManagement_Click(sender As Object, e As EventArgs) Handles btnUserManagement.Click
@@ -699,9 +824,15 @@ Public Class frmAdminDashboard
         tabUserManagement_SelectedIndexChanged(Nothing, Nothing)
     End Sub
 
+    Private Sub btnAdminManagement_Click(sender As Object, e As EventArgs) Handles btnAdminManagement.Click
+        ShowPanel(pnlAdminManagement, btnAdminManagement)
+        FetchAdmins()
+    End Sub
+
     Private Sub btnCounterManagement_Click(sender As Object, e As EventArgs) Handles btnCounterManagement.Click
         ShowPanel(pnlCounterManagement, btnCounterManagement)
         FetchCounters()
+        FetchCashiers()
     End Sub
 
     Private Sub btnQueueLogs_Click(sender As Object, e As EventArgs) Handles btnQueueLogs.Click
@@ -711,6 +842,8 @@ Public Class frmAdminDashboard
 
     Private Sub btnReports_Click(sender As Object, e As EventArgs) Handles btnReports.Click
         ShowPanel(pnlReports, btnReports)
+        dgvReports.DataSource = Nothing
+        lblReportTotal.Text = "Total Records: 0"
     End Sub
 
     Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
@@ -725,100 +858,289 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub btnAddUser_Click(sender As Object, e As EventArgs) Handles btnAddUser.Click
-        If dgvUsersWithoutAccount.SelectedRows.Count > 0 Then
-            Dim selectedUser As User = CType(dgvUsersWithoutAccount.SelectedRows(0).DataBoundItem, User)
-            If selectedUser.Role = "No Account" Then
-                Using frm As New frmAddEditUser(selectedUser.StudentID, selectedUser.FullName)
-                    If frm.ShowDialog() = DialogResult.OK Then
-                        FetchUsers()
-                    End If
-                End Using
-            Else
-                MessageBox.Show("This student already has an account.", "Account Exists", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            End If
-        Else
-            MessageBox.Show("Please select a student from the 'Without Account' tab to create an account for.", "No Student Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        End If
-    End Sub
-
-    Private Sub btnEditUser_Click(sender As Object, e As EventArgs) Handles btnEditUser.Click
-        If dgvUsersWithAccount.SelectedRows.Count > 0 Then
-            Dim selectedUser As User = CType(dgvUsersWithAccount.SelectedRows(0).DataBoundItem, User)
-            If selectedUser.Role <> "No Account" Then
-                Using frm As New frmAddEditUser(selectedUser.UserID, selectedUser.FullName, selectedUser.Username, selectedUser.Role)
-                    If frm.ShowDialog() = DialogResult.OK Then
-                        FetchUsers()
-                    End If
-                End Using
-            Else
-                MessageBox.Show("This student does not have an account to edit.", "No Account", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            End If
-        Else
-            MessageBox.Show("Please select a user from the 'With Account' tab to edit.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        End If
-    End Sub
-
-    Private Sub btnDeleteUser_Click(sender As Object, e As EventArgs) Handles btnDeleteUser.Click
-        If dgvUsersWithAccount.SelectedRows.Count > 0 Then
-            Dim selectedUser As User = CType(dgvUsersWithAccount.SelectedRows(0).DataBoundItem, User)
-
-            If selectedUser.Role = "No Account" Then
-                MessageBox.Show("This student does not have an account to delete.", "No Account", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                Return
-            End If
-
-            If MessageBox.Show($"Are you sure you want to delete the user account for '{selectedUser.FullName}'?{vbCrLf}This will not delete the student record.", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-                Using conn As MySqlConnection = DatabaseHelper.GetConnection()
-                    Try
-                        conn.Open()
-                        Dim query As String = "DELETE FROM users WHERE user_id = @userId"
-
-                        Using cmd As New MySqlCommand(query, conn)
-                            cmd.Parameters.AddWithValue("@userId", selectedUser.UserID)
-                            Dim result = cmd.ExecuteNonQuery()
-
-                            If result > 0 Then
-                                MessageBox.Show("User account deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                                FetchUsers()
-                            Else
-                                MessageBox.Show("Could not find the user account to delete. The list will be refreshed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        DirectCast(sender, Button).Enabled = False
+        Try
+            If _activePanel Is pnlUserManagement AndAlso tabUserManagement.SelectedTab Is tpWithoutAccount Then
+                If dgvUsersWithoutAccount.SelectedRows.Count > 0 Then
+                    Dim selectedStudent As User = CType(dgvUsersWithoutAccount.SelectedRows(0).DataBoundItem, User)
+                    If selectedStudent.Role = "No Account" Then
+                        Using frm As New frmAddEditUser(selectedStudent.StudentID, selectedStudent.FullName)
+                            frm.ShowDialog(Me)
+                            If frm.DialogResult = DialogResult.OK Then
                                 FetchUsers()
                             End If
                         End Using
+                    Else
+                        MessageBox.Show("This student seems to already have an account listed elsewhere.", "Account Exists Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        FetchUsers()
+                    End If
+                Else
+                    MessageBox.Show("Please select a student from the 'Without Account' tab to create an account for.", "No Student Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                End If
+            Else
+                MessageBox.Show("This action is only available for students without accounts.", "Action Not Applicable", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+        Finally
+            DirectCast(sender, Button).Enabled = True
+        End Try
+    End Sub
+
+    Private Sub btnEditUser_Click(sender As Object, e As EventArgs) Handles btnEditUser.Click
+        DirectCast(sender, Button).Enabled = False
+        Try
+            If _activePanel Is pnlUserManagement AndAlso tabUserManagement.SelectedTab Is tpWithAccount Then
+                If dgvUsersWithAccount.SelectedRows.Count > 0 Then
+                    Dim selectedUser As User = CType(dgvUsersWithAccount.SelectedRows(0).DataBoundItem, User)
+                    If selectedUser.Role <> "No Account" AndAlso selectedUser.UserID > 0 Then
+                        Using frm As New frmAddEditUser(selectedUser.UserID, selectedUser.FullName, selectedUser.Username, selectedUser.Role)
+                            frm.ShowDialog(Me)
+                            If frm.DialogResult = DialogResult.OK Then
+                                FetchUsers()
+                            End If
+                        End Using
+                    Else
+                        MessageBox.Show("Cannot edit selected entry. It might not have a valid account.", "Edit Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        FetchUsers()
+                    End If
+                Else
+                    MessageBox.Show("Please select a student user from the 'With Account' tab to edit.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                End If
+            Else
+                MessageBox.Show("This action is only available for student accounts.", "Action Not Applicable", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+        Finally
+            DirectCast(sender, Button).Enabled = True
+        End Try
+    End Sub
+
+
+    Private Sub btnDeleteUser_Click(sender As Object, e As EventArgs) Handles btnDeleteUser.Click
+        If _activePanel Is pnlUserManagement AndAlso tabUserManagement.SelectedTab Is tpWithAccount Then
+            If dgvUsersWithAccount.SelectedRows.Count > 0 Then
+                Dim selectedUser As User = CType(dgvUsersWithAccount.SelectedRows(0).DataBoundItem, User)
+
+                If selectedUser.Role = "No Account" OrElse selectedUser.UserID <= 0 Then
+                    MessageBox.Show("This student does not have an account to delete.", "No Account", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                If MessageBox.Show($"Are you sure you want to delete the user account for '{selectedUser.FullName}'?{vbCrLf}This will NOT delete the student record itself.", "Confirm Account Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                    DirectCast(sender, Button).Enabled = False
+                    Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                        Try
+                            conn.Open()
+                            Dim query As String = "DELETE FROM users WHERE user_id = @userId"
+
+                            Using cmd As New MySqlCommand(query, conn)
+                                cmd.Parameters.AddWithValue("@userId", selectedUser.UserID)
+                                Dim result = cmd.ExecuteNonQuery()
+
+                                If result > 0 Then
+                                    MessageBox.Show("Student user account deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                    FetchUsers()
+                                Else
+                                    MessageBox.Show("Could not find the student user account to delete. The list will be refreshed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                                    FetchUsers()
+                                End If
+                            End Using
+                        Catch ex As Exception
+                            MessageBox.Show($"Error deleting student user account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Finally
+                             If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                             DirectCast(sender, Button).Enabled = True
+                        End Try
+                    End Using
+                End If
+            Else
+                MessageBox.Show("Please select a student user from the 'With Account' tab to delete their account.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
+        Else
+            MessageBox.Show("This action is only available for student accounts.", "Action Not Applicable", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    End Sub
+
+    Private Sub btnAddAdmin_Click(sender As Object, e As EventArgs) Handles btnAddAdmin.Click
+        DirectCast(sender, Button).Enabled = False
+        Try
+            Using frm As New frmAddEditUser("Admin")
+                frm.ShowDialog(Me)
+                If frm.DialogResult = DialogResult.OK Then
+                    FetchAdmins()
+                End If
+            End Using
+        Finally
+            DirectCast(sender, Button).Enabled = True
+        End Try
+    End Sub
+
+    Private Sub btnEditAdmin_Click(sender As Object, e As EventArgs) Handles btnEditAdmin.Click
+        DirectCast(sender, Button).Enabled = False
+        Try
+            If dgvAdmins.SelectedRows.Count > 0 Then
+                Dim selectedAdmin As StaffUser = CType(dgvAdmins.SelectedRows(0).DataBoundItem, StaffUser)
+                Using frm As New frmAddEditUser(selectedAdmin.UserID, selectedAdmin.FullName, selectedAdmin.Username, "Admin")
+                   frm.ShowDialog(Me)
+                   If frm.DialogResult = DialogResult.OK Then
+                        FetchAdmins()
+                    End If
+                End Using
+            Else
+                MessageBox.Show("Please select an admin to edit.", "No Admin Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
+        Finally
+             DirectCast(sender, Button).Enabled = True
+        End Try
+    End Sub
+
+    Private Sub btnDeleteAdmin_Click(sender As Object, e As EventArgs) Handles btnDeleteAdmin.Click
+        If dgvAdmins.SelectedRows.Count > 0 Then
+            Dim selectedAdmin As StaffUser = CType(dgvAdmins.SelectedRows(0).DataBoundItem, StaffUser)
+
+            If selectedAdmin.FullName = _adminFullName Then
+                MessageBox.Show("You cannot delete your own admin account while logged in.", "Action Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            If MessageBox.Show($"Are you sure you want to permanently delete the admin account for '{selectedAdmin.FullName}'?", "Confirm Admin Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) = DialogResult.Yes Then
+                DirectCast(sender, Button).Enabled = False
+                Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                    Try
+                        conn.Open()
+                        Dim query As String = "DELETE FROM admins WHERE admin_id = @adminId"
+                        Using cmd As New MySqlCommand(query, conn)
+                            cmd.Parameters.AddWithValue("@adminId", selectedAdmin.UserID)
+                            Dim result = cmd.ExecuteNonQuery()
+                            If result > 0 Then
+                                MessageBox.Show("Admin account deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                FetchAdmins()
+                            Else
+                                MessageBox.Show("Could not find the admin account to delete.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                            End If
+                        End Using
                     Catch ex As Exception
-                        MessageBox.Show($"Error deleting user account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        MessageBox.Show($"Error deleting admin account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Finally
+                         If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                         DirectCast(sender, Button).Enabled = True
                     End Try
                 End Using
             End If
         Else
-            MessageBox.Show("Please select a user from the 'With Account' tab to delete.", "No User Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Please select an admin to delete.", "No Admin Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End If
+    End Sub
+
+    Private Sub btnAddCashier_Click(sender As Object, e As EventArgs) Handles btnAddCashier.Click
+        DirectCast(sender, Button).Enabled = False
+        Try
+            Using frm As New frmAddEditUser("Cashier")
+                frm.ShowDialog(Me)
+                If frm.DialogResult = DialogResult.OK Then
+                    FetchCashiers()
+                    FetchCounters()
+                End If
+            End Using
+        Finally
+             DirectCast(sender, Button).Enabled = True
+        End Try
+    End Sub
+
+    Private Sub btnEditCashier_Click(sender As Object, e As EventArgs) Handles btnEditCashier.Click
+         DirectCast(sender, Button).Enabled = False
+         Try
+            If dgvCashiers.SelectedRows.Count > 0 Then
+                Dim selectedCashier As StaffUser = CType(dgvCashiers.SelectedRows(0).DataBoundItem, StaffUser)
+                Using frm As New frmAddEditUser(selectedCashier.UserID, selectedCashier.FullName, selectedCashier.Username, "Cashier")
+                    frm.ShowDialog(Me)
+                    If frm.DialogResult = DialogResult.OK Then
+                        FetchCashiers()
+                        FetchCounters()
+                    End If
+                End Using
+            Else
+                MessageBox.Show("Please select a cashier to edit.", "No Cashier Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
+        Finally
+            DirectCast(sender, Button).Enabled = True
+        End Try
+    End Sub
+
+    Private Sub btnDeleteCashier_Click(sender As Object, e As EventArgs) Handles btnDeleteCashier.Click
+        If dgvCashiers.SelectedRows.Count > 0 Then
+            Dim selectedCashier As StaffUser = CType(dgvCashiers.SelectedRows(0).DataBoundItem, StaffUser)
+
+            If MessageBox.Show($"Are you sure you want to permanently delete the cashier account for '{selectedCashier.FullName}'?{vbCrLf}This might affect counter assignments.", "Confirm Cashier Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) = DialogResult.Yes Then
+                DirectCast(sender, Button).Enabled = False
+                Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                    Try
+                        conn.Open()
+                        Dim query As String = "DELETE FROM cashiers WHERE cashier_id = @cashierId"
+                        Using cmd As New MySqlCommand(query, conn)
+                            cmd.Parameters.AddWithValue("@cashierId", selectedCashier.UserID)
+                            Dim result = cmd.ExecuteNonQuery()
+                            If result > 0 Then
+                                MessageBox.Show("Cashier account deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                FetchCashiers()
+                                FetchCounters()
+                            Else
+                                MessageBox.Show("Could not find the cashier account to delete.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                            End If
+                        End Using
+                    Catch ex As MySqlException
+                        If ex.Number = 1451 Then
+                            MessageBox.Show($"Cannot delete cashier. They might be referenced elsewhere (e.g., active session logs - check database schema).", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Else
+                            MessageBox.Show($"Error deleting cashier account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        End If
+                    Catch ex As Exception
+                        MessageBox.Show($"Error deleting cashier account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Finally
+                         If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                         DirectCast(sender, Button).Enabled = True
+                    End Try
+                End Using
+            End If
+        Else
+            MessageBox.Show("Please select a cashier to delete.", "No Cashier Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
 
     Private Sub btnAddCounter_Click(sender As Object, e As EventArgs) Handles btnAddCounter.Click
-        Using frm As New frmAddEditCounter()
-            If frm.ShowDialog() = DialogResult.OK Then
-                FetchCounters()
-            End If
-        End Using
-    End Sub
-
-    Private Sub btnEditCounter_Click(sender As Object, e As EventArgs) Handles btnEditCounter.Click
-        If dgvCounters.SelectedRows.Count > 0 Then
-            Dim selectedCounter As Counter = CType(dgvCounters.SelectedRows(0).DataBoundItem, Counter)
-            Using frm As New frmAddEditCounter(selectedCounter.CounterID)
-                If frm.ShowDialog() = DialogResult.OK Then
+        DirectCast(sender, Button).Enabled = False
+        Try
+            Using frm As New frmAddEditCounter()
+                frm.ShowDialog(Me)
+                If frm.DialogResult = DialogResult.OK Then
                     FetchCounters()
                 End If
             End Using
-        Else
-            MessageBox.Show("Please select a counter to edit.", "No Counter Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        End If
+        Finally
+             DirectCast(sender, Button).Enabled = True
+        End Try
+    End Sub
+
+    Private Sub btnEditCounter_Click(sender As Object, e As EventArgs) Handles btnEditCounter.Click
+        DirectCast(sender, Button).Enabled = False
+        Try
+            If dgvCounters.SelectedRows.Count > 0 Then
+                Dim selectedCounter As Counter = CType(dgvCounters.SelectedRows(0).DataBoundItem, Counter)
+                Using frm As New frmAddEditCounter(selectedCounter.CounterID)
+                    frm.ShowDialog(Me)
+                    If frm.DialogResult = DialogResult.OK Then
+                        FetchCounters()
+                        FetchCashiers()
+                    End If
+                End Using
+            Else
+                MessageBox.Show("Please select a counter to edit.", "No Counter Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
+        Finally
+            DirectCast(sender, Button).Enabled = True
+        End Try
     End Sub
 
     Private Sub btnChangeStatus_Click(sender As Object, e As EventArgs) Handles btnChangeStatus.Click
         If dgvQueueLogs.SelectedRows.Count > 0 Then
-            ' The DataBoundItem is a DataRowView when the DataSource is a DataTable.
             Dim selectedRow As DataRowView = TryCast(dgvQueueLogs.SelectedRows(0).DataBoundItem, DataRowView)
 
             If selectedRow IsNot Nothing Then
@@ -826,55 +1148,65 @@ Public Class frmAdminDashboard
                 Dim queueNumber As String = selectedRow("Queue Number").ToString()
                 Dim currentStatus As String = selectedRow("Status").ToString()
 
+                Using statusForm As New Form() With {
+                    .Text = "Change Queue Status",
+                    .StartPosition = FormStartPosition.CenterParent,
+                    .FormBorderStyle = FormBorderStyle.FixedDialog,
+                    .ClientSize = New Size(250, 150),
+                    .MaximizeBox = False,
+                    .MinimizeBox = False
+                }
 
-                Using statusForm As New Form()
-                    statusForm.Text = "Change Queue Status"
-                    statusForm.StartPosition = FormStartPosition.CenterParent
-                    statusForm.FormBorderStyle = FormBorderStyle.FixedDialog
-                    statusForm.ClientSize = New Size(250, 150)
-
-                    Dim lbl As New Label()
-                    lbl.Text = $"Change status for {queueNumber}:"
-                    lbl.Location = New Point(10, 10)
-                    lbl.AutoSize = True
+                    Dim lbl As New Label() With {
+                        .Text = $"Change status for {queueNumber}:",
+                        .Location = New Point(10, 10),
+                        .AutoSize = True
+                    }
                     statusForm.Controls.Add(lbl)
 
-                    Dim cboStatus As New ComboBox()
-                    cboStatus.DropDownStyle = ComboBoxStyle.DropDownList
+                    Dim cboStatus As New ComboBox() With {
+                        .DropDownStyle = ComboBoxStyle.DropDownList,
+                        .Location = New Point(10, 40),
+                        .Width = 230
+                    }
                     cboStatus.Items.AddRange(New String() {"waiting", "serving", "completed", "cancelled", "no-show", "scheduled", "expired"})
                     cboStatus.SelectedItem = currentStatus
-                    cboStatus.Location = New Point(10, 40)
-                    cboStatus.Width = 230
                     statusForm.Controls.Add(cboStatus)
 
-                    Dim btnOk As New Button()
-                    btnOk.Text = "OK"
-                    btnOk.DialogResult = DialogResult.OK
-                    btnOk.Location = New Point(80, 80)
+                    Dim btnOk As New Button() With {
+                        .Text = "OK",
+                        .DialogResult = DialogResult.OK,
+                        .Location = New Point(80, 80)
+                    }
                     statusForm.Controls.Add(btnOk)
 
-                    Dim btnCancel As New Button()
-                    btnCancel.Text = "Cancel"
-                    btnCancel.DialogResult = DialogResult.Cancel
-                    btnCancel.Location = New Point(160, 80)
+                    Dim btnCancel As New Button() With {
+                        .Text = "Cancel",
+                        .DialogResult = DialogResult.Cancel,
+                        .Location = New Point(160, 80)
+                    }
                     statusForm.Controls.Add(btnCancel)
+                    statusForm.AcceptButton = btnOk
+                    statusForm.CancelButton = btnCancel
 
-                    If statusForm.ShowDialog() = DialogResult.OK Then
+                    If statusForm.ShowDialog(Me) = DialogResult.OK Then
                         Dim newStatus As String = cboStatus.SelectedItem.ToString()
-                        Using conn As MySqlConnection = DatabaseHelper.GetConnection()
-                            Try
-                                conn.Open()
-                                Dim query As String = "UPDATE queues SET status = @status WHERE queue_id = @queueId"
-                                Using cmd As New MySqlCommand(query, conn)
-                                    cmd.Parameters.AddWithValue("@status", newStatus)
-                                    cmd.Parameters.AddWithValue("@queueId", queueId)
-                                    cmd.ExecuteNonQuery()
-                                End Using
-                                FetchAllQueueLogs()
-                            Catch ex As Exception
-                                MessageBox.Show($"Error updating status: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                            End Try
-                        End Using
+                        If newStatus <> currentStatus Then
+                            Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                                Try
+                                    conn.Open()
+                                    Dim query As String = "UPDATE queues SET status = @status WHERE queue_id = @queueId"
+                                    Using cmd As New MySqlCommand(query, conn)
+                                        cmd.Parameters.AddWithValue("@status", newStatus)
+                                        cmd.Parameters.AddWithValue("@queueId", queueId)
+                                        cmd.ExecuteNonQuery()
+                                    End Using
+                                    FetchAllQueueLogs()
+                                Catch ex As Exception
+                                    MessageBox.Show($"Error updating status: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                                End Try
+                            End Using
+                        End If
                     End If
                 End Using
             End If
@@ -886,30 +1218,49 @@ Public Class frmAdminDashboard
     Private Sub btnDeleteCounter_Click(sender As Object, e As EventArgs) Handles btnDeleteCounter.Click
         If dgvCounters.SelectedRows.Count > 0 Then
             Dim selectedCounter As Counter = CType(dgvCounters.SelectedRows(0).DataBoundItem, Counter)
-            If MessageBox.Show($"Are you sure you want to delete '{selectedCounter.CounterName}'?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
-                Using conn As MySqlConnection = DatabaseHelper.GetConnection()
-                    conn.Open()
-                    Dim transaction As MySqlTransaction = conn.BeginTransaction()
-                    Try
-                        ' First, delete the cashier associated with the counter
-                        Dim deleteCashierQuery As String = "DELETE FROM cashiers WHERE counter_id = @counterId"
-                        Using cmd As New MySqlCommand(deleteCashierQuery, conn, transaction)
-                            cmd.Parameters.AddWithValue("@counterId", selectedCounter.CounterID)
-                            cmd.ExecuteNonQuery()
-                        End Using
 
-                        ' Then, delete the counter itself
+            If selectedCounter.Cashier <> "Unassigned" Then
+                MessageBox.Show($"Cannot delete counter '{selectedCounter.CounterName}' because it is currently assigned to cashier '{selectedCounter.Cashier}'.{vbCrLf}Please unassign the cashier first (edit the cashier's details).", "Cannot Delete Assigned Counter", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+
+            If MessageBox.Show($"Are you sure you want to permanently delete counter '{selectedCounter.CounterName}'?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) = DialogResult.Yes Then
+                DirectCast(sender, Button).Enabled = False
+                Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                    Dim transaction As MySqlTransaction = Nothing
+                    Try
+                        conn.Open()
+                        transaction = conn.BeginTransaction()
+
                         Dim deleteCounterQuery As String = "DELETE FROM counters WHERE counter_id = @counterId"
                         Using cmd As New MySqlCommand(deleteCounterQuery, conn, transaction)
                             cmd.Parameters.AddWithValue("@counterId", selectedCounter.CounterID)
-                            cmd.ExecuteNonQuery()
+                            Dim result = cmd.ExecuteNonQuery()
+
+                            If result > 0 Then
+                                transaction.Commit()
+                                MessageBox.Show("Counter deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                FetchCounters()
+                            Else
+                                transaction.Rollback()
+                                MessageBox.Show("Could not find the counter to delete.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                            End If
                         End Using
 
-                        transaction.Commit()
-                        FetchCounters()
+                    Catch ex As MySqlException
+                        If transaction IsNot Nothing Then transaction.Rollback()
+                        If ex.Number = 1451 Then
+                            MessageBox.Show($"Cannot delete counter '{selectedCounter.CounterName}' as it is referenced by other records (e.g., existing queues). Please resolve these references first.", "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Else
+                            MessageBox.Show($"Error deleting counter: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        End If
                     Catch ex As Exception
-                        transaction.Rollback()
-                        MessageBox.Show($"Error deleting counter: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        If transaction IsNot Nothing Then transaction.Rollback()
+                        MessageBox.Show($"Error deleting counter: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Finally
+                         If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                         DirectCast(sender, Button).Enabled = True
                     End Try
                 End Using
             End If
@@ -917,6 +1268,7 @@ Public Class frmAdminDashboard
             MessageBox.Show("Please select a counter to delete.", "No Counter Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
+
     Private Sub btnGenerateReport_Click(sender As Object, e As EventArgs) Handles btnGenerateReport.Click
         FetchReportData()
     End Sub
@@ -928,56 +1280,64 @@ Public Class frmAdminDashboard
         End If
 
         Dim reportType As String = cboReportType.SelectedItem.ToString()
-        Dim startDate As Date = dtpStartDate.Value
-        Dim endDate As Date = dtpEndDate.Value
+        Dim startDate As Date = dtpStartDate.Value.Date
+        Dim endDate As Date = dtpEndDate.Value.Date
         Dim reportData As New BindingList(Of QueueLogAdminItem)()
 
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
-                Dim query As String = "
-                SELECT
-                    q.queue_id,
-                    q.queue_number,
-                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
-                    q.status,
-                    q.created_at
-                FROM queues q
-                LEFT JOIN students s ON q.student_id = s.student_id
-                LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
-                WHERE "
+                Dim queryBuilder As New System.Text.StringBuilder("
+                    SELECT q.queue_id, q.queue_number,
+                           COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
+                           q.status, q.created_at
+                    FROM queues q
+                    LEFT JOIN students s ON q.student_id = s.student_id
+                    LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
+                    WHERE ")
+
+                Dim cmd As New MySqlCommand()
 
                 Select Case reportType
                     Case "Daily"
-                        query &= "DATE(q.created_at) = @startDate"
+                        queryBuilder.Append("DATE(q.created_at) = @dateParam")
+                        cmd.Parameters.AddWithValue("@dateParam", startDate)
                     Case "Weekly"
-                        query &= "YEARWEEK(q.created_at, 1) = YEARWEEK(@startDate, 1)"
+                        queryBuilder.Append("YEARWEEK(q.created_at, 1) = YEARWEEK(@dateParam, 1)")
+                        cmd.Parameters.AddWithValue("@dateParam", startDate)
                     Case "Monthly"
-                        query &= "YEAR(q.created_at) = YEAR(@startDate) AND MONTH(q.created_at) = MONTH(@startDate)"
+                        queryBuilder.Append("YEAR(q.created_at) = @yearParam AND MONTH(q.created_at) = @monthParam")
+                        cmd.Parameters.AddWithValue("@yearParam", startDate.Year)
+                        cmd.Parameters.AddWithValue("@monthParam", startDate.Month)
                     Case "Annual"
-                        query &= "YEAR(q.created_at) = YEAR(@startDate)"
+                        queryBuilder.Append("YEAR(q.created_at) = @yearParam")
+                        cmd.Parameters.AddWithValue("@yearParam", startDate.Year)
+                    Case Else
+                        queryBuilder.Append("DATE(q.created_at) = @dateParam")
+                        cmd.Parameters.AddWithValue("@dateParam", startDate)
                 End Select
 
-                query &= " ORDER BY q.created_at DESC"
+                queryBuilder.Append(" ORDER BY q.created_at DESC")
 
-                Using cmd As New MySqlCommand(query, conn)
-                    cmd.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"))
+                cmd.CommandText = queryBuilder.ToString()
+                cmd.Connection = conn
 
-                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                        While reader.Read()
-                            reportData.Add(New QueueLogAdminItem With {
-                                .QueueID = Convert.ToInt32(reader("queue_id")),
-                                .QueueNumber = reader("queue_number").ToString(),
-                                .FullName = reader("FullName").ToString(),
-                                .Status = reader("status").ToString(),
-                                .CreatedAt = Convert.ToDateTime(reader("created_at")).ToString("g")
-                            })
-                        End While
-                    End Using
+
+                Using reader As MySqlDataReader = cmd.ExecuteReader()
+                    While reader.Read()
+                        reportData.Add(New QueueLogAdminItem With {
+                            .QueueID = Convert.ToInt32(reader("queue_id")),
+                            .QueueNumber = reader("queue_number").ToString(),
+                            .FullName = reader("FullName").ToString(),
+                            .Status = reader("status").ToString(),
+                            .CreatedAt = Convert.ToDateTime(reader("created_at")).ToString("g")
+                        })
+                    End While
                 End Using
 
                 dgvReports.DataSource = reportData
                 lblReportTotal.Text = $"Total Records: {reportData.Count}"
+                dgvReports.ClearSelection()
             Catch ex As Exception
                 HandleDbError("fetching report data", ex)
             End Try
@@ -985,253 +1345,177 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub dgvQueueLogs_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvQueueLogs.CellFormatting
-        If e.ColumnIndex = dgvQueueLogs.Columns("Status").Index AndAlso e.Value IsNot Nothing Then
-            Dim status As String = e.Value.ToString()
+        If e.RowIndex < 0 OrElse e.ColumnIndex <> dgvQueueLogs.Columns("Status").Index OrElse e.Value Is Nothing Then Return
 
-            ' Check if the row is selected
-            Dim isSelected As Boolean = False
-            If e.RowIndex >= 0 AndAlso e.RowIndex < dgvQueueLogs.Rows.Count Then
-                isSelected = dgvQueueLogs.Rows(e.RowIndex).Selected
-            End If
+        Dim status As String = e.Value.ToString()
+        Dim isSelected As Boolean = dgvQueueLogs.Rows(e.RowIndex).Selected
+        Dim backColor As Color = Color.White
+        Dim foreColor As Color = Color.FromArgb(108, 117, 125)
 
-            Select Case status
-                Case "completed"
-                    e.CellStyle.BackColor = Color.LimeGreen
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "serving"
-                    e.CellStyle.BackColor = Color.Blue
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "waiting"
-                    e.CellStyle.BackColor = Color.Orange
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "cancelled"
-                    e.CellStyle.BackColor = Color.Red
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "no-show"
-                    e.CellStyle.BackColor = Color.Gray
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "scheduled"
-                    e.CellStyle.BackColor = Color.Purple
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "expired"
-                    e.CellStyle.BackColor = Color.DarkGray
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-            End Select
+        Select Case status
+            Case "completed" : backColor = Color.LimeGreen : foreColor = Color.White
+            Case "serving" : backColor = Color.DodgerBlue : foreColor = Color.White
+            Case "waiting" : backColor = Color.Orange : foreColor = Color.White
+            Case "cancelled" : backColor = Color.Crimson : foreColor = Color.White
+            Case "no-show" : backColor = Color.DimGray : foreColor = Color.White
+            Case "scheduled" : backColor = Color.MediumPurple : foreColor = Color.White
+            Case "expired" : backColor = Color.SlateGray : foreColor = Color.White
+        End Select
+
+        e.CellStyle.BackColor = backColor
+        e.CellStyle.ForeColor = foreColor
+
+        If isSelected Then
+            e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+            e.CellStyle.SelectionForeColor = Color.White
+        Else
+            e.CellStyle.SelectionBackColor = backColor
+            e.CellStyle.SelectionForeColor = foreColor
         End If
+        e.FormattingApplied = True
+
     End Sub
 
     Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvAllQueues.CellFormatting
-        If e.ColumnIndex = dgvAllQueues.Columns("Status").Index AndAlso e.Value IsNot Nothing Then
-            Dim status As String = e.Value.ToString()
+        If e.RowIndex < 0 OrElse e.ColumnIndex <> dgvAllQueues.Columns("Status").Index OrElse e.Value Is Nothing Then Return
 
-            ' Check if the row is selected
-            Dim isSelected As Boolean = False
-            If e.RowIndex >= 0 AndAlso e.RowIndex < dgvAllQueues.Rows.Count Then
-                isSelected = dgvAllQueues.Rows(e.RowIndex).Selected
-            End If
+        Dim status As String = e.Value.ToString()
+        Dim isSelected As Boolean = dgvAllQueues.Rows(e.RowIndex).Selected
+        Dim backColor As Color = Color.White
+        Dim foreColor As Color = Color.FromArgb(108, 117, 125)
 
-            Select Case status
-                Case "completed"
-                    e.CellStyle.BackColor = Color.Green
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "serving"
-                    e.CellStyle.BackColor = Color.Blue
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "waiting"
-                    e.CellStyle.BackColor = Color.Orange
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "cancelled"
-                    e.CellStyle.BackColor = Color.Red
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "no-show"
-                    e.CellStyle.BackColor = Color.Gray
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "scheduled"
-                    e.CellStyle.BackColor = Color.Purple
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "expired"
-                    e.CellStyle.BackColor = Color.DarkGray
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-            End Select
+        Select Case status
+            Case "completed" : backColor = Color.LimeGreen : foreColor = Color.White
+            Case "serving" : backColor = Color.DodgerBlue : foreColor = Color.White
+            Case "waiting" : backColor = Color.Orange : foreColor = Color.White
+            Case "cancelled" : backColor = Color.Crimson : foreColor = Color.White
+            Case "no-show" : backColor = Color.DimGray : foreColor = Color.White
+            Case "scheduled" : backColor = Color.MediumPurple : foreColor = Color.White
+            Case "expired" : backColor = Color.SlateGray : foreColor = Color.White
+        End Select
+
+        e.CellStyle.BackColor = backColor
+        e.CellStyle.ForeColor = foreColor
+
+        If isSelected Then
+            e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+            e.CellStyle.SelectionForeColor = Color.White
+        Else
+            e.CellStyle.SelectionBackColor = backColor
+            e.CellStyle.SelectionForeColor = foreColor
         End If
+        e.FormattingApplied = True
+
     End Sub
 
     Private Sub dgvCashierStatus_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgvCashierStatus.CellFormatting
-        If e.ColumnIndex = dgvCashierStatus.Columns("Status").Index AndAlso e.Value IsNot Nothing Then
-            Dim status As String = e.Value.ToString()
+        If e.RowIndex < 0 OrElse e.ColumnIndex <> dgvCashierStatus.Columns("Status").Index OrElse e.Value Is Nothing Then Return
 
-            ' Check if the row is selected
-            Dim isSelected As Boolean = False
-            If e.RowIndex >= 0 AndAlso e.RowIndex < dgvCashierStatus.Rows.Count Then
-                isSelected = dgvCashierStatus.Rows(e.RowIndex).Selected
-            End If
+        Dim status As String = e.Value.ToString()
+        Dim isSelected As Boolean = dgvCashierStatus.Rows(e.RowIndex).Selected
+        Dim backColor As Color = Color.White
+        Dim foreColor As Color = Color.FromArgb(108, 117, 125)
 
-            Select Case status.ToLower()
-                Case "open"
-                    e.CellStyle.BackColor = Color.Green
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "offline"
-                    e.CellStyle.BackColor = Color.Gray
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case "break"
-                    e.CellStyle.BackColor = Color.Orange
-                    e.CellStyle.ForeColor = Color.White
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-                Case Else
-                    e.CellStyle.BackColor = Color.LightBlue
-                    e.CellStyle.ForeColor = Color.Black
-                    If isSelected Then
-                        e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-                        e.CellStyle.SelectionForeColor = Color.White
-                    End If
-            End Select
+        Select Case status.ToLower()
+            Case "open" : backColor = Color.LimeGreen : foreColor = Color.White
+            Case "offline" : backColor = Color.DimGray : foreColor = Color.White
+            Case "break" : backColor = Color.Orange : foreColor = Color.White
+            Case Else
+                backColor = Color.LightGray : foreColor = Color.Black
+        End Select
+
+        e.CellStyle.BackColor = backColor
+        e.CellStyle.ForeColor = foreColor
+
+        If isSelected Then
+            e.CellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+            e.CellStyle.SelectionForeColor = Color.White
+        Else
+            e.CellStyle.SelectionBackColor = backColor
+            e.CellStyle.SelectionForeColor = foreColor
         End If
+        e.FormattingApplied = True
+
     End Sub
 
     Private Sub tabUserManagement_SelectedIndexChanged(sender As Object, e As EventArgs)
-        lblNoResultsFound.Visible = False
-        btnAddNewStudent.Visible = True
+        Dim isWithoutAccountTab As Boolean = (tabUserManagement.SelectedTab Is tpWithoutAccount)
 
-        If tabUserManagement.SelectedTab Is tpWithAccount Then
-            btnAddUser.Visible = False
-            btnEditUser.Visible = True
-            btnDeleteUser.Visible = True
-            btnDeleteStudent.Visible = False
-        ElseIf tabUserManagement.SelectedTab Is tpWithoutAccount Then
-            btnAddUser.Visible = True
-            btnEditUser.Visible = False
-            btnDeleteUser.Visible = False
-            btnDeleteStudent.Visible = True
+        btnAddUser.Visible = isWithoutAccountTab
+        btnAddNewStudent.Visible = isWithoutAccountTab
+        btnDeleteStudent.Visible = isWithoutAccountTab
+        btnEditUser.Visible = Not isWithoutAccountTab
+        btnDeleteUser.Visible = Not isWithoutAccountTab
+
+        txtSearchUsers.Clear()
+        If dgvUsersWithAccount.Tag IsNot Nothing Then
+            dgvUsersWithAccount.DataSource = CType(dgvUsersWithAccount.Tag, BindingList(Of User))
+            dgvUsersWithAccount.Tag = Nothing
         End If
-        If Not String.IsNullOrEmpty(txtSearchUsers.Text) Then
-            txtSearchUsers_TextChanged(txtSearchUsers, EventArgs.Empty)
+        If dgvUsersWithoutAccount.Tag IsNot Nothing Then
+            dgvUsersWithoutAccount.DataSource = CType(dgvUsersWithoutAccount.Tag, BindingList(Of User))
+            dgvUsersWithoutAccount.Tag = Nothing
         End If
+        Dim noResultsLabel = flpUserControls.Controls.OfType(Of Label).FirstOrDefault(Function(lbl) lbl.Name = "lblNoResultsFound")
+        If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = False
+        flpUserControls_Resize(flpUserControls, EventArgs.Empty)
+
     End Sub
 
-
-    Private Sub btnAddNewStudent_Click(sender As Object, e As EventArgs)
-
-        Using frm As New frmAddStudent()
-            If frm.ShowDialog() = DialogResult.OK Then
-                FetchUsers()
-            End If
-        End Using
+    Private Sub btnAddNewStudent_Click(sender As Object, e As EventArgs) Handles btnAddNewStudent.Click
+        DirectCast(sender, Button).Enabled = False
+        Try
+            Using frm As New frmAddStudent()
+                frm.ShowDialog(Me)
+                If frm.DialogResult = DialogResult.OK Then
+                    FetchUsers()
+                End If
+            End Using
+        Finally
+            DirectCast(sender, Button).Enabled = True
+        End Try
     End Sub
 
-    Private Sub btnDeleteStudent_Click(sender As Object, e As EventArgs)
+    Private Sub btnDeleteStudent_Click(sender As Object, e As EventArgs) Handles btnDeleteStudent.Click
         If dgvUsersWithoutAccount.SelectedRows.Count > 0 Then
             Dim selectedUser As User = CType(dgvUsersWithoutAccount.SelectedRows(0).DataBoundItem, User)
 
-            ' Confirm deletion
+            If selectedUser.UserID > 0 Then
+                MessageBox.Show($"Student '{selectedUser.FullName}' appears to have an account.{vbCrLf}Please delete the account first from the 'With Account' tab.", "Account Exists", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+
             Dim result As DialogResult = MessageBox.Show(
-            $"Are you sure you want to delete the student record for '{selectedUser.FullName}'?{vbCrLf}{vbCrLf}" &
-            $"Student Number: {selectedUser.StudentNo}{vbCrLf}{vbCrLf}" &
-            "⚠️ WARNING: This will permanently delete the student record and all associated data!",
+            $"Are you sure you want to PERMANENTLY delete the student record for '{selectedUser.FullName}' (Student No: {selectedUser.StudentNo})?{vbCrLf}{vbCrLf}" &
+            "⚠️ WARNING: This action cannot be undone and will remove the student entirely!",
             "Confirm Student Deletion",
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Warning,
             MessageBoxDefaultButton.Button2)
 
             If result = DialogResult.Yes Then
-                ' Call the DeleteStudent function from DatabaseHelper
-                Dim success As Boolean = DatabaseHelper.DeleteStudent(selectedUser.StudentNo)
+                DirectCast(sender, Button).Enabled = False
+                Try
+                    Dim success As Boolean = DatabaseHelper.DeleteStudent(selectedUser.StudentNo)
 
-                If success Then
-                    MessageBox.Show(
-                    $"Student '{selectedUser.FullName}' has been successfully deleted.",
-                    "Student Deleted",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information)
-                    FetchUsers()
-                Else
-                    MessageBox.Show(
-                    "Failed to delete the student record. The student may not exist or there was a database error.",
-                    "Deletion Failed",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error)
-                End If
+                    If success Then
+                        MessageBox.Show($"Student record for '{selectedUser.FullName}' has been successfully deleted.", "Student Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        FetchUsers()
+                    Else
+                        MessageBox.Show("Failed to delete the student record. The student might no longer exist or there was a database error.", "Deletion Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        FetchUsers()
+                    End If
+                Finally
+                     DirectCast(sender, Button).Enabled = True
+                End Try
             End If
         Else
-            MessageBox.Show(
-            "Please select a student from the 'Without Account' tab to delete.",
-            "No Student Selected",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Warning)
+            MessageBox.Show("Please select a student from the 'Without Account' tab to delete their record.", "No Student Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
 
-
 End Class
-
-
-
 
 Public Class CashierStatusItem
     Public Property CashierName As String
@@ -1274,3 +1558,13 @@ Public Class Counter
     Public Property CounterName As String
     Public Property Cashier As String
 End Class
+
+Public Class StaffUser
+    Public Property UserID As Integer
+    Public Property FullName As String
+    Public Property Username As String
+    Public Property Role As String
+    Public Property LastLogin As String
+    Public Property Counter As String
+End Class
+

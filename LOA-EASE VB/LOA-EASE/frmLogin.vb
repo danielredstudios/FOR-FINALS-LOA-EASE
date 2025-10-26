@@ -2,29 +2,36 @@
 Imports MySql.Data.MySqlClient
 
 Public Class frmLogin
-    ' Login attempt tracking
     Private Const MAX_ATTEMPTS As Integer = 3
+    Private Const LOCKOUT_DURATION_MINUTES As Integer = 5
+    Private Const PROGRESSIVE_LOCKOUT_ENABLED As Boolean = True
+
     Private loginAttempts As Integer = 0
     Private isAccountLocked As Boolean = False
     Private lockoutEndTime As DateTime = DateTime.MinValue
+    Private currentUsername As String = ""
+    Private lockoutTimer As Timer
 
-    ' Animation variables
     Private cardOpacity As Integer = 200
     Private fadeDirection As Integer = -5
 
     Private Sub frmLogin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ' Initialize UI
         pnlAttempts.Visible = False
 
-        ' Add rounded corners effect to panels
         AddRoundedCorners(pnlLoginContainer, 15)
         AddRoundedCorners(pnlUsernameContainer, 8)
         AddRoundedCorners(pnlPasswordContainer, 8)
         AddRoundedCorners(btnLogin, 8)
         AddRoundedCorners(pnlFloatingCard, 12)
         AddRoundedCorners(pnlAttempts, 8)
+
         FadeTimer.Start()
-        CheckAccountLockout()
+
+        lockoutTimer = New Timer()
+        lockoutTimer.Interval = 1000
+        AddHandler lockoutTimer.Tick, AddressOf LockoutTimer_Tick
+
+        CheckPersistedLockout()
     End Sub
 
     Private Sub AddRoundedCorners(ctrl As Control, radius As Integer)
@@ -41,26 +48,27 @@ Public Class frmLogin
         Return path
     End Function
 
+    Private Sub CheckPersistedLockout()
+        Dim lockoutData As DataRow = DatabaseHelper.CheckActiveLockout("")
 
+        If lockoutData IsNot Nothing Then
+            currentUsername = lockoutData("username").ToString()
+            lockoutEndTime = Convert.ToDateTime(lockoutData("lockout_until"))
+            loginAttempts = Convert.ToInt32(lockoutData("failed_attempts"))
+            isAccountLocked = True
 
-    Private Sub CheckAccountLockout()
-        ' Check if account is currently locked
-        If isAccountLocked AndAlso DateTime.Now < lockoutEndTime Then
-            Dim remainingTime As TimeSpan = lockoutEndTime - DateTime.Now
-            DisableLogin(CInt(Math.Ceiling(remainingTime.TotalSeconds)))
-        ElseIf isAccountLocked AndAlso DateTime.Now >= lockoutEndTime Then
-            ' Lockout expired
-            ResetAttempts()
+            Dim remainingSeconds As Integer = Convert.ToInt32(lockoutData("seconds_remaining"))
+            If remainingSeconds > 0 Then
+                DisableLogin(remainingSeconds)
+                txtUsername.Text = currentUsername
+            End If
         End If
     End Sub
 
     Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
-        ' Check if account is locked
         If isAccountLocked Then
             CheckAccountLockout()
             If isAccountLocked Then
-                MessageBox.Show("Account is temporarily locked. Please try again later.",
-                              "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
         End If
@@ -71,20 +79,32 @@ Public Class frmLogin
         If String.IsNullOrEmpty(username) OrElse String.IsNullOrEmpty(password) Then
             MessageBox.Show("Please enter both username and password.",
                           "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtUsername.Focus()
             Return
         End If
 
-        ' Show loading state
+        If CheckUsernameLockout(username) Then
+            Return
+        End If
+
+        currentUsername = username
+
         btnLogin.Enabled = False
         btnLogin.Text = "Signing In..."
         Application.DoEvents()
 
         Try
-            Dim userRow As DataRow = DatabaseHelper.Authenticate(username, password)
+            Dim userRow As DataRow = DatabaseHelper.AuthenticateWithStoredProcedure(username, password)
 
             If userRow IsNot Nothing Then
-                ' Successful login
+                Dim userId As Integer = Convert.ToInt32(userRow("id"))
+                Dim userType As String = userRow("role").ToString()
+
+                DatabaseHelper.RecordLoginAttempt(username, userType, userId, True, GetLocalIPAddress(), Environment.OSVersion.ToString(), "Successful login")
+                DatabaseHelper.UpdateLastLogin(username, userType, GetLocalIPAddress())
+
                 ResetAttempts()
+                DatabaseHelper.ClearLockout(username)
 
                 Dim role As String = userRow("role").ToString()
                 Dim fullName As String = userRow("full_name").ToString()
@@ -97,52 +117,109 @@ Public Class frmLogin
                     HandleCashierLogin(userRow, fullName)
                 End If
             Else
-                ' Failed login attempt
-                HandleFailedLogin(username)
+                If UserExists(username) Then
+                    HandleFailedLogin(username)
+                Else
+                    MessageBox.Show("Invalid username or password.", "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    txtPassword.Clear()
+                    txtPassword.Focus()
+                End If
             End If
         Catch ex As Exception
-            MessageBox.Show("An error occurred during login: " & ex.Message,
-                          "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("An error occurred during login: " & ex.Message, "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
-            btnLogin.Enabled = True
-            btnLogin.Text = "Sign In"
+            If Not isAccountLocked Then
+                btnLogin.Enabled = True
+                btnLogin.Text = "Sign In"
+            End If
         End Try
     End Sub
 
-    Private Sub HandleCashierLogin(userRow As DataRow, fullName As String)
-        Dim counterId As Integer
-        If userRow("counter_id") IsNot DBNull.Value AndAlso
-           Integer.TryParse(userRow("counter_id").ToString(), counterId) Then
+    Private Function UserExists(username As String) As Boolean
+        Try
+            Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                conn.Open()
 
-            Dim cashierId As Integer
-            If userRow("cashier_id") IsNot DBNull.Value AndAlso
-               Integer.TryParse(userRow("cashier_id").ToString(), cashierId) Then
+                Dim query As String = "SELECT COUNT(*) FROM admins WHERE username = @username " &
+                                    "UNION ALL SELECT COUNT(*) FROM cashiers WHERE username = @username"
 
-                ' Update cashier status
-                Try
-                    Using conn As MySqlConnection = DatabaseHelper.GetConnection()
-                        conn.Open()
-                        Dim query As String = "UPDATE counter_schedules SET is_open = 1, status = 'open' WHERE counter_id = @counterId"
-                        Using cmd As New MySqlCommand(query, conn)
-                            cmd.Parameters.AddWithValue("@counterId", counterId)
-                            cmd.ExecuteNonQuery()
-                        End Using
+                Using cmd As New MySqlCommand(query, conn)
+                    cmd.Parameters.AddWithValue("@username", username)
+
+                    Using reader As MySqlDataReader = cmd.ExecuteReader()
+                        While reader.Read()
+                            If Convert.ToInt32(reader(0)) > 0 Then
+                                Return True
+                            End If
+                        End While
                     End Using
-                Catch ex As Exception
-                    MessageBox.Show("Could not update cashier status: " & ex.Message,
-                                  "Status Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    Return
-                End Try
+                End Using
+            End Using
+        Catch ex As Exception
+            Console.WriteLine("Error checking if user exists: " & ex.Message)
+        End Try
 
-                Dim cashierDashboard As New frmCashierDashboard(cashierId, counterId, fullName)
-                cashierDashboard.Show()
-                Me.Hide()
-            Else
-                MessageBox.Show("Invalid Cashier ID from database.",
-                              "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End If
+        Return False
+    End Function
+
+    Private Function CheckUsernameLockout(username As String) As Boolean
+        Dim lockoutData As DataRow = DatabaseHelper.CheckActiveLockout(username)
+
+        If lockoutData IsNot Nothing Then
+            lockoutEndTime = Convert.ToDateTime(lockoutData("lockout_until"))
+            loginAttempts = Convert.ToInt32(lockoutData("failed_attempts"))
+            isAccountLocked = True
+            currentUsername = username
+
+            Dim remainingSeconds As Integer = Convert.ToInt32(lockoutData("seconds_remaining"))
+            DisableLogin(remainingSeconds)
+
+            Dim minutes As Integer = Math.Ceiling(remainingSeconds / 60.0)
+            MessageBox.Show($"This account is temporarily locked due to multiple failed login attempts.{vbCrLf}{vbCrLf}" &
+                          $"Please try again in {minutes} minute(s).",
+                          "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return True
+        End If
+
+        Return False
+    End Function
+
+    Private Sub CheckAccountLockout()
+        If isAccountLocked AndAlso DateTime.Now < lockoutEndTime Then
+            Dim remainingTime As TimeSpan = lockoutEndTime - DateTime.Now
+            MessageBox.Show($"Account is locked. Please try again in {Math.Ceiling(remainingTime.TotalMinutes)} minute(s).",
+                          "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        ElseIf isAccountLocked AndAlso DateTime.Now >= lockoutEndTime Then
+            ResetAttempts()
+            DatabaseHelper.ClearLockout(currentUsername)
+        End If
+    End Sub
+
+    Private Sub HandleCashierLogin(userRow As DataRow, fullName As String)
+        If userRow("counter_id") IsNot DBNull.Value Then
+            Dim counterId As Integer = Convert.ToInt32(userRow("counter_id"))
+            Dim cashierId As Integer = Convert.ToInt32(userRow("cashier_id"))
+
+            Try
+                Using conn As MySqlConnection = DatabaseHelper.GetConnection()
+                    conn.Open()
+                    Dim query As String = "UPDATE counter_schedules SET is_open = 1, status = 'open' WHERE counter_id = @counterId"
+                    Using cmd As New MySqlCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@counterId", counterId)
+                        cmd.ExecuteNonQuery()
+                    End Using
+                End Using
+            Catch ex As Exception
+                MessageBox.Show("Could not update cashier status: " & ex.Message,
+                              "Status Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return
+            End Try
+
+            Dim cashierDashboard As New frmCashierDashboard(cashierId, counterId, fullName)
+            cashierDashboard.Show()
+            Me.Hide()
         Else
-            MessageBox.Show("Invalid Counter ID from database.",
+            MessageBox.Show("No counter assigned to this cashier account.",
                           "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
@@ -151,29 +228,53 @@ Public Class frmLogin
         loginAttempts += 1
         Dim remainingAttempts As Integer = MAX_ATTEMPTS - loginAttempts
 
+        Dim userType As String = DatabaseHelper.GetUserType(username)
+        Dim userId As Integer? = DatabaseHelper.GetUserId(username, userType)
+
+        DatabaseHelper.RecordLoginAttempt(username, userType, userId, False, GetLocalIPAddress(), Environment.OSVersion.ToString(), $"Failed attempt {loginAttempts} of {MAX_ATTEMPTS}")
+
         If loginAttempts >= MAX_ATTEMPTS Then
-            ' Lock the account
             LockAccount(username)
         Else
-            ' Show warning with remaining attempts
+            DatabaseHelper.UpdateFailedAttempts(username, userType, loginAttempts)
+
             ShowAttemptsWarning(remainingAttempts)
 
-            MessageBox.Show($"Invalid username or password.{vbCrLf}You have {remainingAttempts} attempt(s) remaining.",
-                          "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            txtPassword.Clear()
+            txtPassword.Focus()
+
+            Dim message As String = $"Invalid username or password.{vbCrLf}{vbCrLf}" &
+                                   $"You have {remainingAttempts} attempt(s) remaining."
+
+            If remainingAttempts = 1 Then
+                message &= $"{vbCrLf}{vbCrLf}⚠ Warning: Your account will be locked for {LOCKOUT_DURATION_MINUTES} minutes after the next failed attempt."
+            End If
+
+            MessageBox.Show(message, "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
 
     Private Sub LockAccount(username As String)
+        Dim lockoutDuration As Integer = LOCKOUT_DURATION_MINUTES
+
+        If PROGRESSIVE_LOCKOUT_ENABLED Then
+            lockoutDuration = DatabaseHelper.GetProgressiveLockoutDuration(username)
+        End If
+
         isAccountLocked = True
-        lockoutEndTime = DateTime.Now.AddMinutes(5) ' 5-minute lockout
+        lockoutEndTime = DateTime.Now.AddMinutes(lockoutDuration)
 
-        ' Log lockout event
-        LogLoginAttempt(username, False, "Account locked due to multiple failed attempts")
+        Dim userType As String = DatabaseHelper.GetUserType(username)
+        Dim userId As Integer? = DatabaseHelper.GetUserId(username, userType)
 
-        ' Disable login controls
-        DisableLogin(300) ' 300 seconds = 5 minutes
+        DatabaseHelper.CreateLockout(username, userType, userId, loginAttempts, lockoutDuration, GetLocalIPAddress())
+        DatabaseHelper.RecordLoginAttempt(username, userType, userId, False, GetLocalIPAddress(), Environment.OSVersion.ToString(), $"Account locked for {lockoutDuration} minutes due to {MAX_ATTEMPTS} failed attempts")
 
-        MessageBox.Show("Too many failed login attempts. Your account has been temporarily locked for 5 minutes.",
+        DisableLogin(lockoutDuration * 60)
+
+        MessageBox.Show($"Too many failed login attempts.{vbCrLf}{vbCrLf}" &
+                       $"Your account has been temporarily locked for {lockoutDuration} minute(s).{vbCrLf}{vbCrLf}" &
+                       $"Please contact your administrator if you need immediate assistance.",
                       "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
     End Sub
 
@@ -185,29 +286,39 @@ Public Class frmLogin
 
         pnlAttempts.BackColor = Color.FromArgb(CByte(248), CByte(215), CByte(218))
         lblAttemptsInfo.ForeColor = Color.FromArgb(CByte(114), CByte(28), CByte(36))
-        lblAttemptsInfo.Text = $"🔒 Account locked. Try again in {TimeSpan.FromSeconds(seconds).TotalMinutes:F0} minutes"
+
+        UpdateLockoutDisplay(seconds)
         pnlAttempts.Visible = True
 
-        ' Start countdown timer
-        Dim countdownTimer As New Timer()
-        countdownTimer.Interval = 1000
-        countdownTimer.Tag = seconds
+        lockoutTimer.Tag = seconds
+        lockoutTimer.Start()
+    End Sub
 
-        AddHandler countdownTimer.Tick, Sub(s, e)
-                                            Dim remaining As Integer = CInt(countdownTimer.Tag) - 1
-                                            countdownTimer.Tag = remaining
+    Private Sub UpdateLockoutDisplay(remainingSeconds As Integer)
+        Dim minutes As Integer = remainingSeconds \ 60
+        Dim seconds As Integer = remainingSeconds Mod 60
 
-                                            If remaining > 0 Then
-                                                Dim minutes As Integer = remaining \ 60
-                                                Dim secs As Integer = remaining Mod 60
-                                                lblAttemptsInfo.Text = $"🔒 Account locked. Try again in {minutes}:{secs:D2}"
-                                            Else
-                                                countdownTimer.Stop()
-                                                ResetAttempts()
-                                            End If
-                                        End Sub
+        If minutes > 0 Then
+            lblAttemptsInfo.Text = $"🔒 Account locked. Try again in {minutes}:{seconds:D2}"
+        Else
+            lblAttemptsInfo.Text = $"🔒 Account locked. Try again in {seconds} second(s)"
+        End If
+    End Sub
 
-        countdownTimer.Start()
+    Private Sub LockoutTimer_Tick(sender As Object, e As EventArgs)
+        Dim remaining As Integer = CInt(lockoutTimer.Tag) - 1
+        lockoutTimer.Tag = remaining
+
+        If remaining > 0 Then
+            UpdateLockoutDisplay(remaining)
+        Else
+            lockoutTimer.Stop()
+            ResetAttempts()
+            DatabaseHelper.ClearLockout(currentUsername)
+
+            MessageBox.Show("Lockout period has expired. You may now attempt to log in again.",
+                          "Lockout Expired", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
     End Sub
 
     Private Sub ShowAttemptsWarning(remainingAttempts As Integer)
@@ -215,9 +326,9 @@ Public Class frmLogin
         lblAttemptsInfo.ForeColor = Color.FromArgb(CByte(133), CByte(100), CByte(4))
 
         If remainingAttempts = 1 Then
-            lblAttemptsInfo.Text = "⚠ Warning: 1 attempt remaining before lockout!"
+            lblAttemptsInfo.Text = "⚠ FINAL WARNING: 1 attempt remaining before lockout!"
         Else
-            lblAttemptsInfo.Text = $"⚠ {remainingAttempts} attempts remaining"
+            lblAttemptsInfo.Text = $"⚠ {remainingAttempts} attempt(s) remaining"
         End If
 
         pnlAttempts.Visible = True
@@ -233,30 +344,8 @@ Public Class frmLogin
         txtPassword.Enabled = True
         btnLogin.Enabled = True
         chkShowPassword.Enabled = True
-    End Sub
 
-    Private Sub LogLoginAttempt(username As String, success As Boolean, Optional notes As String = "")
-        Try
-            Using conn As MySqlConnection = DatabaseHelper.GetConnection()
-                conn.Open()
-
-                Dim query As String = "INSERT INTO login_attempts (username, success, attempt_time, ip_address, notes) " &
-                                    "VALUES (@username, @success, @attemptTime, @ipAddress, @notes)"
-
-                Using cmd As New MySqlCommand(query, conn)
-                    cmd.Parameters.AddWithValue("@username", username)
-                    cmd.Parameters.AddWithValue("@success", success)
-                    cmd.Parameters.AddWithValue("@attemptTime", DateTime.Now)
-                    cmd.Parameters.AddWithValue("@ipAddress", GetLocalIPAddress())
-                    cmd.Parameters.AddWithValue("@notes", notes)
-
-                    cmd.ExecuteNonQuery()
-                End Using
-            End Using
-        Catch ex As Exception
-            ' Silently fail - don't interrupt login process
-            Console.WriteLine("Failed to log login attempt: " & ex.Message)
-        End Try
+        txtPassword.Clear()
     End Sub
 
     Private Function GetLocalIPAddress() As String
@@ -278,7 +367,9 @@ Public Class frmLogin
     End Sub
 
     Private Sub lblForgotPassword_Click(sender As Object, e As EventArgs) Handles lblForgotPassword.Click
-        MessageBox.Show("Please contact your system administrator to reset your password.",
+        MessageBox.Show("Please contact your system administrator to reset your password." & vbCrLf & vbCrLf &
+                      "Administrator Email: admin@loaease.edu" & vbCrLf &
+                      "Support Hotline: (02) 8123-4567",
                       "Password Reset", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
@@ -292,11 +383,12 @@ Public Class frmLogin
     Private Sub txtPassword_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtPassword.KeyPress
         If e.KeyChar = ChrW(Keys.Enter) Then
             e.Handled = True
-            btnLogin.PerformClick()
+            If btnLogin.Enabled Then
+                btnLogin.PerformClick()
+            End If
         End If
     End Sub
 
-    ' Hover effects for button
     Private Sub btnLogin_MouseEnter(sender As Object, e As EventArgs) Handles btnLogin.MouseEnter
         If btnLogin.Enabled Then
             btnLogin.BackColor = Color.FromArgb(CByte(10), CByte(60), CByte(140))
@@ -318,5 +410,9 @@ Public Class frmLogin
     Protected Overrides Sub OnFormClosing(e As FormClosingEventArgs)
         MyBase.OnFormClosing(e)
         FadeTimer.Stop()
+        If lockoutTimer IsNot Nothing Then
+            lockoutTimer.Stop()
+            lockoutTimer.Dispose()
+        End If
     End Sub
 End Class

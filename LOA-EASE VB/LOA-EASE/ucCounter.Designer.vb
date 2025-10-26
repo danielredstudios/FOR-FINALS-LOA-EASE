@@ -2,7 +2,6 @@
 Partial Class ucCounter
     Inherits System.Windows.Forms.UserControl
 
-    'UserControl overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -14,70 +13,79 @@ Partial Class ucCounter
         End Try
     End Sub
 
-    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
-    'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
-    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.lblQueueNumber = New System.Windows.Forms.Label()
-        Me.lblCounterName = New System.Windows.Forms.Label()
-        Me.pnlLeftBorder = New System.Windows.Forms.Panel()
-        Me.SuspendLayout()
-        '
-        'lblQueueNumber
-        '
-        Me.lblQueueNumber.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblQueueNumber.Font = New System.Drawing.Font("Segoe UI", 24.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
-        Me.lblQueueNumber.ForeColor = System.Drawing.Color.FromArgb(CType(CType(52, Byte), Integer), CType(CType(58, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.lblQueueNumber.Location = New System.Drawing.Point(20, 10)
-        Me.lblQueueNumber.Name = "lblQueueNumber"
-        Me.lblQueueNumber.Size = New System.Drawing.Size(260, 54)
-        Me.lblQueueNumber.TabIndex = 0
-        Me.lblQueueNumber.Text = "P-CCS-0925-004"
-        Me.lblQueueNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        '
-        'lblCounterName
-        '
-        Me.lblCounterName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblCounterName.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
-        Me.lblCounterName.ForeColor = System.Drawing.Color.FromArgb(CType(CType(108, Byte), Integer), CType(CType(117, Byte), Integer), CType(CType(125, Byte), Integer))
-        Me.lblCounterName.Location = New System.Drawing.Point(20, 70)
-        Me.lblCounterName.Name = "lblCounterName"
-        Me.lblCounterName.Size = New System.Drawing.Size(260, 28)
-        Me.lblCounterName.TabIndex = 1
-        Me.lblCounterName.Text = "Cashier 1"
-        Me.lblCounterName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        '
-        'pnlLeftBorder
-        '
-        Me.pnlLeftBorder.BackColor = System.Drawing.Color.FromArgb(CType(CType(25, Byte), Integer), CType(CType(135, Byte), Integer), CType(CType(84, Byte), Integer))
-        Me.pnlLeftBorder.Dock = System.Windows.Forms.DockStyle.Left
-        Me.pnlLeftBorder.Location = New System.Drawing.Point(0, 0)
-        Me.pnlLeftBorder.Name = "pnlLeftBorder"
-        Me.pnlLeftBorder.Size = New System.Drawing.Size(10, 110)
-        Me.pnlLeftBorder.TabIndex = 2
-        '
-        'ucCounter
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 20.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.BackColor = System.Drawing.Color.White
-        Me.Controls.Add(Me.pnlLeftBorder)
-        Me.Controls.Add(Me.lblCounterName)
-        Me.Controls.Add(Me.lblQueueNumber)
-        Me.Margin = New System.Windows.Forms.Padding(10)
-        Me.Name = "ucCounter"
-        Me.Size = New System.Drawing.Size(300, 110)
-        Me.ResumeLayout(False)
+        lblCounterName = New Label()
+        lblQueueNumber = New Label()
+        lblStatusBadge = New Label()
+        SuspendLayout()
+        ' 
+        ' lblCounterName
+        ' 
+        lblCounterName.Dock = DockStyle.Top
+        lblCounterName.Font = New Font("Segoe UI", 18.0F, FontStyle.Bold, GraphicsUnit.Point, CType(0, Byte))
+        lblCounterName.ForeColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
+        lblCounterName.Location = New Point(0, 0)
+        lblCounterName.Name = "lblCounterName"
+        lblCounterName.Padding = New Padding(9, 11, 9, 4)
+        lblCounterName.Size = New Size(350, 60)
+        lblCounterName.TabIndex = 0
+        lblCounterName.Text = "Counter 1"
+        lblCounterName.TextAlign = ContentAlignment.MiddleCenter
+        lblCounterName.UseMnemonic = False
+        lblCounterName.UseCompatibleTextRendering = False
+        ' 
+        ' lblQueueNumber
+        ' 
+        lblQueueNumber.Dock = DockStyle.Fill
+        lblQueueNumber.Font = New Font("Segoe UI", 52.0F, FontStyle.Bold, GraphicsUnit.Point, CType(0, Byte))
+        lblQueueNumber.ForeColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
+        lblQueueNumber.Location = New Point(0, 60)
+        lblQueueNumber.Name = "lblQueueNumber"
+        lblQueueNumber.Padding = New Padding(9, 8, 9, 8)
+        lblQueueNumber.Size = New Size(350, 165)
+        lblQueueNumber.TabIndex = 1
+        lblQueueNumber.Text = "A-001"
+        lblQueueNumber.TextAlign = ContentAlignment.MiddleCenter
+        lblQueueNumber.UseMnemonic = False
+        lblQueueNumber.UseCompatibleTextRendering = False
+        ' 
+        ' lblStatusBadge
+        ' 
+        lblStatusBadge.Anchor = AnchorStyles.None
+        lblStatusBadge.AutoSize = False
+        lblStatusBadge.BackColor = Color.Transparent
+        lblStatusBadge.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold, GraphicsUnit.Point, CType(0, Byte))
+        lblStatusBadge.ForeColor = Color.White
+        lblStatusBadge.Location = New Point(122, 188)
+        lblStatusBadge.Name = "lblStatusBadge"
+        lblStatusBadge.Size = New Size(105, 26)
+        lblStatusBadge.TabIndex = 2
+        lblStatusBadge.TextAlign = ContentAlignment.MiddleCenter
+        lblStatusBadge.Visible = False
+        lblStatusBadge.UseMnemonic = False
+        lblStatusBadge.UseCompatibleTextRendering = False
+        ' 
+        ' ucCounter
+        ' 
+        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
+        AutoScaleMode = AutoScaleMode.Font
+        BackColor = Color.White
+        Controls.Add(lblStatusBadge)
+        Controls.Add(lblQueueNumber)
+        Controls.Add(lblCounterName)
+        DoubleBuffered = True
+        Font = New Font("Segoe UI", 9.0F, FontStyle.Regular, GraphicsUnit.Point, CType(0, Byte))
+        Margin = New Padding(9, 8, 9, 8)
+        Name = "ucCounter"
+        Size = New Size(350, 225)
+        ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents lblQueueNumber As Label
     Friend WithEvents lblCounterName As Label
-    Friend WithEvents pnlLeftBorder As Panel
+    Friend WithEvents lblQueueNumber As Label
+    Friend WithEvents lblStatusBadge As Label
 End Class
