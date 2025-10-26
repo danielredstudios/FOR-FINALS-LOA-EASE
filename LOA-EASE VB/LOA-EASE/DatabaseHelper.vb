@@ -18,15 +18,15 @@ Public Class DatabaseHelper
                 conn.Open()
 
                 Dim query As String = "
-                    (SELECT admin_id, username, password_hash, full_name, 'admin' AS role, 
-                            NULL AS counter_id, NULL AS cashier_id, NULL as counter_name 
-                     FROM admins 
+                    (SELECT admin_id, username, password_hash, full_name, 'admin' AS role, is_active, is_locked,
+                            NULL AS counter_id, NULL AS cashier_id, NULL as counter_name
+                     FROM admins
                      WHERE BINARY username = @username)
-                    
+
                     UNION
-                    
-                    (SELECT c.cashier_id, c.username, c.password_hash, c.full_name, c.role, 
-                            c.counter_id, c.cashier_id, co.counter_name 
+
+                    (SELECT c.cashier_id, c.username, c.password_hash, c.full_name, c.role, c.is_active, c.is_locked,
+                            c.counter_id, c.cashier_id, co.counter_name
                      FROM cashiers c
                      JOIN counters co ON c.counter_id = co.counter_id
                      WHERE BINARY c.username = @username AND c.role = 'cashier')
@@ -42,6 +42,19 @@ Public Class DatabaseHelper
 
                     If dt.Rows.Count > 0 Then
                         Dim userRow As DataRow = dt.Rows(0)
+
+                        If Not Convert.ToBoolean(userRow("is_active")) Then
+                            MessageBox.Show("Your account is inactive. Please contact the administrator.",
+                                          "Account Inactive", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            Return Nothing
+                        End If
+                        If Convert.ToBoolean(userRow("is_locked")) Then
+                            MessageBox.Show("Your account is locked. Please contact the administrator.",
+                                          "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            Return Nothing
+                        End If
+
+
                         Dim storedHash As String = userRow("password_hash").ToString()
 
                         If BCrypt.Net.BCrypt.Verify(password, storedHash) Then
@@ -74,17 +87,13 @@ Public Class DatabaseHelper
                         If dt.Rows.Count > 0 Then
                             Dim row As DataRow = dt.Rows(0)
 
+                            If Not Convert.ToBoolean(row("is_active")) Then
+                                Return Nothing
+                            End If
                             If Convert.ToBoolean(row("is_locked")) Then
-                                MessageBox.Show("Your account is locked. Please contact the administrator.",
-                                              "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                                 Return Nothing
                             End If
 
-                            If Not Convert.ToBoolean(row("is_active")) Then
-                                MessageBox.Show("Your account is inactive. Please contact the administrator.",
-                                              "Account Inactive", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                                Return Nothing
-                            End If
 
                             Dim storedHash As String = row("password_hash").ToString()
                             If BCrypt.Net.BCrypt.Verify(password, storedHash) Then
@@ -101,6 +110,32 @@ Public Class DatabaseHelper
         Return Nothing
     End Function
 
+    Public Shared Function GetUserDetails(username As String) As DataRow ' Added Function
+        Try
+            Using conn As MySqlConnection = GetConnection()
+                conn.Open()
+
+                Using cmd As New MySqlCommand("sp_get_user_by_username", conn)
+                    cmd.CommandType = CommandType.StoredProcedure
+                    cmd.Parameters.AddWithValue("@p_username", username)
+
+                    Using adapter As New MySqlDataAdapter(cmd)
+                        Dim dt As New DataTable()
+                        adapter.Fill(dt)
+
+                        If dt.Rows.Count > 0 Then
+                            Return dt.Rows(0)
+                        End If
+                    End Using
+                End Using
+            End Using
+        Catch ex As Exception
+            Console.WriteLine("Error getting user details: " & ex.Message)
+        End Try
+        Return Nothing
+    End Function
+
+
     Public Shared Sub UpdateLastLogin(username As String, userType As String, ipAddress As String)
         Try
             Using conn As MySqlConnection = GetConnection()
@@ -113,6 +148,7 @@ Public Class DatabaseHelper
                     cmd.Parameters.AddWithValue("@p_ip_address", ipAddress)
                     cmd.ExecuteNonQuery()
                 End Using
+                ClearLockout(username)
             End Using
         Catch ex As Exception
             Console.WriteLine("Error updating last login: " & ex.Message)
@@ -128,7 +164,7 @@ Public Class DatabaseHelper
                     cmd.CommandType = CommandType.StoredProcedure
                     cmd.Parameters.AddWithValue("@p_username", username)
                     cmd.Parameters.AddWithValue("@p_user_type", userType)
-                    cmd.Parameters.AddWithValue("@p_user_id", If(userId, DBNull.Value))
+                    cmd.Parameters.AddWithValue("@p_user_id", If(userId IsNot Nothing, userId, DBNull.Value))
                     cmd.Parameters.AddWithValue("@p_success", success)
                     cmd.Parameters.AddWithValue("@p_ip_address", ipAddress)
                     cmd.Parameters.AddWithValue("@p_user_agent", userAgent)
@@ -168,7 +204,7 @@ Public Class DatabaseHelper
                     cmd.CommandType = CommandType.StoredProcedure
                     cmd.Parameters.AddWithValue("@p_username", username)
                     cmd.Parameters.AddWithValue("@p_user_type", userType)
-                    cmd.Parameters.AddWithValue("@p_user_id", If(userId, DBNull.Value))
+                    cmd.Parameters.AddWithValue("@p_user_id", If(userId IsNot Nothing, userId, DBNull.Value))
                     cmd.Parameters.AddWithValue("@p_failed_attempts", failedAttempts)
                     cmd.Parameters.AddWithValue("@p_lockout_minutes", lockoutMinutes)
                     cmd.Parameters.AddWithValue("@p_ip_address", ipAddress)
@@ -222,20 +258,32 @@ Public Class DatabaseHelper
         Return Nothing
     End Function
 
-    Public Shared Function GetProgressiveLockoutDuration(username As String) As Integer
+    ' Updated Function Signature
+    Public Shared Function GetProgressiveLockoutDuration(username As String, Optional peekNext As Boolean = False) As Integer
         Try
             Using conn As MySqlConnection = GetConnection()
                 conn.Open()
 
-                Using cmd As New MySqlCommand("sp_get_lockout_duration", conn)
-                    cmd.CommandType = CommandType.StoredProcedure
-                    cmd.Parameters.AddWithValue("@p_username", username)
+                Dim query As String = "SELECT COUNT(*) FROM user_lockouts WHERE username = @username AND lockout_until IS NOT NULL AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)"
+                Dim lockout_count As Integer
 
-                    Dim result = cmd.ExecuteScalar()
-                    If result IsNot Nothing Then
-                        Return Convert.ToInt32(result)
-                    End If
+                Using cmdCount As New MySqlCommand(query, conn)
+                    cmdCount.Parameters.AddWithValue("@username", username)
+                    lockout_count = Convert.ToInt32(cmdCount.ExecuteScalar())
                 End Using
+
+                Dim effective_count As Integer = If(peekNext, lockout_count + 1, lockout_count)
+
+                Select Case effective_count
+                    Case 0, 1
+                        Return 5
+                    Case 2
+                        Return 15
+                    Case 3
+                        Return 30
+                    Case Else
+                        Return 60
+                End Select
             End Using
         Catch ex As Exception
             Console.WriteLine("Error getting progressive lockout duration: " & ex.Message)
@@ -243,6 +291,7 @@ Public Class DatabaseHelper
 
         Return 5
     End Function
+
 
     Public Shared Function GetUserType(username As String) As String
         Try
@@ -283,7 +332,7 @@ Public Class DatabaseHelper
                     Using cmd As New MySqlCommand(query, conn)
                         cmd.Parameters.AddWithValue("@username", username)
                         Dim result = cmd.ExecuteScalar()
-                        If result IsNot Nothing Then
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
                             Return Convert.ToInt32(result)
                         End If
                     End Using
@@ -296,12 +345,78 @@ Public Class DatabaseHelper
         Return Nothing
     End Function
 
+    Public Shared Function GetFailedAttempts(username As String, userType As String) As Integer
+        Try
+            Using conn As MySqlConnection = GetConnection()
+                conn.Open()
+
+                Dim query As String = ""
+                If userType = "admin" Then
+                    query = "SELECT failed_login_attempts FROM admins WHERE username = @username"
+                ElseIf userType = "cashier" Then
+                    query = "SELECT failed_login_attempts FROM cashiers WHERE username = @username"
+                Else
+                    Return 0
+                End If
+
+                Using cmd As New MySqlCommand(query, conn)
+                    cmd.Parameters.AddWithValue("@username", username)
+                    Dim result = cmd.ExecuteScalar()
+                    If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                        Return Convert.ToInt32(result)
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Console.WriteLine("Error getting failed attempts: " & ex.Message)
+        End Try
+
+        Return 0
+    End Function
+
+    Public Shared Function SetUserActiveStatus(userId As Integer, userType As String, isActive As Boolean) As Boolean
+        Try
+            Using conn As MySqlConnection = GetConnection()
+                conn.Open()
+                Dim tableName As String = ""
+                Dim idColumn As String = ""
+
+                If userType = "Admin" Then
+                    tableName = "admins"
+                    idColumn = "admin_id"
+                ElseIf userType = "Cashier" Then
+                    tableName = "cashiers"
+                    idColumn = "cashier_id"
+                Else
+                    Return False
+                End If
+
+                Dim query As String = $"UPDATE {tableName} SET is_active = @isActive WHERE {idColumn} = @userId"
+                Using cmd As New MySqlCommand(query, conn)
+                    cmd.Parameters.AddWithValue("@isActive", isActive)
+                    cmd.Parameters.AddWithValue("@userId", userId)
+                    Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
+                    Return rowsAffected > 0
+                End Using
+            End Using
+        Catch ex As Exception
+            Console.WriteLine($"Error setting user active status: {ex.Message}")
+            Return False
+        End Try
+    End Function
+
     Public Shared Function GetCashierStatus() As DataTable
         Using conn As New MySqlConnection(ConnectionString)
             Dim dt As New DataTable()
             Try
                 conn.Open()
-                Dim query As String = "SELECT c.full_name, co.counter_name, cs.is_open, cs.status FROM cashiers c JOIN counters co ON c.counter_id = co.counter_id LEFT JOIN counter_schedules cs ON c.counter_id = cs.counter_id WHERE c.role = 'cashier' ORDER BY co.counter_name"
+                Dim query As String = "
+                    SELECT c.full_name, co.counter_name, cs.is_open, cs.status
+                    FROM cashiers c
+                    JOIN counters co ON c.counter_id = co.counter_id
+                    LEFT JOIN counter_schedules cs ON c.counter_id = cs.counter_id
+                    WHERE c.role = 'cashier' AND c.is_active = 1
+                    ORDER BY co.counter_name"
                 Dim adapter As New MySqlDataAdapter(query, conn)
                 adapter.Fill(dt)
             Catch ex As Exception
@@ -310,6 +425,7 @@ Public Class DatabaseHelper
             Return dt
         End Using
     End Function
+
 
     Public Shared Function GetAllQueues() As DataTable
         Using conn As New MySqlConnection(ConnectionString)
@@ -428,3 +544,4 @@ Public Class DatabaseHelper
     End Function
 
 End Class
+

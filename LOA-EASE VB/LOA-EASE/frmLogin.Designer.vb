@@ -61,9 +61,8 @@ Partial Class frmLogin
         pnlBranding.Controls.Add(pnlGradientOverlay)
         pnlBranding.Dock = DockStyle.Left
         pnlBranding.Location = New Point(0, 0)
-        pnlBranding.Margin = New Padding(3, 4, 3, 4)
         pnlBranding.Name = "pnlBranding"
-        pnlBranding.Size = New Size(514, 907)
+        pnlBranding.Size = New Size(450, 680)
         pnlBranding.TabIndex = 0
         ' 
         ' pnlFloatingCard
@@ -72,10 +71,9 @@ Partial Class frmLogin
         pnlFloatingCard.BackColor = Color.FromArgb(CByte(200), CByte(255), CByte(255), CByte(255))
         pnlFloatingCard.Controls.Add(lblCardText)
         pnlFloatingCard.Controls.Add(lblCardIcon)
-        pnlFloatingCard.Location = New Point(69, 600)
-        pnlFloatingCard.Margin = New Padding(3, 4, 3, 4)
+        pnlFloatingCard.Location = New Point(60, 450)
         pnlFloatingCard.Name = "pnlFloatingCard"
-        pnlFloatingCard.Size = New Size(377, 160)
+        pnlFloatingCard.Size = New Size(330, 120)
         pnlFloatingCard.TabIndex = 1
         ' 
         ' lblCardText
@@ -83,9 +81,9 @@ Partial Class frmLogin
         lblCardText.BackColor = Color.Transparent
         lblCardText.Font = New Font("Poppins", 9.75F)
         lblCardText.ForeColor = Color.FromArgb(CByte(13), CByte(71), CByte(161))
-        lblCardText.Location = New Point(23, 80)
+        lblCardText.Location = New Point(20, 60)
         lblCardText.Name = "lblCardText"
-        lblCardText.Size = New Size(331, 67)
+        lblCardText.Size = New Size(290, 50)
         lblCardText.TabIndex = 1
         lblCardText.Text = "Access the student and staff queueing portal for faster service."
         ' 
@@ -93,11 +91,11 @@ Partial Class frmLogin
         ' 
         lblCardIcon.AutoSize = True
         lblCardIcon.BackColor = Color.Transparent
-        lblCardIcon.Font = New Font("Segoe UI", 24.0F, FontStyle.Bold)
+        lblCardIcon.Font = New Font("Segoe UI", 24F, FontStyle.Bold)
         lblCardIcon.ForeColor = Color.FromArgb(CByte(13), CByte(71), CByte(161))
-        lblCardIcon.Location = New Point(17, 20)
+        lblCardIcon.Location = New Point(15, 15)
         lblCardIcon.Name = "lblCardIcon"
-        lblCardIcon.Size = New Size(79, 54)
+        lblCardIcon.Size = New Size(65, 45)
         lblCardIcon.TabIndex = 0
         lblCardIcon.Text = "👥"
         ' 
@@ -107,18 +105,17 @@ Partial Class frmLogin
         pnlGradientOverlay.Controls.Add(lblBrandSubtitle)
         pnlGradientOverlay.Controls.Add(lblBrandTitle)
         pnlGradientOverlay.Location = New Point(0, 0)
-        pnlGradientOverlay.Margin = New Padding(3, 4, 3, 4)
         pnlGradientOverlay.Name = "pnlGradientOverlay"
-        pnlGradientOverlay.Size = New Size(514, 533)
+        pnlGradientOverlay.Size = New Size(450, 400)
         pnlGradientOverlay.TabIndex = 0
         ' 
         ' lblBrandSubtitle
         ' 
         lblBrandSubtitle.Font = New Font("Poppins", 12.75F)
         lblBrandSubtitle.ForeColor = Color.FromArgb(CByte(200), CByte(220), CByte(240))
-        lblBrandSubtitle.Location = New Point(46, 387)
+        lblBrandSubtitle.Location = New Point(40, 290)
         lblBrandSubtitle.Name = "lblBrandSubtitle"
-        lblBrandSubtitle.Size = New Size(423, 107)
+        lblBrandSubtitle.Size = New Size(370, 80)
         lblBrandSubtitle.TabIndex = 1
         lblBrandSubtitle.Text = "Queueing System for Lyceum of Alabang"
         lblBrandSubtitle.TextAlign = ContentAlignment.TopCenter
@@ -126,11 +123,11 @@ Partial Class frmLogin
         ' lblBrandTitle
         ' 
         lblBrandTitle.AutoSize = True
-        lblBrandTitle.Font = New Font("Poppins", 48.0F, FontStyle.Bold)
+        lblBrandTitle.Font = New Font("Poppins", 48F, FontStyle.Bold)
         lblBrandTitle.ForeColor = Color.White
-        lblBrandTitle.Location = New Point(69, 240)
+        lblBrandTitle.Location = New Point(60, 180)
         lblBrandTitle.Name = "lblBrandTitle"
-        lblBrandTitle.Size = New Size(431, 141)
+        lblBrandTitle.Size = New Size(346, 113)
         lblBrandTitle.TabIndex = 0
         lblBrandTitle.Text = "LOA EASE"
         ' 
@@ -139,10 +136,9 @@ Partial Class frmLogin
         pnlLogin.BackColor = Color.FromArgb(CByte(245), CByte(247), CByte(250))
         pnlLogin.Controls.Add(pnlLoginContainer)
         pnlLogin.Dock = DockStyle.Fill
-        pnlLogin.Location = New Point(514, 0)
-        pnlLogin.Margin = New Padding(3, 4, 3, 4)
+        pnlLogin.Location = New Point(450, 0)
         pnlLogin.Name = "pnlLogin"
-        pnlLogin.Size = New Size(572, 907)
+        pnlLogin.Size = New Size(500, 680)
         pnlLogin.TabIndex = 1
         ' 
         ' pnlLoginContainer
@@ -157,20 +153,18 @@ Partial Class frmLogin
         pnlLoginContainer.Controls.Add(pnlUsernameContainer)
         pnlLoginContainer.Controls.Add(lblSubtitle)
         pnlLoginContainer.Controls.Add(lblLogin)
-        pnlLoginContainer.Location = New Point(81, 153)
-        pnlLoginContainer.Margin = New Padding(3, 4, 3, 4)
+        pnlLoginContainer.Location = New Point(71, 115)
         pnlLoginContainer.Name = "pnlLoginContainer"
-        pnlLoginContainer.Size = New Size(411, 667)
+        pnlLoginContainer.Size = New Size(360, 500)
         pnlLoginContainer.TabIndex = 0
         ' 
         ' pnlAttempts
         ' 
         pnlAttempts.BackColor = Color.FromArgb(CByte(255), CByte(243), CByte(205))
         pnlAttempts.Controls.Add(lblAttemptsInfo)
-        pnlAttempts.Location = New Point(34, 453)
-        pnlAttempts.Margin = New Padding(3, 4, 3, 4)
+        pnlAttempts.Location = New Point(30, 340)
         pnlAttempts.Name = "pnlAttempts"
-        pnlAttempts.Size = New Size(343, 60)
+        pnlAttempts.Size = New Size(300, 45)
         pnlAttempts.TabIndex = 7
         pnlAttempts.Visible = False
         ' 
@@ -181,7 +175,7 @@ Partial Class frmLogin
         lblAttemptsInfo.ForeColor = Color.FromArgb(CByte(133), CByte(100), CByte(4))
         lblAttemptsInfo.Location = New Point(0, 0)
         lblAttemptsInfo.Name = "lblAttemptsInfo"
-        lblAttemptsInfo.Size = New Size(343, 60)
+        lblAttemptsInfo.Size = New Size(300, 45)
         lblAttemptsInfo.TabIndex = 0
         lblAttemptsInfo.Text = "⚠ 2 attempts remaining"
         lblAttemptsInfo.TextAlign = ContentAlignment.MiddleCenter
@@ -192,9 +186,9 @@ Partial Class frmLogin
         lblForgotPassword.Cursor = Cursors.Hand
         lblForgotPassword.Font = New Font("Poppins", 8.25F)
         lblForgotPassword.ForeColor = Color.FromArgb(CByte(13), CByte(71), CByte(161))
-        lblForgotPassword.Location = New Point(34, 407)
+        lblForgotPassword.Location = New Point(30, 305)
         lblForgotPassword.Name = "lblForgotPassword"
-        lblForgotPassword.Size = New Size(132, 25)
+        lblForgotPassword.Size = New Size(105, 19)
         lblForgotPassword.TabIndex = 6
         lblForgotPassword.Text = "Forgot Password?"
         ' 
@@ -203,10 +197,9 @@ Partial Class frmLogin
         chkShowPassword.AutoSize = True
         chkShowPassword.Font = New Font("Poppins", 8.25F)
         chkShowPassword.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
-        chkShowPassword.Location = New Point(34, 360)
-        chkShowPassword.Margin = New Padding(3, 4, 3, 4)
+        chkShowPassword.Location = New Point(30, 270)
         chkShowPassword.Name = "chkShowPassword"
-        chkShowPassword.Size = New Size(140, 29)
+        chkShowPassword.Size = New Size(112, 23)
         chkShowPassword.TabIndex = 5
         chkShowPassword.Text = "Show Password"
         chkShowPassword.UseVisualStyleBackColor = True
@@ -218,10 +211,9 @@ Partial Class frmLogin
         btnLogin.FlatAppearance.BorderSize = 0
         btnLogin.FlatStyle = FlatStyle.Flat
         btnLogin.ForeColor = Color.White
-        btnLogin.Location = New Point(34, 540)
-        btnLogin.Margin = New Padding(3, 4, 3, 4)
+        btnLogin.Location = New Point(30, 405)
         btnLogin.Name = "btnLogin"
-        btnLogin.Size = New Size(343, 73)
+        btnLogin.Size = New Size(300, 55)
         btnLogin.TabIndex = 4
         btnLogin.Text = "Sign In"
         btnLogin.UseVisualStyleBackColor = False
@@ -231,20 +223,19 @@ Partial Class frmLogin
         pnlPasswordContainer.BackColor = Color.FromArgb(CByte(245), CByte(247), CByte(250))
         pnlPasswordContainer.Controls.Add(lblPasswordIcon)
         pnlPasswordContainer.Controls.Add(txtPassword)
-        pnlPasswordContainer.Location = New Point(34, 273)
-        pnlPasswordContainer.Margin = New Padding(3, 4, 3, 4)
+        pnlPasswordContainer.Location = New Point(30, 205)
         pnlPasswordContainer.Name = "pnlPasswordContainer"
-        pnlPasswordContainer.Size = New Size(343, 67)
+        pnlPasswordContainer.Size = New Size(300, 50)
         pnlPasswordContainer.TabIndex = 3
         ' 
         ' lblPasswordIcon
         ' 
         lblPasswordIcon.AutoSize = True
-        lblPasswordIcon.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
+        lblPasswordIcon.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
         lblPasswordIcon.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
-        lblPasswordIcon.Location = New Point(14, 16)
+        lblPasswordIcon.Location = New Point(12, 12)
         lblPasswordIcon.Name = "lblPasswordIcon"
-        lblPasswordIcon.Size = New Size(48, 32)
+        lblPasswordIcon.Size = New Size(34, 25)
         lblPasswordIcon.TabIndex = 2
         lblPasswordIcon.Text = "🔒"
         ' 
@@ -254,11 +245,10 @@ Partial Class frmLogin
         txtPassword.BorderStyle = BorderStyle.None
         txtPassword.Font = New Font("Poppins", 11.25F)
         txtPassword.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
-        txtPassword.Location = New Point(57, 17)
-        txtPassword.Margin = New Padding(3, 4, 3, 4)
+        txtPassword.Location = New Point(50, 13)
         txtPassword.Name = "txtPassword"
         txtPassword.PlaceholderText = "Password"
-        txtPassword.Size = New Size(269, 29)
+        txtPassword.Size = New Size(235, 23)
         txtPassword.TabIndex = 1
         txtPassword.UseSystemPasswordChar = True
         ' 
@@ -267,20 +257,19 @@ Partial Class frmLogin
         pnlUsernameContainer.BackColor = Color.FromArgb(CByte(245), CByte(247), CByte(250))
         pnlUsernameContainer.Controls.Add(lblUserIcon)
         pnlUsernameContainer.Controls.Add(txtUsername)
-        pnlUsernameContainer.Location = New Point(34, 187)
-        pnlUsernameContainer.Margin = New Padding(3, 4, 3, 4)
+        pnlUsernameContainer.Location = New Point(30, 140)
         pnlUsernameContainer.Name = "pnlUsernameContainer"
-        pnlUsernameContainer.Size = New Size(343, 67)
+        pnlUsernameContainer.Size = New Size(300, 50)
         pnlUsernameContainer.TabIndex = 2
         ' 
         ' lblUserIcon
         ' 
         lblUserIcon.AutoSize = True
-        lblUserIcon.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
+        lblUserIcon.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
         lblUserIcon.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
-        lblUserIcon.Location = New Point(14, 16)
+        lblUserIcon.Location = New Point(12, 12)
         lblUserIcon.Name = "lblUserIcon"
-        lblUserIcon.Size = New Size(48, 32)
+        lblUserIcon.Size = New Size(34, 25)
         lblUserIcon.TabIndex = 2
         lblUserIcon.Text = "👤"
         ' 
@@ -290,32 +279,31 @@ Partial Class frmLogin
         txtUsername.BorderStyle = BorderStyle.None
         txtUsername.Font = New Font("Poppins", 11.25F)
         txtUsername.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
-        txtUsername.Location = New Point(57, 17)
-        txtUsername.Margin = New Padding(3, 4, 3, 4)
+        txtUsername.Location = New Point(50, 13)
         txtUsername.Name = "txtUsername"
         txtUsername.PlaceholderText = "Username"
-        txtUsername.Size = New Size(269, 29)
+        txtUsername.Size = New Size(235, 23)
         txtUsername.TabIndex = 1
         ' 
         ' lblSubtitle
         ' 
         lblSubtitle.AutoSize = True
-        lblSubtitle.Font = New Font("Poppins", 9.0F)
+        lblSubtitle.Font = New Font("Poppins", 9F)
         lblSubtitle.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
-        lblSubtitle.Location = New Point(34, 127)
+        lblSubtitle.Location = New Point(30, 95)
         lblSubtitle.Name = "lblSubtitle"
-        lblSubtitle.Size = New Size(265, 26)
+        lblSubtitle.Size = New Size(208, 22)
         lblSubtitle.TabIndex = 1
         lblSubtitle.Text = "Sign in to access your dashboard"
         ' 
         ' lblLogin
         ' 
         lblLogin.AutoSize = True
-        lblLogin.Font = New Font("Poppins", 26.0F, FontStyle.Bold)
+        lblLogin.Font = New Font("Poppins", 26F, FontStyle.Bold)
         lblLogin.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
-        lblLogin.Location = New Point(23, 47)
+        lblLogin.Location = New Point(20, 35)
         lblLogin.Name = "lblLogin"
-        lblLogin.Size = New Size(370, 78)
+        lblLogin.Size = New Size(295, 62)
         lblLogin.TabIndex = 0
         lblLogin.Text = "Welcome Back"
         ' 
@@ -324,20 +312,19 @@ Partial Class frmLogin
         pnlStatusBar.BackColor = Color.FromArgb(CByte(13), CByte(71), CByte(161))
         pnlStatusBar.Controls.Add(lblVersion)
         pnlStatusBar.Dock = DockStyle.Bottom
-        pnlStatusBar.Location = New Point(514, 867)
-        pnlStatusBar.Margin = New Padding(3, 4, 3, 4)
+        pnlStatusBar.Location = New Point(450, 650)
         pnlStatusBar.Name = "pnlStatusBar"
-        pnlStatusBar.Size = New Size(572, 40)
+        pnlStatusBar.Size = New Size(500, 30)
         pnlStatusBar.TabIndex = 2
         ' 
         ' lblVersion
         ' 
         lblVersion.Dock = DockStyle.Fill
-        lblVersion.Font = New Font("Poppins", 8.0F)
+        lblVersion.Font = New Font("Poppins", 8F)
         lblVersion.ForeColor = Color.White
         lblVersion.Location = New Point(0, 0)
         lblVersion.Name = "lblVersion"
-        lblVersion.Size = New Size(572, 40)
+        lblVersion.Size = New Size(500, 30)
         lblVersion.TabIndex = 0
         lblVersion.Text = "LOA EASE v1.0 | © 2025 Queueing Management System"
         lblVersion.TextAlign = ContentAlignment.MiddleCenter
@@ -348,15 +335,14 @@ Partial Class frmLogin
         ' 
         ' frmLogin
         ' 
-        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
+        AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.White
-        ClientSize = New Size(1086, 907)
+        ClientSize = New Size(950, 680)
         Controls.Add(pnlStatusBar)
         Controls.Add(pnlLogin)
         Controls.Add(pnlBranding)
         FormBorderStyle = FormBorderStyle.FixedSingle
-        Margin = New Padding(3, 4, 3, 4)
         MaximizeBox = False
         Name = "frmLogin"
         StartPosition = FormStartPosition.CenterScreen

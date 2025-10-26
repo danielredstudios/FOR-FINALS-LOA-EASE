@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
+      "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\frmadmindashboard.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\frmadmindashboard.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
@@ -37,18 +49,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\frmaddstudent.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\frmaddstudent.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
-      "RelativeMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|solutionrelative:loa-ease\\frmlogin.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7516E6DA-197D-BCEB-AE2C-02CADDC57C16}|LOA-EASE\\LOA-EASE.vbproj|c:\\users\\red\\source\\repos\\loa-ease\\loa-ease\\loa-ease.vbproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
@@ -134,7 +134,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 11,
+          "SelectedChildIndex": 15,
           "Children": [
             {
               "$type": "Bookmark",
@@ -170,56 +170,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "frmLogin.vb [Design]",
-              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb",
-              "RelativeDocumentMoniker": "LOA-EASE\\frmLogin.vb",
-              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb [Design]",
-              "RelativeToolTip": "LOA-EASE\\frmLogin.vb [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-09-25T00:56:46.563Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "frmLogin.vb",
-              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb",
-              "RelativeDocumentMoniker": "LOA-EASE\\frmLogin.vb",
-              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb",
-              "RelativeToolTip": "LOA-EASE\\frmLogin.vb",
-              "ViewState": "AgIAAIUAAAAAAAAAAAAcwBAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-09-25T02:46:31.643Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "frmAdminDashboard.vb [Design]",
-              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAdminDashboard.vb",
-              "RelativeDocumentMoniker": "LOA-EASE\\frmAdminDashboard.vb",
-              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAdminDashboard.vb [Design]",
-              "RelativeToolTip": "LOA-EASE\\frmAdminDashboard.vb [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-09-27T04:17:29.403Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "frmAdminDashboard.vb",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAdminDashboard.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAdminDashboard.vb",
               "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAdminDashboard.vb",
               "RelativeToolTip": "LOA-EASE\\frmAdminDashboard.vb",
-              "ViewState": "AgIAAA8GAAAAAAAAAAA9wBEGAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAPoHAAAAAAAAAAA7wBwIAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2025-10-23T02:20:18.815Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "frmAdminDashboard.Designer.vb",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAdminDashboard.Designer.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAdminDashboard.Designer.vb",
@@ -232,7 +196,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "frmAddEditUser.vb [Design]",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAddEditUser.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAddEditUser.vb",
@@ -244,7 +208,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "frmAddEditUser.vb",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAddEditUser.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAddEditUser.vb",
@@ -252,12 +216,11 @@
               "RelativeToolTip": "LOA-EASE\\frmAddEditUser.vb",
               "ViewState": "AgIAALAAAAAAAAAAAAAkwM0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-10-02T09:38:06.102Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-02T09:38:06.102Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "frmAddEditUser.Designer.vb",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAddEditUser.Designer.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAddEditUser.Designer.vb",
@@ -265,8 +228,57 @@
               "RelativeToolTip": "LOA-EASE\\frmAddEditUser.Designer.vb",
               "ViewState": "AgIAAJEAAAAAAAAAAAAkwK4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-10-02T09:37:50.588Z",
+              "WhenOpened": "2025-10-02T09:37:50.588Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DatabaseHelper.vb",
+              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\DatabaseHelper.vb",
+              "RelativeDocumentMoniker": "LOA-EASE\\DatabaseHelper.vb",
+              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\DatabaseHelper.vb",
+              "RelativeToolTip": "LOA-EASE\\DatabaseHelper.vb",
+              "ViewState": "AgIAAAYCAAAAAAAAAAAkwCMCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-09-25T02:55:16.927Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "frmLogin.vb [Design]",
+              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb",
+              "RelativeDocumentMoniker": "LOA-EASE\\frmLogin.vb",
+              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb [Design]",
+              "RelativeToolTip": "LOA-EASE\\frmLogin.vb [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-09-25T00:56:46.563Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "frmLogin.vb",
+              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb",
+              "RelativeDocumentMoniker": "LOA-EASE\\frmLogin.vb",
+              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.vb",
+              "RelativeToolTip": "LOA-EASE\\frmLogin.vb",
+              "ViewState": "AgIAANIBAAAAAAAAAAAkwN0BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-09-25T02:46:31.643Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "frmAdminDashboard.vb [Design]",
+              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAdminDashboard.vb",
+              "RelativeDocumentMoniker": "LOA-EASE\\frmAdminDashboard.vb",
+              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAdminDashboard.vb [Design]",
+              "RelativeToolTip": "LOA-EASE\\frmAdminDashboard.vb [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-09-27T04:17:29.403Z",
+              "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
@@ -281,7 +293,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 10,
               "Title": "frmAddStudent.Designer.vb",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAddStudent.Designer.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAddStudent.Designer.vb",
@@ -289,12 +301,11 @@
               "RelativeToolTip": "LOA-EASE\\frmAddStudent.Designer.vb",
               "ViewState": "AgIAAKwAAAAAAAAAAAArwLoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-10-25T11:33:48.226Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-25T11:33:48.226Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "frmAddStudent.vb [Design]",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAddStudent.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAddStudent.vb",
@@ -318,7 +329,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 11,
               "Title": "frmAddStudent.vb",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmAddStudent.vb",
               "RelativeDocumentMoniker": "LOA-EASE\\frmAddStudent.vb",
@@ -326,20 +337,7 @@
               "RelativeToolTip": "LOA-EASE\\frmAddStudent.vb",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-10-23T02:04:28.857Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "DatabaseHelper.vb",
-              "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\DatabaseHelper.vb",
-              "RelativeDocumentMoniker": "LOA-EASE\\DatabaseHelper.vb",
-              "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\DatabaseHelper.vb",
-              "RelativeToolTip": "LOA-EASE\\DatabaseHelper.vb",
-              "ViewState": "AgIAADMAAAAAAAAAAAAjwEEAAABGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-09-25T02:55:16.927Z"
+              "WhenOpened": "2025-10-23T02:04:28.857Z"
             },
             {
               "$type": "Document",
@@ -446,7 +444,8 @@
               "RelativeToolTip": "LOA-EASE\\frmLogin.Designer.vb",
               "ViewState": "AgIAAGwAAAAAAAAAAADgv1UBAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-09-25T02:46:20.245Z"
+              "WhenOpened": "2025-09-25T02:46:20.245Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -517,7 +516,8 @@
               "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE\\LOA-EASE\\frmLogin.resx",
               "RelativeToolTip": "LOA-EASE\\frmLogin.resx",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
-              "WhenOpened": "2025-09-25T02:49:15.906Z"
+              "WhenOpened": "2025-09-25T02:49:15.906Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",

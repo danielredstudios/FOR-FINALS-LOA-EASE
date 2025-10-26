@@ -7,12 +7,15 @@ Public Class frmAdminDashboard
     Private _activeButton As Button
     Private queueLogsTable As DataTable
     Private _lastQueueLogTimestamp As DateTime
-    Private lblNoResultsFound As Label
+    Private lblNoResultsFound As Label ' Keep this if used elsewhere, otherwise remove if only for flpUserControls
     Private WithEvents tmrUserManagementRefresh As New Timer()
     Private WithEvents btnAddNewStudent As Button
     Private WithEvents btnDeleteStudent As Button
     Private _activePanel As Panel
     Private WithEvents cboSortUsers As ComboBox
+    Private WithEvents btnToggleAdminStatus As Button
+    Private WithEvents btnToggleCashierStatus As Button
+
 
     Public Sub New(adminFullName As String)
         InitializeComponent()
@@ -24,64 +27,32 @@ Public Class frmAdminDashboard
         Me.WindowState = FormWindowState.Maximized
         lblWelcome.Text = $"Welcome, {_adminFullName}"
 
-        lblNoResultsFound = New Label() With {
-            .AutoSize = True,
-            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
-            .ForeColor = Color.Red,
-            .Name = "lblNoResultsFound",
-            .Size = New Size(150, 22),
-            .Text = "No results found",
-            .Visible = False,
-            .Anchor = AnchorStyles.Left,
-            .Margin = New Padding(3, 15, 3, 3)
-        }
-
-        Dim lblNoResultsAdmins As New Label() With {
-            .AutoSize = True,
-            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
-            .ForeColor = Color.Red,
-            .Name = "lblNoResultsAdmins",
-            .Size = New Size(150, 22),
-            .Text = "No results found",
-            .Visible = False,
-            .Anchor = AnchorStyles.Left,
-            .Margin = New Padding(3, 15, 3, 3)
-        }
-        flpAdminControls.Controls.Add(lblNoResultsAdmins)
-        flpAdminControls.SetFlowBreak(lblNoResultsAdmins, True)
-
-        Dim lblNoResultsCashiers As New Label() With {
-            .AutoSize = True,
-            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
-            .ForeColor = Color.Red,
-            .Name = "lblNoResultsCashiers",
-            .Size = New Size(150, 22),
-            .Text = "No results found",
-            .Visible = False,
-            .Anchor = AnchorStyles.Left,
-            .Margin = New Padding(3, 15, 3, 3)
-        }
-        flpCounterUserControls.Controls.Add(lblNoResultsCashiers)
-        flpCounterUserControls.SetFlowBreak(lblNoResultsCashiers, True)
-
         SetupDataGridViews()
         RefreshAllData()
 
         tmrRefresh.Interval = 15000
         AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
         tmrRefresh.Start()
+
+        ' ============================================
+        ' QUEUE LOGS SORT SETUP
+        ' ============================================
+        cboSortQueueLogs.Items.Clear()
         cboSortQueueLogs.Items.Add("Default")
         cboSortQueueLogs.Items.Add("Queue Number")
         cboSortQueueLogs.Items.Add("Full Name")
         cboSortQueueLogs.Items.Add("Status")
         cboSortQueueLogs.SelectedIndex = 0
 
+        ' ============================================
+        ' USER MANAGEMENT CONTROLS SETUP
+        ' ============================================
         cboSortUsers = New ComboBox() With {
             .DropDownStyle = ComboBoxStyle.DropDownList,
             .Name = "cboSortUsers",
-            .Size = New Size(180, 30),
+            .Size = New Size(150, 36),
             .Font = New Font("Poppins", 9.0F),
-            .Margin = New Padding(3, 11, 3, 4)
+            .Margin = New Padding(3, 6, 3, 3)
         }
         cboSortUsers.Items.Add("Default")
         cboSortUsers.Items.Add("Name (A-Z)")
@@ -94,94 +65,312 @@ Public Class frmAdminDashboard
         AddHandler cboSortUsers.SelectedIndexChanged, AddressOf cboSortUsers_SelectedIndexChanged
 
         Dim lblSortUsers As New Label() With {
-            .Text = "Sort by:",
+            .Text = "Sort:",
             .AutoSize = True,
             .Font = New Font("Poppins", 9.0F),
             .Name = "lblSortUsers",
-            .Margin = New Padding(10, 13, 3, 0)
+            .Margin = New Padding(15, 13, 3, 0)
         }
 
+        Dim lblSearchUsers As New Label() With {
+            .Text = "Search:",
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F),
+            .Name = "lblSearchUsers",
+            .Margin = New Padding(0, 13, 3, 0)
+        }
+
+        txtSearchUsers.Size = New Size(200, 36)
+        txtSearchUsers.Margin = New Padding(3, 8, 3, 3)
+
+        ' User Management Buttons
         btnAddNewStudent = New Button() With {
             .Name = "btnAddNewStudent",
             .Text = "➕ Add Student",
-            .Size = New Size(150, 48),
+            .Size = New Size(130, 36),
             .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
             .BackColor = Color.FromArgb(0, 123, 255),
             .ForeColor = Color.White,
             .FlatStyle = FlatStyle.Flat,
             .Cursor = Cursors.Hand,
             .Visible = False,
-            .Margin = New Padding(3, 4, 3, 4)
+            .Margin = New Padding(3, 3, 3, 3)
         }
         btnAddNewStudent.FlatAppearance.BorderSize = 0
         AddHandler btnAddNewStudent.Click, AddressOf btnAddNewStudent_Click
 
-
         btnDeleteStudent = New Button() With {
             .Name = "btnDeleteStudent",
-            .Text = "🗑️ Delete Student",
-            .Size = New Size(160, 48),
+            .Text = "🗑️ Delete",
+            .Size = New Size(100, 36),
             .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
             .BackColor = Color.FromArgb(220, 53, 69),
             .ForeColor = Color.White,
             .FlatStyle = FlatStyle.Flat,
             .Cursor = Cursors.Hand,
             .Visible = False,
-            .Margin = New Padding(3, 4, 3, 4)
+            .Margin = New Padding(3, 3, 3, 3)
         }
         btnDeleteStudent.FlatAppearance.BorderSize = 0
         AddHandler btnDeleteStudent.Click, AddressOf btnDeleteStudent_Click
 
+        btnAddUser.Size = New Size(140, 36)
+        btnAddUser.Text = "➕ Create Account"
+        btnAddUser.Margin = New Padding(3, 3, 3, 3)
+
+        btnEditUser.Size = New Size(100, 36)
+        btnEditUser.Text = "✏️ Edit"
+        btnEditUser.Margin = New Padding(3, 3, 3, 3)
+
+        btnDeleteUser.Size = New Size(100, 36)
+        btnDeleteUser.Text = "🗑️ Delete"
+        btnDeleteUser.Margin = New Padding(3, 3, 3, 3)
+
+        Dim lblNoResultsUsers As New Label() With {
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .ForeColor = Color.Red,
+            .Name = "lblNoResultsFound",
+            .Text = "No results found",
+            .Visible = False,
+            .Margin = New Padding(15, 13, 3, 3)
+        }
+
+        ' Create spacer for user controls
+        Dim spacerUser As New Panel With {
+            .Name = "spacerUser",
+            .Size = New Size(1, 1),
+            .Margin = New Padding(0)
+        }
+
+        ' Reorganize User Controls: Search/Sort LEFT --- Buttons RIGHT
         flpUserControls.FlowDirection = FlowDirection.LeftToRight
         flpUserControls.Controls.Clear()
-
-        flpUserControls.Controls.Add(btnAddUser)
         flpUserControls.Controls.Add(lblSearchUsers)
         flpUserControls.Controls.Add(txtSearchUsers)
         flpUserControls.Controls.Add(lblSortUsers)
         flpUserControls.Controls.Add(cboSortUsers)
-
-        Dim spacerPanel As New Panel With {
-            .Margin = New Padding(0),
-            .Size = New Size(0, 0),
-            .AutoSize = True,
-            .AutoSizeMode = AutoSizeMode.GrowAndShrink
-        }
-        flpUserControls.Controls.Add(spacerPanel)
-        flpUserControls.SetFlowBreak(spacerPanel, False)
-
+        flpUserControls.Controls.Add(lblNoResultsUsers)
+        flpUserControls.Controls.Add(spacerUser) ' Add Spacer
+        flpUserControls.Controls.Add(btnAddUser)
         flpUserControls.Controls.Add(btnAddNewStudent)
-        flpUserControls.Controls.Add(btnDeleteStudent)
         flpUserControls.Controls.Add(btnEditUser)
         flpUserControls.Controls.Add(btnDeleteUser)
+        flpUserControls.Controls.Add(btnDeleteStudent)
 
+        AddHandler flpUserControls.Resize, AddressOf FlowLayoutPanel_Resize ' Use Universal Handler
 
-        flpUserControls.Controls.Add(lblNoResultsFound)
-        flpUserControls.SetFlowBreak(lblNoResultsFound, True)
+        ' ============================================
+        ' ADMIN MANAGEMENT CONTROLS SETUP
+        ' ============================================
+        btnToggleAdminStatus = New Button() With {
+            .Name = "btnToggleAdminStatus",
+            .Text = "🔄 Toggle", ' Updated Text
+            .Size = New Size(100, 36), ' Updated Size
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .BackColor = Color.FromArgb(255, 193, 7),
+            .ForeColor = Color.White,
+            .FlatStyle = FlatStyle.Flat,
+            .Cursor = Cursors.Hand,
+            .Margin = New Padding(3, 3, 3, 3) ' Updated Margin
+        }
+        btnToggleAdminStatus.FlatAppearance.BorderSize = 0
+        AddHandler btnToggleAdminStatus.Click, AddressOf btnToggleAdminStatus_Click
 
-        AddHandler flpUserControls.Resize, AddressOf flpUserControls_Resize
+        btnAddAdmin.Size = New Size(120, 36)
+        btnAddAdmin.Text = "➕ Add Admin"
+        btnAddAdmin.Margin = New Padding(3, 3, 3, 3)
 
+        btnEditAdmin.Size = New Size(100, 36)
+        btnEditAdmin.Text = "✏️ Edit"
+        btnEditAdmin.Margin = New Padding(3, 3, 3, 3)
 
+        btnDeleteAdmin.Size = New Size(100, 36)
+        btnDeleteAdmin.Text = "🗑️ Delete"
+        btnDeleteAdmin.Margin = New Padding(3, 3, 3, 3)
+
+        txtSearchAdmins.Size = New Size(200, 36)
+        txtSearchAdmins.Margin = New Padding(3, 8, 3, 3)
+
+        Dim lblSearchAdmins As New Label() With {
+            .Text = "Search:",
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F),
+            .Name = "lblSearchAdmins",
+            .Margin = New Padding(0, 13, 3, 0) ' Updated Margin
+        }
+
+        Dim lblNoResultsAdmins As New Label() With {
+            .AutoSize = True,
+            .Font = New Font("Poppins", 9.0F, FontStyle.Bold),
+            .ForeColor = Color.Red,
+            .Name = "lblNoResultsAdmins",
+            .Text = "No results found",
+            .Visible = False,
+            .Margin = New Padding(15, 13, 3, 3) ' Updated Margin
+        }
+
+        ' Create spacer for admin controls
+        Dim spacerAdmin As New Panel With {
+            .Name = "spacerAdmin",
+            .Size = New Size(1, 1),
+            .Margin = New Padding(0)
+        }
+
+        ' Reorganize Admin Controls: Search LEFT --- Buttons RIGHT
+        flpAdminControls.FlowDirection = FlowDirection.LeftToRight
+        flpAdminControls.Controls.Clear()
+        flpAdminControls.Controls.Add(lblSearchAdmins)
+        flpAdminControls.Controls.Add(txtSearchAdmins)
+        flpAdminControls.Controls.Add(lblNoResultsAdmins)
+        flpAdminControls.Controls.Add(spacerAdmin) ' Add Spacer
+        flpAdminControls.Controls.Add(btnAddAdmin)
+        flpAdminControls.Controls.Add(btnEditAdmin)
+        flpAdminControls.Controls.Add(btnToggleAdminStatus)
+        flpAdminControls.Controls.Add(btnDeleteAdmin)
+
+        AddHandler flpAdminControls.Resize, AddressOf FlowLayoutPanel_Resize ' Use Universal Handler
+
+        ' ============================================
+        ' COUNTER MANAGEMENT CONTROLS SETUP
+        ' ============================================
+        btnToggleCashierStatus = New Button() With {
+            .Name = "btnToggleCashierStatus",
+            .Text = "🔄 Toggle",
+            .Size = New Size(90, 25), ' Updated Size
+            .Font = New Font("Poppins", 8.0F, FontStyle.Bold),
+            .BackColor = Color.FromArgb(255, 193, 7),
+            .ForeColor = Color.White,
+            .FlatStyle = FlatStyle.Flat,
+            .Cursor = Cursors.Hand,
+            .Margin = New Padding(3, 2, 3, 2) ' Updated Margin
+        }
+        btnToggleCashierStatus.FlatAppearance.BorderSize = 0
+        AddHandler btnToggleCashierStatus.Click, AddressOf btnToggleCashierStatus_Click
+
+        ' Counter section buttons
+        btnAddCounter.Size = New Size(100, 25) ' Updated Size
+        btnAddCounter.Text = "➕ Add"
+        btnAddCounter.Margin = New Padding(3, 2, 3, 2)
+        btnAddCounter.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+
+        btnEditCounter.Size = New Size(80, 25) ' Updated Size
+        btnEditCounter.Text = "✏️ Edit"
+        btnEditCounter.Margin = New Padding(3, 2, 3, 2)
+        btnEditCounter.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+
+        btnDeleteCounter.Size = New Size(80, 25) ' Updated Size
+        btnDeleteCounter.Text = "🗑️ Delete"
+        btnDeleteCounter.Margin = New Padding(3, 2, 3, 2)
+        btnDeleteCounter.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+
+        ' Cashier section buttons
+        btnAddCashier.Size = New Size(100, 25) ' Updated Size
+        btnAddCashier.Text = "➕ Add"
+        btnAddCashier.Margin = New Padding(3, 2, 3, 2)
+        btnAddCashier.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+
+        btnEditCashier.Size = New Size(80, 25) ' Updated Size
+        btnEditCashier.Text = "✏️ Edit"
+        btnEditCashier.Margin = New Padding(3, 2, 3, 2)
+        btnEditCashier.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+
+        btnDeleteCashier.Size = New Size(80, 25) ' Updated Size
+        btnDeleteCashier.Text = "🗑️ Delete"
+        btnDeleteCashier.Margin = New Padding(3, 2, 3, 2)
+        btnDeleteCashier.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+
+        txtSearchCashiers.Size = New Size(180, 25)
+        txtSearchCashiers.Margin = New Padding(3, 4, 3, 2)
+        txtSearchCashiers.Font = New Font("Poppins", 8.0F)
+
+        Dim lblSearchCashiers As New Label() With {
+            .AutoSize = True,
+            .Font = New Font("Poppins", 8.0F),
+            .Name = "lblSearchCashiers",
+            .Text = "Search:",
+            .Margin = New Padding(0, 5, 3, 0) ' Updated Margin
+        }
+
+        Dim lblNoResultsCashiers As New Label() With {
+            .AutoSize = True,
+            .Font = New Font("Poppins", 8.0F, FontStyle.Bold),
+            .ForeColor = Color.Red,
+            .Name = "lblNoResultsCashiers",
+            .Text = "No results found",
+            .Visible = False,
+            .Margin = New Padding(12, 5, 3, 2) ' Updated Margin
+        }
+
+        ' Create spacer for counter controls
+        Dim spacerCounter As New Panel With {
+            .Name = "spacerCounter",
+            .Size = New Size(1, 1),
+            .Margin = New Padding(0)
+        }
+
+        ' Create spacer for cashier controls
+        Dim spacerCashier As New Panel With {
+            .Name = "spacerCashier",
+            .Size = New Size(1, 1),
+            .Margin = New Padding(0)
+        }
+
+        ' Reorganize Counter Controls: Empty LEFT --- Buttons RIGHT
+        flpCounterControls.FlowDirection = FlowDirection.LeftToRight
+        flpCounterControls.Controls.Clear()
+        flpCounterControls.Controls.Add(spacerCounter) ' Add Spacer First
+        flpCounterControls.Controls.Add(btnAddCounter)
+        flpCounterControls.Controls.Add(btnEditCounter)
+        flpCounterControls.Controls.Add(btnDeleteCounter)
+
+        AddHandler flpCounterControls.Resize, AddressOf FlowLayoutPanel_Resize ' Use Universal Handler
+
+        ' Reorganize Cashier Controls: Search LEFT --- Buttons RIGHT
+        flpCounterUserControls.FlowDirection = FlowDirection.LeftToRight
+        flpCounterUserControls.Controls.Clear()
+        flpCounterUserControls.Controls.Add(lblSearchCashiers)
+        flpCounterUserControls.Controls.Add(txtSearchCashiers)
+        flpCounterUserControls.Controls.Add(lblNoResultsCashiers)
+        flpCounterUserControls.Controls.Add(spacerCashier) ' Add Spacer
+        flpCounterUserControls.Controls.Add(btnAddCashier)
+        flpCounterUserControls.Controls.Add(btnEditCashier)
+        flpCounterUserControls.Controls.Add(btnToggleCashierStatus)
+        flpCounterUserControls.Controls.Add(btnDeleteCashier)
+
+        AddHandler flpCounterUserControls.Resize, AddressOf FlowLayoutPanel_Resize ' Use Universal Handler
+
+        ' ============================================
+        ' SHOW INITIAL PANEL
+        ' ============================================
         ShowPanel(pnlDashboard, btnDashboard)
         AddHandler tabUserManagement.SelectedIndexChanged, AddressOf tabUserManagement_SelectedIndexChanged
         AddHandler txtSearchAdmins.TextChanged, AddressOf txtSearchAdmins_TextChanged
         AddHandler txtSearchCashiers.TextChanged, AddressOf txtSearchCashiers_TextChanged
-
+        AddHandler dgvAdmins.CellFormatting, AddressOf dgvAdmins_CellFormatting
+        AddHandler dgvCashiers.CellFormatting, AddressOf dgvCashiers_CellFormatting
     End Sub
 
-    Private Sub flpUserControls_Resize(sender As Object, e As EventArgs)
+    ' Universal Spacer Resize Handler
+    Private Sub FlowLayoutPanel_Resize(sender As Object, e As EventArgs)
         Dim flp = DirectCast(sender, FlowLayoutPanel)
-        Dim spacer = flp.Controls.OfType(Of Panel).FirstOrDefault()
+
+        ' Find the spacer panel in this FlowLayoutPanel
+        Dim spacer = flp.Controls.OfType(Of Panel).FirstOrDefault(Function(p) p.Name.StartsWith("spacer"))
+
         If spacer IsNot Nothing Then
+            ' Calculate occupied width
             Dim occupiedWidth As Integer = 0
             For Each ctrl As Control In flp.Controls
                 If ctrl IsNot spacer AndAlso ctrl.Visible Then
                     occupiedWidth += ctrl.Width + ctrl.Margin.Horizontal
                 End If
             Next
-            Dim spacerWidth = flp.ClientSize.Width - occupiedWidth - flp.Padding.Horizontal
-            spacer.Width = Math.Max(0, spacerWidth)
-            spacer.Visible = (spacer.Width > 0)
+
+            ' Calculate spacer width to push buttons to the right
+            Dim availableWidth = flp.ClientSize.Width - occupiedWidth - flp.Padding.Horizontal
+            spacer.Width = Math.Max(0, availableWidth)
+            spacer.Visible = True ' Keep spacer visible even if width is 0 for structure
         End If
     End Sub
 
@@ -233,7 +422,7 @@ Public Class frmAdminDashboard
                                       Dim format As String = "g"
                                       Dim dtX As DateTime
                                       Dim dtY As DateTime
-                                      If DateTime.TryParseExact(x.LastQueueDateTime, format, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, dtX) AndAlso _
+                                      If DateTime.TryParseExact(x.LastQueueDateTime, format, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, dtX) AndAlso
                                          DateTime.TryParseExact(y.LastQueueDateTime, format, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, dtY) Then
                                           Return DateTime.Compare(dtY, dtX)
                                       Else
@@ -288,6 +477,131 @@ Public Class frmAdminDashboard
     End Sub
 
     Private Sub SetupDataGridViews()
+        ' ============================================
+        ' ADMIN MANAGEMENT DataGridView
+        ' ============================================
+        dgvAdmins.AutoGenerateColumns = False
+        dgvAdmins.Columns.Clear()
+        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "FullName",
+            .HeaderText = "Full Name",
+            .DataPropertyName = "FullName",
+            .FillWeight = 25 ' Use FillWeight for relative sizing
+        })
+        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Username",
+            .HeaderText = "Username",
+            .DataPropertyName = "Username",
+            .FillWeight = 20
+        })
+
+        ' Active column - centered, no checkmark in header
+        Dim activeColumnAdmin As New DataGridViewCheckBoxColumn With {
+            .Name = "IsActive",
+            .HeaderText = "Active", ' Removed checkmark
+            .DataPropertyName = "IsActive",
+            .ReadOnly = True,
+            .FillWeight = 10 ' Adjusted FillWeight
+        }
+        activeColumnAdmin.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        activeColumnAdmin.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+        dgvAdmins.Columns.Add(activeColumnAdmin)
+
+        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "LastLogin",
+            .HeaderText = "Last Login",
+            .DataPropertyName = "LastLogin",
+            .FillWeight = 25
+        })
+        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "FailedAttempts",
+            .HeaderText = "Failed Attempts",
+            .DataPropertyName = "FailedAttempts",
+            .FillWeight = 15
+        })
+        dgvAdmins.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvAdmins.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        dgvAdmins.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvAdmins.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ' Apply Fill sizing
+
+
+        ' ============================================
+        ' CASHIER MANAGEMENT DataGridView
+        ' ============================================
+        dgvCashiers.AutoGenerateColumns = False
+        dgvCashiers.Columns.Clear()
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "FullName",
+            .HeaderText = "Full Name",
+            .DataPropertyName = "FullName",
+            .FillWeight = 22
+        })
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Username",
+            .HeaderText = "Username",
+            .DataPropertyName = "Username",
+            .FillWeight = 18
+        })
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Counter",
+            .HeaderText = "Assigned Counter",
+            .DataPropertyName = "Counter",
+            .FillWeight = 18
+        })
+
+        ' Active column - centered, no checkmark in header
+        Dim activeColumnCashier As New DataGridViewCheckBoxColumn With {
+            .Name = "IsActive",
+            .HeaderText = "Active", ' Removed checkmark
+            .DataPropertyName = "IsActive",
+            .ReadOnly = True,
+            .FillWeight = 10
+        }
+        activeColumnCashier.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        activeColumnCashier.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+        dgvCashiers.Columns.Add(activeColumnCashier)
+
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "LastLogin",
+            .HeaderText = "Last Login",
+            .DataPropertyName = "LastLogin",
+            .FillWeight = 20
+        })
+        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "FailedAttempts",
+            .HeaderText = "Failed Attempts",
+            .DataPropertyName = "FailedAttempts",
+            .FillWeight = 12
+        })
+        dgvCashiers.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvCashiers.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        dgvCashiers.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvCashiers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ' Apply Fill sizing
+
+        ' ============================================
+        ' COUNTER DataGridView
+        ' ============================================
+        dgvCounters.AutoGenerateColumns = False
+        dgvCounters.Columns.Clear()
+        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "CounterName",
+            .HeaderText = "Counter Name",
+            .DataPropertyName = "CounterName",
+            .FillWeight = 40
+        })
+        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "Cashier",
+            .HeaderText = "Cashier Assigned",
+            .DataPropertyName = "Cashier",
+            .FillWeight = 60
+        })
+        dgvCounters.SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        dgvCounters.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        dgvCounters.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvCounters.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ' Apply Fill sizing
+
+
+        ' --- Keep other DataGridView setups as they are ---
         dgvCashierStatus.AutoGenerateColumns = False
         dgvCashierStatus.Columns.Clear()
         dgvCashierStatus.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CashierName", .HeaderText = "Cashier Name", .DataPropertyName = "CashierName"})
@@ -296,6 +610,7 @@ Public Class frmAdminDashboard
         dgvCashierStatus.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvCashierStatus.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvCashierStatus.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvCashierStatus.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
         dgvAllQueues.AutoGenerateColumns = False
         dgvAllQueues.Columns.Clear()
@@ -307,6 +622,7 @@ Public Class frmAdminDashboard
         dgvAllQueues.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvAllQueues.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvAllQueues.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvAllQueues.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
         dgvQueueLogs.AutoGenerateColumns = False
         dgvQueueLogs.Columns.Clear()
@@ -317,6 +633,7 @@ Public Class frmAdminDashboard
         dgvQueueLogs.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvQueueLogs.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvQueueLogs.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvQueueLogs.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
         dgvUsersWithAccount.AutoGenerateColumns = False
         dgvUsersWithAccount.Columns.Clear()
@@ -332,6 +649,7 @@ Public Class frmAdminDashboard
         dgvUsersWithAccount.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvUsersWithAccount.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvUsersWithAccount.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvUsersWithAccount.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
         dgvUsersWithoutAccount.AutoGenerateColumns = False
         dgvUsersWithoutAccount.Columns.Clear()
@@ -343,37 +661,12 @@ Public Class frmAdminDashboard
         dgvUsersWithoutAccount.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvUsersWithoutAccount.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvUsersWithoutAccount.DefaultCellStyle.SelectionForeColor = Color.White
-
-        dgvCounters.AutoGenerateColumns = False
-        dgvCounters.Columns.Clear()
-        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "CounterName", .HeaderText = "Counter Name", .DataPropertyName = "CounterName"})
-        dgvCounters.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Cashier", .HeaderText = "Cashier Assigned", .DataPropertyName = "Cashier"})
-        dgvCounters.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        dgvCounters.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-        dgvCounters.DefaultCellStyle.SelectionForeColor = Color.White
-
-        dgvAdmins.AutoGenerateColumns = False
-        dgvAdmins.Columns.Clear()
-        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "FullName"})
-        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Username", .HeaderText = "Username", .DataPropertyName = "Username"})
-        dgvAdmins.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastLogin", .HeaderText = "Last Login", .DataPropertyName = "LastLogin"})
-        dgvAdmins.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        dgvAdmins.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-        dgvAdmins.DefaultCellStyle.SelectionForeColor = Color.White
-
-        dgvCashiers.AutoGenerateColumns = False
-        dgvCashiers.Columns.Clear()
-        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "FullName", .HeaderText = "Full Name", .DataPropertyName = "FullName"})
-        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Username", .HeaderText = "Username", .DataPropertyName = "Username"})
-        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "LastLogin", .HeaderText = "Last Login", .DataPropertyName = "LastLogin"})
-        dgvCashiers.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "Counter", .HeaderText = "Assigned Counter", .DataPropertyName = "Counter"})
-        dgvCashiers.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        dgvCashiers.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
-        dgvCashiers.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvUsersWithoutAccount.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
         dgvReports.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         dgvReports.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 85, 164)
         dgvReports.DefaultCellStyle.SelectionForeColor = Color.White
+        dgvReports.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
     End Sub
 
     Private Sub RefreshAllData()
@@ -474,7 +767,7 @@ Public Class frmAdminDashboard
                 End Using
 
                 dgvQueueLogs.DataSource = queueLogsTable
-                dgvQueueLogs.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                ' Removed AutoSizeColumnsMode from here, set in SetupDataGridViews
                 dgvQueueLogs.AllowUserToOrderColumns = True
                 dgvQueueLogs.ReadOnly = True
                 dgvQueueLogs.SelectionMode = DataGridViewSelectionMode.FullRowSelect
@@ -536,13 +829,13 @@ Public Class frmAdminDashboard
                 If dgvUsersWithAccount.Tag Is Nothing Then dgvUsersWithAccount.Tag = source
                 Dim originalSource = CType(dgvUsersWithAccount.Tag, BindingList(Of User))
                 Dim filteredList = New BindingList(Of User)(originalSource.Where(Function(user)
-                                                                                       Return user.FullName.ToLower().Contains(searchText) OrElse
-                                                                                              user.Username.ToLower().Contains(searchText) OrElse
-                                                                                              user.StudentNo.ToLower().Contains(searchText) OrElse
-                                                                                              (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
-                                                                                              (user.YearLevel IsNot Nothing AndAlso user.YearLevel.ToLower().Contains(searchText)) OrElse
-                                                                                              user.Role.ToLower().Contains(searchText)
-                                                                                   End Function).ToList())
+                                                                                     Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                            user.Username.ToLower().Contains(searchText) OrElse
+                                                                                            user.StudentNo.ToLower().Contains(searchText) OrElse
+                                                                                            (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
+                                                                                            (user.YearLevel IsNot Nothing AndAlso user.YearLevel.ToLower().Contains(searchText)) OrElse
+                                                                                            user.Role.ToLower().Contains(searchText)
+                                                                                 End Function).ToList())
                 dgvUsersWithAccount.DataSource = filteredList
                 resultsFound = filteredList.Any()
             End If
@@ -552,11 +845,11 @@ Public Class frmAdminDashboard
                 If dgvUsersWithoutAccount.Tag Is Nothing Then dgvUsersWithoutAccount.Tag = source
                 Dim originalSource = CType(dgvUsersWithoutAccount.Tag, BindingList(Of User))
                 Dim filteredList = New BindingList(Of User)(originalSource.Where(Function(user)
-                                                                                       Return user.FullName.ToLower().Contains(searchText) OrElse
-                                                                                              user.StudentNo.ToLower().Contains(searchText) OrElse
-                                                                                              (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
-                                                                                              user.LastQueueDateTime.ToLower().Contains(searchText)
-                                                                                   End Function).ToList())
+                                                                                     Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                            user.StudentNo.ToLower().Contains(searchText) OrElse
+                                                                                            (user.Course IsNot Nothing AndAlso user.Course.ToLower().Contains(searchText)) OrElse
+                                                                                            user.LastQueueDateTime.ToLower().Contains(searchText)
+                                                                                 End Function).ToList())
                 dgvUsersWithoutAccount.DataSource = filteredList
                 resultsFound = filteredList.Any()
             End If
@@ -584,9 +877,9 @@ Public Class frmAdminDashboard
         If dgvAdmins.Tag Is Nothing Then dgvAdmins.Tag = source
         Dim originalSource = CType(dgvAdmins.Tag, BindingList(Of StaffUser))
         Dim filteredList = New BindingList(Of StaffUser)(originalSource.Where(Function(user)
-                                                                               Return user.FullName.ToLower().Contains(searchText) OrElse
-                                                                                      user.Username.ToLower().Contains(searchText)
-                                                                           End Function).ToList())
+                                                                                  Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                         user.Username.ToLower().Contains(searchText)
+                                                                              End Function).ToList())
         dgvAdmins.DataSource = filteredList
         If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = Not filteredList.Any()
     End Sub
@@ -610,10 +903,10 @@ Public Class frmAdminDashboard
         If dgvCashiers.Tag Is Nothing Then dgvCashiers.Tag = source
         Dim originalSource = CType(dgvCashiers.Tag, BindingList(Of StaffUser))
         Dim filteredList = New BindingList(Of StaffUser)(originalSource.Where(Function(user)
-                                                                               Return user.FullName.ToLower().Contains(searchText) OrElse
-                                                                                      user.Username.ToLower().Contains(searchText) OrElse
-                                                                                      (user.Counter IsNot Nothing AndAlso user.Counter.ToLower().Contains(searchText))
-                                                                           End Function).ToList())
+                                                                                  Return user.FullName.ToLower().Contains(searchText) OrElse
+                                                                                         user.Username.ToLower().Contains(searchText) OrElse
+                                                                                         (user.Counter IsNot Nothing AndAlso user.Counter.ToLower().Contains(searchText))
+                                                                              End Function).ToList())
         dgvCashiers.DataSource = filteredList
         If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = Not filteredList.Any()
     End Sub
@@ -696,7 +989,7 @@ Public Class frmAdminDashboard
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
-                Dim query As String = "SELECT admin_id, full_name, username, last_login FROM admins ORDER BY full_name"
+                Dim query As String = "SELECT admin_id, full_name, username, last_login, failed_login_attempts, is_active FROM admins ORDER BY full_name"
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
@@ -705,7 +998,9 @@ Public Class frmAdminDashboard
                                 .FullName = reader("full_name").ToString(),
                                 .Username = reader("username").ToString(),
                                 .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
-                                .Role = "Admin"
+                                .Role = "Admin",
+                                .FailedAttempts = Convert.ToInt32(reader("failed_login_attempts")),
+                                .IsActive = Convert.ToBoolean(reader("is_active"))
                             })
                         End While
                     End Using
@@ -726,7 +1021,7 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-                    SELECT csh.cashier_id, csh.full_name, csh.username, csh.last_login, COALESCE(cnt.counter_name, 'Unassigned') AS counter_name
+                    SELECT csh.cashier_id, csh.full_name, csh.username, csh.last_login, csh.failed_login_attempts, csh.is_active, COALESCE(cnt.counter_name, 'Unassigned') AS counter_name
                     FROM cashiers csh
                     LEFT JOIN counters cnt ON csh.counter_id = cnt.counter_id
                     ORDER BY csh.full_name"
@@ -739,7 +1034,9 @@ Public Class frmAdminDashboard
                                 .Username = reader("username").ToString(),
                                 .LastLogin = If(reader.IsDBNull(reader.GetOrdinal("last_login")), "N/A", Convert.ToDateTime(reader("last_login")).ToString("g")),
                                 .Role = "Cashier",
-                                .Counter = reader("counter_name").ToString()
+                                .Counter = reader("counter_name").ToString(),
+                                .FailedAttempts = Convert.ToInt32(reader("failed_login_attempts")),
+                                .IsActive = Convert.ToBoolean(reader("is_active"))
                             })
                         End While
                     End Using
@@ -756,6 +1053,8 @@ Public Class frmAdminDashboard
 
     Private Sub FetchCounters()
         Dim counterList As New BindingList(Of Counter)()
+        Dim workingCount As Integer = 0 ' Initialize counter for assigned counters
+
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
@@ -771,16 +1070,19 @@ Public Class frmAdminDashboard
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
+                            Dim cashierName As String = reader("cashier").ToString()
+                            If cashierName <> "Unassigned" Then workingCount += 1 ' Increment if assigned
+
                             counterList.Add(New Counter With {
                                 .CounterID = Convert.ToInt32(reader("counter_id")),
                                 .CounterName = reader("counter_name").ToString(),
-                                .Cashier = reader("cashier").ToString()
+                                .Cashier = cashierName
                             })
                         End While
                     End Using
                 End Using
                 dgvCounters.DataSource = counterList
-                lblCountersTotal.Text = $"(Total: {counterList.Count})"
+                lblCountersTotal.Text = $"(Total: {counterList.Count} | Assigned: {workingCount})" ' Update label text
                 dgvCounters.ClearSelection()
             Catch ex As Exception
                 HandleDbError("fetching counters", ex)
@@ -946,8 +1248,8 @@ Public Class frmAdminDashboard
                         Catch ex As Exception
                             MessageBox.Show($"Error deleting student user account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                         Finally
-                             If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
-                             DirectCast(sender, Button).Enabled = True
+                            If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                            DirectCast(sender, Button).Enabled = True
                         End Try
                     End Using
                 End If
@@ -979,8 +1281,8 @@ Public Class frmAdminDashboard
             If dgvAdmins.SelectedRows.Count > 0 Then
                 Dim selectedAdmin As StaffUser = CType(dgvAdmins.SelectedRows(0).DataBoundItem, StaffUser)
                 Using frm As New frmAddEditUser(selectedAdmin.UserID, selectedAdmin.FullName, selectedAdmin.Username, "Admin")
-                   frm.ShowDialog(Me)
-                   If frm.DialogResult = DialogResult.OK Then
+                    frm.ShowDialog(Me)
+                    If frm.DialogResult = DialogResult.OK Then
                         FetchAdmins()
                     End If
                 End Using
@@ -988,7 +1290,7 @@ Public Class frmAdminDashboard
                 MessageBox.Show("Please select an admin to edit.", "No Admin Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             End If
         Finally
-             DirectCast(sender, Button).Enabled = True
+            DirectCast(sender, Button).Enabled = True
         End Try
     End Sub
 
@@ -1020,8 +1322,8 @@ Public Class frmAdminDashboard
                     Catch ex As Exception
                         MessageBox.Show($"Error deleting admin account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     Finally
-                         If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
-                         DirectCast(sender, Button).Enabled = True
+                        If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                        DirectCast(sender, Button).Enabled = True
                     End Try
                 End Using
             End If
@@ -1029,6 +1331,71 @@ Public Class frmAdminDashboard
             MessageBox.Show("Please select an admin to delete.", "No Admin Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
+
+    Private Sub btnToggleAdminStatus_Click(sender As Object, e As EventArgs) Handles btnToggleAdminStatus.Click
+        If dgvAdmins.SelectedRows.Count > 0 Then
+            Dim selectedAdmin As StaffUser = CType(dgvAdmins.SelectedRows(0).DataBoundItem, StaffUser)
+
+            ' Prevent self-deactivation
+            If selectedAdmin.FullName = _adminFullName Then
+                MessageBox.Show("You cannot deactivate your own admin account while logged in.",
+                              "Action Denied",
+                              MessageBoxButtons.OK,
+                              MessageBoxIcon.Warning)
+                Return
+            End If
+
+            Dim newStatus As Boolean = Not selectedAdmin.IsActive
+            Dim action As String = If(newStatus, "activate", "deactivate")
+            Dim actionPastTense As String = If(newStatus, "activated", "deactivated")
+
+            ' Single confirmation dialog with action result
+            Dim confirmation As DialogResult = MessageBox.Show(
+                $"Are you sure you want to {action} the admin account for '{selectedAdmin.FullName}'?",
+                $"Confirm {action.ToUpper()}",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question)
+
+            If confirmation = DialogResult.Yes Then
+                DirectCast(sender, Button).Enabled = False
+                Try
+                    Dim success As Boolean = DatabaseHelper.SetUserActiveStatus(selectedAdmin.UserID, "Admin", newStatus)
+
+                    If success Then
+                        ' Success - refresh and show single message
+                        FetchAdmins()
+                        MessageBox.Show(
+                            $"Admin account for '{selectedAdmin.FullName}' has been successfully {actionPastTense}.",
+                            "Success",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information)
+                    Else
+                        ' Error - show single message
+                        MessageBox.Show(
+                            $"Failed to {action} the admin account for '{selectedAdmin.FullName}'. Please try again.",
+                            "Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error)
+                    End If
+                Catch ex As Exception
+                    MessageBox.Show(
+                        $"Error toggling admin status: {ex.Message}",
+                        "Database Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error)
+                Finally
+                    DirectCast(sender, Button).Enabled = True
+                End Try
+            End If
+        Else
+            MessageBox.Show(
+                "Please select an admin to activate or deactivate.",
+                "No Admin Selected",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning)
+        End If
+    End Sub
+
 
     Private Sub btnAddCashier_Click(sender As Object, e As EventArgs) Handles btnAddCashier.Click
         DirectCast(sender, Button).Enabled = False
@@ -1041,13 +1408,13 @@ Public Class frmAdminDashboard
                 End If
             End Using
         Finally
-             DirectCast(sender, Button).Enabled = True
+            DirectCast(sender, Button).Enabled = True
         End Try
     End Sub
 
     Private Sub btnEditCashier_Click(sender As Object, e As EventArgs) Handles btnEditCashier.Click
-         DirectCast(sender, Button).Enabled = False
-         Try
+        DirectCast(sender, Button).Enabled = False
+        Try
             If dgvCashiers.SelectedRows.Count > 0 Then
                 Dim selectedCashier As StaffUser = CType(dgvCashiers.SelectedRows(0).DataBoundItem, StaffUser)
                 Using frm As New frmAddEditUser(selectedCashier.UserID, selectedCashier.FullName, selectedCashier.Username, "Cashier")
@@ -1095,8 +1462,8 @@ Public Class frmAdminDashboard
                     Catch ex As Exception
                         MessageBox.Show($"Error deleting cashier account: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     Finally
-                         If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
-                         DirectCast(sender, Button).Enabled = True
+                        If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                        DirectCast(sender, Button).Enabled = True
                     End Try
                 End Using
             End If
@@ -1104,6 +1471,63 @@ Public Class frmAdminDashboard
             MessageBox.Show("Please select a cashier to delete.", "No Cashier Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
+
+    Private Sub btnToggleCashierStatus_Click(sender As Object, e As EventArgs) Handles btnToggleCashierStatus.Click
+        If dgvCashiers.SelectedRows.Count > 0 Then
+            Dim selectedCashier As StaffUser = CType(dgvCashiers.SelectedRows(0).DataBoundItem, StaffUser)
+
+            Dim newStatus As Boolean = Not selectedCashier.IsActive
+            Dim action As String = If(newStatus, "activate", "deactivate")
+            Dim actionPastTense As String = If(newStatus, "activated", "deactivated")
+
+            ' Single confirmation dialog with action result
+            Dim confirmation As DialogResult = MessageBox.Show(
+                $"Are you sure you want to {action} the cashier account for '{selectedCashier.FullName}'?",
+                $"Confirm {action.ToUpper()}",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question)
+
+            If confirmation = DialogResult.Yes Then
+                DirectCast(sender, Button).Enabled = False
+                Try
+                    Dim success As Boolean = DatabaseHelper.SetUserActiveStatus(selectedCashier.UserID, "Cashier", newStatus)
+
+                    If success Then
+                        ' Success - refresh and show single message
+                        FetchCashiers()
+                        FetchCashierStatus() ' Update dashboard status too
+                        MessageBox.Show(
+                            $"Cashier account for '{selectedCashier.FullName}' has been successfully {actionPastTense}.",
+                            "Success",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information)
+                    Else
+                        ' Error - show single message
+                        MessageBox.Show(
+                            $"Failed to {action} the cashier account for '{selectedCashier.FullName}'. Please try again.",
+                            "Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error)
+                    End If
+                Catch ex As Exception
+                    MessageBox.Show(
+                        $"Error toggling cashier status: {ex.Message}",
+                        "Database Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error)
+                Finally
+                    DirectCast(sender, Button).Enabled = True
+                End Try
+            End If
+        Else
+            MessageBox.Show(
+                "Please select a cashier to activate or deactivate.",
+                "No Cashier Selected",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning)
+        End If
+    End Sub
+
 
     Private Sub btnAddCounter_Click(sender As Object, e As EventArgs) Handles btnAddCounter.Click
         DirectCast(sender, Button).Enabled = False
@@ -1115,7 +1539,7 @@ Public Class frmAdminDashboard
                 End If
             End Using
         Finally
-             DirectCast(sender, Button).Enabled = True
+            DirectCast(sender, Button).Enabled = True
         End Try
     End Sub
 
@@ -1259,8 +1683,8 @@ Public Class frmAdminDashboard
                         If transaction IsNot Nothing Then transaction.Rollback()
                         MessageBox.Show($"Error deleting counter: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     Finally
-                         If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
-                         DirectCast(sender, Button).Enabled = True
+                        If conn IsNot Nothing AndAlso conn.State = ConnectionState.Open Then conn.Close()
+                        DirectCast(sender, Button).Enabled = True
                     End Try
                 End Using
             End If
@@ -1438,6 +1862,85 @@ Public Class frmAdminDashboard
 
     End Sub
 
+    Private Sub dgvAdmins_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+        If e.RowIndex < 0 Then Return
+
+        If e.ColumnIndex = dgvAdmins.Columns("FailedAttempts").Index AndAlso e.Value IsNot Nothing Then
+            Dim attempts As Integer = CInt(e.Value)
+            If attempts > 0 Then
+                e.CellStyle.BackColor = Color.FromArgb(255, 224, 224)
+                e.CellStyle.ForeColor = Color.DarkRed
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Bold)
+            Else
+                e.CellStyle.BackColor = If(dgvAdmins.Rows(e.RowIndex).Selected, dgvAdmins.DefaultCellStyle.SelectionBackColor, dgvAdmins.DefaultCellStyle.BackColor)
+                e.CellStyle.ForeColor = If(dgvAdmins.Rows(e.RowIndex).Selected, dgvAdmins.DefaultCellStyle.SelectionForeColor, dgvAdmins.DefaultCellStyle.ForeColor)
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Regular)
+            End If
+        ElseIf e.ColumnIndex = dgvAdmins.Columns("IsActive").Index AndAlso e.Value IsNot Nothing Then
+            Dim isActive As Boolean = CBool(e.Value)
+            If Not isActive Then
+                e.CellStyle.ForeColor = Color.Gray
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Italic)
+                If dgvAdmins.Rows(e.RowIndex).Selected Then
+                    e.CellStyle.SelectionBackColor = Color.FromArgb(210, 210, 210)
+                    e.CellStyle.SelectionForeColor = Color.DarkGray
+                Else
+                    e.CellStyle.BackColor = Color.FromArgb(240, 240, 240)
+                End If
+
+            Else
+                e.CellStyle.ForeColor = If(dgvAdmins.Rows(e.RowIndex).Selected, dgvAdmins.DefaultCellStyle.SelectionForeColor, dgvAdmins.DefaultCellStyle.ForeColor)
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Regular)
+                If dgvAdmins.Rows(e.RowIndex).Selected Then
+                    e.CellStyle.SelectionBackColor = dgvAdmins.DefaultCellStyle.SelectionBackColor
+                    e.CellStyle.SelectionForeColor = dgvAdmins.DefaultCellStyle.SelectionForeColor
+                Else
+                    e.CellStyle.BackColor = dgvAdmins.DefaultCellStyle.BackColor
+                End If
+            End If
+            e.FormattingApplied = True
+        End If
+    End Sub
+
+    Private Sub dgvCashiers_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
+        If e.RowIndex < 0 Then Return
+
+        If e.ColumnIndex = dgvCashiers.Columns("FailedAttempts").Index AndAlso e.Value IsNot Nothing Then
+            Dim attempts As Integer = CInt(e.Value)
+            If attempts > 0 Then
+                e.CellStyle.BackColor = Color.FromArgb(255, 224, 224)
+                e.CellStyle.ForeColor = Color.DarkRed
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Bold)
+            Else
+                e.CellStyle.BackColor = If(dgvCashiers.Rows(e.RowIndex).Selected, dgvCashiers.DefaultCellStyle.SelectionBackColor, dgvCashiers.DefaultCellStyle.BackColor)
+                e.CellStyle.ForeColor = If(dgvCashiers.Rows(e.RowIndex).Selected, dgvCashiers.DefaultCellStyle.SelectionForeColor, dgvCashiers.DefaultCellStyle.ForeColor)
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Regular)
+            End If
+        ElseIf e.ColumnIndex = dgvCashiers.Columns("IsActive").Index AndAlso e.Value IsNot Nothing Then
+            Dim isActive As Boolean = CBool(e.Value)
+            If Not isActive Then
+                e.CellStyle.ForeColor = Color.Gray
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Italic)
+                If dgvCashiers.Rows(e.RowIndex).Selected Then
+                    e.CellStyle.SelectionBackColor = Color.FromArgb(210, 210, 210)
+                    e.CellStyle.SelectionForeColor = Color.DarkGray
+                Else
+                    e.CellStyle.BackColor = Color.FromArgb(240, 240, 240)
+                End If
+            Else
+                e.CellStyle.ForeColor = If(dgvCashiers.Rows(e.RowIndex).Selected, dgvCashiers.DefaultCellStyle.SelectionForeColor, dgvCashiers.DefaultCellStyle.ForeColor)
+                e.CellStyle.Font = New Font(e.CellStyle.Font, FontStyle.Regular)
+                If dgvCashiers.Rows(e.RowIndex).Selected Then
+                    e.CellStyle.SelectionBackColor = dgvCashiers.DefaultCellStyle.SelectionBackColor
+                    e.CellStyle.SelectionForeColor = dgvCashiers.DefaultCellStyle.SelectionForeColor
+                Else
+                    e.CellStyle.BackColor = dgvCashiers.DefaultCellStyle.BackColor
+                End If
+            End If
+            e.FormattingApplied = True
+        End If
+    End Sub
+
     Private Sub tabUserManagement_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim isWithoutAccountTab As Boolean = (tabUserManagement.SelectedTab Is tpWithoutAccount)
 
@@ -1458,7 +1961,8 @@ Public Class frmAdminDashboard
         End If
         Dim noResultsLabel = flpUserControls.Controls.OfType(Of Label).FirstOrDefault(Function(lbl) lbl.Name = "lblNoResultsFound")
         If noResultsLabel IsNot Nothing Then noResultsLabel.Visible = False
-        flpUserControls_Resize(flpUserControls, EventArgs.Empty)
+        ' Trigger resize to adjust spacer
+        FlowLayoutPanel_Resize(flpUserControls, EventArgs.Empty)
 
     End Sub
 
@@ -1507,7 +2011,7 @@ Public Class frmAdminDashboard
                         FetchUsers()
                     End If
                 Finally
-                     DirectCast(sender, Button).Enabled = True
+                    DirectCast(sender, Button).Enabled = True
                 End Try
             End If
         Else
@@ -1566,5 +2070,7 @@ Public Class StaffUser
     Public Property Role As String
     Public Property LastLogin As String
     Public Property Counter As String
+    Public Property FailedAttempts As Integer
+    Public Property IsActive As Boolean
 End Class
 
