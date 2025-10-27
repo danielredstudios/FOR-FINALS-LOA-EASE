@@ -5,105 +5,69 @@ Public Class frmAddEditUser
     Private ReadOnly _userId As Integer
     Private ReadOnly _studentId As Integer
     Private ReadOnly _initialUsername As String
-    Private _role As String ' Store the specific role (Admin, Cashier, Student)
+    Private _role As String
 
-    Public Sub New() ' Constructor for adding Admin/Cashier
+    Public Sub New()
         InitializeComponent()
         _isEditMode = False
-        _role = "Admin" ' Default to Admin for this constructor
-        Me.Text = "Add New Admin" ' Dynamic Text
-        lblTitle.Text = "Add New Admin" ' Dynamic Text
-        cboRole.SelectedIndex = 0 ' Default to Admin
+        _role = "Admin"
+        Me.Text = "Add New Admin"
+        lblTitle.Text = "Add New Admin"
         txtFullName.ReadOnly = False
-        Label4.Visible = True ' Show Role selection
-        cboRole.Visible = True
+        Label4.Visible = False
+        cboRole.Visible = False
     End Sub
 
-    ' Overload constructor to specify role when adding
     Public Sub New(addRole As String)
         InitializeComponent()
         _isEditMode = False
-        _role = addRole ' Set role based on parameter
-        Me.Text = $"Add New {addRole}" ' Dynamic Text
-        lblTitle.Text = $"Add New {addRole}" ' Dynamic Text
-
-        If addRole = "Admin" Then
-            cboRole.SelectedIndex = 0
-        ElseIf addRole = "Cashier" Then
-            cboRole.SelectedIndex = 1
-        Else
-            cboRole.SelectedIndex = -1 ' Should not happen via dashboard buttons
-        End If
-
+        _role = addRole
+        Me.Text = $"Add New {addRole}"
+        lblTitle.Text = $"Add New {addRole}"
         txtFullName.ReadOnly = False
-        Label4.Visible = True ' Show Role selection
-        cboRole.Visible = True
+        Label4.Visible = False
+        cboRole.Visible = False
     End Sub
 
-
-    Public Sub New(userId As Integer, fullName As String, username As String, role As String) ' Constructor for editing any role
+    Public Sub New(userId As Integer, fullName As String, username As String, role As String)
         InitializeComponent()
         _isEditMode = True
         _userId = userId
         _initialUsername = username
-        _role = role ' Store the specific role being edited
-        Me.Text = $"Edit {role}" ' Dynamic Text
-        lblTitle.Text = $"Edit {role}" ' Dynamic Text
-
+        _role = role
+        Me.Text = $"Edit {role}"
+        lblTitle.Text = $"Edit {role}"
         txtFullName.Text = fullName
         txtUsername.Text = username
 
         If role = "Student" Then
-            Label4.Visible = False
-            cboRole.Visible = False
             txtFullName.ReadOnly = True
-
-            ' Adjust layout if role controls are hidden
-            Dim roleControlTop As Integer = If(Label4.Visible, Label4.Top, cboRole.Top)
-            Dim heightDifference As Integer = btnSave.Top - roleControlTop
-            btnSave.Top -= heightDifference
-            btnCancel.Top -= heightDifference
-            Me.Height -= heightDifference
-
         Else
-            If role = "Admin" Then
-                cboRole.SelectedItem = "Admin"
-            ElseIf role = "Cashier" Then
-                cboRole.SelectedItem = "Cashier"
-            End If
             txtFullName.ReadOnly = False
-            Label4.Visible = True ' Ensure role controls are visible
-            cboRole.Visible = True
         End If
+
+        Label4.Visible = False
+        cboRole.Visible = False
     End Sub
 
-    Public Sub New(studentId As Integer, fullName As String) ' Constructor for creating Student account
+    Public Sub New(studentId As Integer, fullName As String)
         InitializeComponent()
         _isEditMode = False
         _studentId = studentId
         _role = "Student"
-        Me.Text = "Create Student Account" ' Specific Text
-        lblTitle.Text = "Create Account for Student" ' Specific Text
-
+        Me.Text = "Create Student Account"
+        lblTitle.Text = "Create Account for Student"
         txtFullName.Text = fullName
         txtFullName.ReadOnly = True
+        txtUsername.Text = GenerateUsername(fullName)
         Label4.Visible = False
         cboRole.Visible = False
-
-        ' Adjust layout consistently
-        Dim roleControlTop As Integer = If(Label4.Visible, Label4.Top, cboRole.Top)
-        Dim heightDifference As Integer = btnSave.Top - roleControlTop
-        btnSave.Top -= heightDifference
-        btnCancel.Top -= heightDifference
-        Me.Height -= heightDifference
-
     End Sub
 
 
+
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
-        If String.IsNullOrWhiteSpace(txtFullName.Text) OrElse
-       String.IsNullOrWhiteSpace(txtUsername.Text) OrElse
-       (cboRole.Visible AndAlso cboRole.SelectedIndex = -1 AndAlso _role <> "Student") Then
+        If String.IsNullOrWhiteSpace(txtFullName.Text) OrElse String.IsNullOrWhiteSpace(txtUsername.Text) Then
             MessageBox.Show("Please fill in all required fields.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
@@ -112,8 +76,7 @@ Public Class frmAddEditUser
             Return
         End If
 
-        Dim selectedRole As String = If(_role = "Student", "Student", cboRole.SelectedItem?.ToString())
-        If String.IsNullOrEmpty(selectedRole) Then selectedRole = _role ' Fallback if ComboBox is hidden/invalid
+        Dim selectedRole As String = _role
 
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
@@ -159,9 +122,9 @@ Public Class frmAddEditUser
                             cmd.ExecuteNonQuery()
                         End Using
                     End If
-                Else ' Add Mode
+                Else
                     Dim query As String
-                    If _studentId > 0 Then ' Adding account for existing student
+                    If _studentId > 0 Then
                         query = "INSERT INTO users (student_id, username, password_hash) VALUES (@studentId, @username, @passwordHash)"
                         Using cmd As New MySqlCommand(query, conn)
                             cmd.Parameters.AddWithValue("@studentId", _studentId)
@@ -169,14 +132,13 @@ Public Class frmAddEditUser
                             cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
                             cmd.ExecuteNonQuery()
                         End Using
-                    Else ' Adding new Admin or Cashier
+                    Else
                         Dim tableName As String = If(selectedRole = "Admin", "admins", "cashiers")
                         query = $"INSERT INTO {tableName} (full_name, username, password_hash) VALUES (@fullName, @username, @passwordHash)"
                         Using cmd As New MySqlCommand(query, conn)
                             cmd.Parameters.AddWithValue("@fullName", txtFullName.Text.Trim())
                             cmd.Parameters.AddWithValue("@username", txtUsername.Text.Trim())
                             cmd.Parameters.AddWithValue("@passwordHash", BCrypt.Net.BCrypt.HashPassword(txtPassword.Text))
-
                             cmd.ExecuteNonQuery()
                         End Using
                     End If
@@ -196,10 +158,8 @@ Public Class frmAddEditUser
         End Using
     End Sub
 
-
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
         Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
 End Class
-

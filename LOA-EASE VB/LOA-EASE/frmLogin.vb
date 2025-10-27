@@ -15,6 +15,7 @@ Public Class frmLogin
     Private fadeDirection As Integer = -5
 
     Private Sub frmLogin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         pnlAttempts.Visible = False
 
         AddRoundedCorners(pnlLoginContainer, 15)
@@ -55,7 +56,7 @@ Public Class frmLogin
             currentLockedUsername = username
 
             Dim remainingSeconds As Integer = Convert.ToInt32(lockoutData("seconds_remaining"))
-            If remainingSeconds > 0 Then ' This is line 54
+            If remainingSeconds > 0 Then
                 ShowLockoutPanel(remainingSeconds)
             Else
                 HideLockoutPanel(username)
@@ -115,9 +116,8 @@ Public Class frmLogin
                 Dim existingUserData As DataRow = DatabaseHelper.GetUserDetails(username)
 
                 If existingUserData IsNot Nothing Then
-                    ' --- Safer Boolean Extraction ---
                     Dim isActive As Boolean = False
-                    Dim dbIsLocked As Boolean = True ' Default to locked for safety
+                    Dim dbIsLocked As Boolean = True
 
                     If existingUserData.Table.Columns.Contains("is_active") AndAlso Not IsDBNull(existingUserData("is_active")) Then
                         Dim activeValue = existingUserData("is_active")
@@ -140,7 +140,6 @@ Public Class frmLogin
                             Boolean.TryParse(lockedValue.ToString(), dbIsLocked)
                         End If
                     End If
-                    ' --- End Safer Boolean Extraction ---
 
                     If Not isActive Then
                         MessageBox.Show("Your account is inactive. Please contact the administrator.",
@@ -150,7 +149,7 @@ Public Class frmLogin
                         txtPassword.Focus()
                     ElseIf dbIsLocked Then
                         MessageBox.Show("Your account is currently locked. Please try again later or contact support.",
-                                      "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                                       "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                         DatabaseHelper.RecordLoginAttempt(username, existingUserData("role").ToString(), CInt(existingUserData("id")), False, GetLocalIPAddress(), Environment.OSVersion.ToString(), "Login attempt on locked account")
                         txtPassword.Clear()
                         txtPassword.Focus()
@@ -185,7 +184,7 @@ Public Class frmLogin
                 conn.Open()
 
                 Dim query As String = "SELECT COUNT(*) FROM admins WHERE username = @username " &
-                                    "UNION ALL SELECT COUNT(*) FROM cashiers WHERE username = @username"
+                                     "UNION ALL SELECT COUNT(*) FROM cashiers WHERE username = @username"
 
                 Using cmd As New MySqlCommand(query, conn)
                     cmd.Parameters.AddWithValue("@username", username)
@@ -262,7 +261,7 @@ Public Class frmLogin
             Me.Hide()
         Else
             MessageBox.Show("No counter assigned to this cashier account.",
-                          "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                           "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
 
@@ -336,12 +335,12 @@ Public Class frmLogin
     End Sub
 
     Private Sub HideLockoutPanel(Optional specificUsername As String = "")
-        If pnlAttempts.Visible AndAlso (String.IsNullOrEmpty(specificUsername) OrElse specificUsername.Equals(currentLockedUsername, StringComparison.OrdinalIgnoreCase)) Then
+        If pnlAttempts.Visible Then
             lockoutTimer.Stop()
             pnlAttempts.Visible = False
-            isAccountLocked = False
-            currentLockedUsername = ""
         End If
+        isAccountLocked = False
+        currentLockedUsername = ""
     End Sub
 
 
@@ -486,4 +485,3 @@ Public Class frmLogin
         End If
     End Sub
 End Class
-

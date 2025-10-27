@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\source\\repos\\loa-ease_for-students\\loa-ease_for-students\\frmkiosk.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\source\\repos\\loa-ease_for-students\\loa-ease_for-students\\frmkiosk.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
       "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\source\\repos\\loa-ease_for-students\\loa-ease_for-students\\frmkiosk.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|solutionrelative:loa-ease_for-students\\frmkiosk.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{952B8257-0DFB-02DC-F1DC-ED05A635BEC1}|LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS.vbproj|c:\\users\\red\\source\\repos\\loa-ease_for-students\\loa-ease_for-students\\databasehelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
@@ -90,7 +90,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "frmKiosk.vb [Design]",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
               "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
@@ -108,20 +108,20 @@
               "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
               "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
               "RelativeToolTip": "LOA-EASE_FOR-STUDENTS\\frmKiosk.vb",
-              "ViewState": "AgIAAAIAAAAAAAAAAAAYwBEAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHUAAAAAAAAAAAAnwHIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2025-10-22T12:15:23.811Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "frmKiosk.Designer.vb",
               "DocumentMoniker": "C:\\Users\\RED\\source\\repos\\LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb",
               "RelativeDocumentMoniker": "LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb",
               "ToolTip": "C:\\Users\\RED\\source\\repos\\LOA-EASE_FOR-STUDENTS\\LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb",
               "RelativeToolTip": "LOA-EASE_FOR-STUDENTS\\frmKiosk.Designer.vb",
-              "ViewState": "AgIAAGcCAAAAAAAAAADwv3cCAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAGECAAAAAAAAAIBJwGQCAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2025-10-22T12:31:15.681Z",
               "EditorCaption": ""

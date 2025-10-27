@@ -19,14 +19,14 @@ Public Class DatabaseHelper
 
                 Dim query As String = "
                     (SELECT admin_id, username, password_hash, full_name, 'admin' AS role, is_active, is_locked,
-                            NULL AS counter_id, NULL AS cashier_id, NULL as counter_name
+                        NULL AS counter_id, NULL AS cashier_id, NULL as counter_name
                      FROM admins
                      WHERE BINARY username = @username)
 
                     UNION
 
                     (SELECT c.cashier_id, c.username, c.password_hash, c.full_name, c.role, c.is_active, c.is_locked,
-                            c.counter_id, c.cashier_id, co.counter_name
+                        c.counter_id, c.cashier_id, co.counter_name
                      FROM cashiers c
                      JOIN counters co ON c.counter_id = co.counter_id
                      WHERE BINARY c.username = @username AND c.role = 'cashier')
@@ -45,12 +45,12 @@ Public Class DatabaseHelper
 
                         If Not Convert.ToBoolean(userRow("is_active")) Then
                             MessageBox.Show("Your account is inactive. Please contact the administrator.",
-                                          "Account Inactive", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                                            "Account Inactive", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                             Return Nothing
                         End If
                         If Convert.ToBoolean(userRow("is_locked")) Then
                             MessageBox.Show("Your account is locked. Please contact the administrator.",
-                                          "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                                            "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                             Return Nothing
                         End If
 
@@ -299,7 +299,7 @@ Public Class DatabaseHelper
                 conn.Open()
 
                 Dim query As String = "SELECT 'admin' AS type FROM admins WHERE username = @username " &
-                                    "UNION SELECT 'cashier' AS type FROM cashiers WHERE username = @username LIMIT 1"
+                                        "UNION SELECT 'cashier' AS type FROM cashiers WHERE username = @username LIMIT 1"
 
                 Using cmd As New MySqlCommand(query, conn)
                     cmd.Parameters.AddWithValue("@username", username)
@@ -538,6 +538,74 @@ Public Class DatabaseHelper
                 End Using
             Catch ex As Exception
                 MessageBox.Show("Error deleting student: " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return False
+            End Try
+        End Using
+    End Function
+
+    ' Added functions below
+    Public Shared Function GetSetting(key As String) As String
+        Using conn As MySqlConnection = GetConnection()
+            Try
+                conn.Open()
+                Dim query As String = "SELECT setting_value FROM settings WHERE setting_key = @key LIMIT 1"
+                Using cmd As New MySqlCommand(query, conn)
+                    cmd.Parameters.AddWithValue("@key", key)
+                    Dim result = cmd.ExecuteScalar()
+                    Return result?.ToString()
+                End Using
+            Catch ex As Exception
+                Console.WriteLine($"Error getting setting '{key}': {ex.Message}")
+                Return Nothing
+            End Try
+        End Using
+    End Function
+
+    Public Shared Sub SetSetting(key As String, value As String)
+        Using conn As MySqlConnection = GetConnection()
+            Try
+                conn.Open()
+                ' Use INSERT ... ON DUPLICATE KEY UPDATE for simplicity
+                Dim query As String = "INSERT INTO settings (setting_key, setting_value) VALUES (@key, @value) ON DUPLICATE KEY UPDATE setting_value = @value"
+                Using cmd As New MySqlCommand(query, conn)
+                    cmd.Parameters.AddWithValue("@key", key)
+                    cmd.Parameters.AddWithValue("@value", value)
+                    cmd.ExecuteNonQuery()
+                End Using
+            Catch ex As Exception
+                Console.WriteLine($"Error setting setting '{key}': {ex.Message}")
+                Throw ' Rethrow the exception so the calling code knows about the failure
+            End Try
+        End Using
+    End Sub
+
+    Public Shared Function UnlockUser(userId As Integer, userType As String) As Boolean
+        Using conn As MySqlConnection = GetConnection()
+            Try
+                conn.Open()
+                Dim tableName As String = String.Empty
+                Dim idColumn As String = String.Empty
+                Dim isLockedColumn As String = "is_locked" ' Assuming the column is named is_locked
+
+                Select Case userType
+                    Case "Admin"
+                        tableName = "admins"
+                        idColumn = "admin_id"
+                    Case "Cashier"
+                        tableName = "cashiers"
+                        idColumn = "cashier_id"
+                    Case Else
+                        Throw New ArgumentException("Invalid user type specified for unlock.")
+                End Select
+
+                ' Update both is_locked and failed_login_attempts
+                Dim query As String = $"UPDATE {tableName} SET {isLockedColumn} = FALSE, failed_login_attempts = 0 WHERE {idColumn} = @userId"
+                Using cmd As New MySqlCommand(query, conn)
+                    cmd.Parameters.AddWithValue("@userId", userId)
+                    Return cmd.ExecuteNonQuery() > 0
+                End Using
+            Catch ex As Exception
+                Console.WriteLine($"Error unlocking {userType} ID {userId}: {ex.Message}")
                 Return False
             End Try
         End Using

@@ -47,18 +47,26 @@ Partial Class frmAddStudent
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim _bgColor As Color = Color.FromArgb(244, 247, 249)
+        ' Modern Color Palette
+        Dim _bgColor As Color = Color.FromArgb(248, 249, 250)
         Dim _panelColor As Color = Color.White
+        Dim _primaryColor As Color = Color.FromArgb(0, 123, 255)
         Dim _textColor As Color = Color.FromArgb(33, 37, 41)
-        Dim _dangerColor As Color = Color.FromArgb(220, 53, 69)
+        Dim _textSecondary As Color = Color.FromArgb(108, 117, 125)
         Dim _successColor As Color = Color.FromArgb(40, 167, 69)
-        Dim _grayColor As Color = Color.FromArgb(108, 117, 125)
+        Dim _dangerColor As Color = Color.FromArgb(220, 53, 69)
+        Dim _lightGray As Color = Color.FromArgb(233, 236, 239)
         Dim _cancelColor As Color = Color.FromArgb(108, 117, 125)
 
-        Dim labelFont As New Font("Segoe UI", 9.0F, FontStyle.Regular)
-        Dim inputFont As New Font("Segoe UI", 11.0F, FontStyle.Regular)
-        Dim inputSize As New Size(474, 28)
-        Dim yPos As Integer = 30
+        ' Modern Typography - Enhanced Title Font
+        Dim titleFont As New Font("Segoe UI", 14.0F, FontStyle.Bold)
+        Dim labelFont As New Font("Segoe UI", 9.5F, FontStyle.Regular)
+        Dim inputFont As New Font("Segoe UI", 10.5F, FontStyle.Regular)
+        Dim buttonFont As New Font("Segoe UI Semibold", 10.0F, FontStyle.Bold)
+
+        Dim inputSize As New Size(480, 36)
+        Dim yPos As Integer = 25
+        Dim spacing As Integer = 70
 
         Me.pnlHeader = New System.Windows.Forms.Panel()
         Me.lblTitle = New System.Windows.Forms.Label()
@@ -96,76 +104,79 @@ Partial Class frmAddStudent
         Me.SuspendLayout()
 
         ' 
-        ' pnlHeader
+        ' pnlHeader - Modern Header with Shadow Effect
         ' 
         Me.pnlHeader.BackColor = _panelColor
         Me.pnlHeader.Controls.Add(Me.lblTitle)
         Me.pnlHeader.Controls.Add(Me.btnClose)
         Me.pnlHeader.Dock = DockStyle.Top
-        Me.pnlHeader.Height = 60
+        Me.pnlHeader.Height = 70
         Me.pnlHeader.Location = New Point(0, 0)
         Me.pnlHeader.Name = "pnlHeader"
+        Me.pnlHeader.Padding = New Padding(30, 0, 10, 0)
 
         ' 
-        ' lblTitle
+        ' lblTitle - Bold Modern Title
         ' 
         Me.lblTitle.Text = "ADD NEW STUDENT"
-        Me.lblTitle.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
+        Me.lblTitle.Font = titleFont
         Me.lblTitle.ForeColor = _textColor
-        Me.lblTitle.Location = New Point(25, 20)
+        Me.lblTitle.Location = New Point(30, 24)
         Me.lblTitle.AutoSize = True
         Me.lblTitle.Name = "lblTitle"
 
         ' 
-        ' btnClose
+        ' btnClose - Modern Close Button
         ' 
         Me.btnClose.Text = "✕"
-        Me.btnClose.Font = New Font("Segoe UI", 12.0F, FontStyle.Regular)
-        Me.btnClose.Size = New Size(40, 40)
-        Me.btnClose.Location = New Point(500, 10)
+        Me.btnClose.Font = New Font("Segoe UI", 11.0F, FontStyle.Regular)
+        Me.btnClose.Size = New Size(45, 45)
+        Me.btnClose.Location = New Point(515, 12)
         Me.btnClose.BackColor = Color.Transparent
-        Me.btnClose.ForeColor = _grayColor
+        Me.btnClose.ForeColor = _textSecondary
         Me.btnClose.FlatStyle = FlatStyle.Flat
         Me.btnClose.FlatAppearance.BorderSize = 0
-        Me.btnClose.FlatAppearance.MouseOverBackColor = _dangerColor
+        Me.btnClose.FlatAppearance.MouseOverBackColor = _lightGray
         Me.btnClose.Cursor = Cursors.Hand
         Me.btnClose.Name = "btnClose"
 
         ' 
-        ' pnlFooter
+        ' pnlFooter - Modern Footer
         ' 
         Me.pnlFooter.BackColor = _panelColor
         Me.pnlFooter.Controls.Add(Me.lblRequired)
         Me.pnlFooter.Controls.Add(Me.btnSave)
         Me.pnlFooter.Controls.Add(Me.btnCancel)
         Me.pnlFooter.Dock = DockStyle.Bottom
-        Me.pnlFooter.Height = 65
+        Me.pnlFooter.Height = 75
         Me.pnlFooter.Location = New Point(0, 615)
         Me.pnlFooter.Name = "pnlFooter"
+        Me.pnlFooter.Padding = New Padding(30, 15, 30, 15)
 
         ' 
-        ' pnlMain
+        ' pnlMain - Modern Scrollable Content Area
         ' 
         Me.pnlMain.BackColor = _bgColor
         Me.pnlMain.Dock = DockStyle.Fill
         Me.pnlMain.AutoScroll = True
         Me.pnlMain.Name = "pnlMain"
+        Me.pnlMain.Padding = New Padding(0, 10, 0, 10)
 
         ' 
         ' lblLastName
         ' 
         Me.lblLastName.Text = "Last Name *"
         Me.lblLastName.Font = labelFont
-        Me.lblLastName.ForeColor = _grayColor
-        Me.lblLastName.Location = New Point(35, yPos)
+        Me.lblLastName.ForeColor = _textSecondary
+        Me.lblLastName.Location = New Point(40, yPos)
         Me.lblLastName.AutoSize = True
         Me.lblLastName.Name = "lblLastName"
         Me.pnlMain.Controls.Add(Me.lblLastName)
 
         ' 
-        ' txtLastName
+        ' txtLastName - Modern Input
         ' 
-        Me.txtLastName.Location = New Point(35, yPos + 22)
+        Me.txtLastName.Location = New Point(40, yPos + 24)
         Me.txtLastName.Size = inputSize
         Me.txtLastName.Font = inputFont
         Me.txtLastName.BorderStyle = BorderStyle.None
@@ -177,22 +188,23 @@ Partial Class frmAddStudent
         Me.pnlMain.Controls.Add(Me.txtLastName)
 
         ' 
-        ' pnlLastNameUnderline
+        ' pnlLastNameUnderline - Modern Underline
         ' 
-        Me.pnlLastNameUnderline.Location = New Point(Me.txtLastName.Left, Me.txtLastName.Bottom + 2)
-        Me.pnlLastNameUnderline.Size = New Size(Me.txtLastName.Width, 1)
-        Me.pnlLastNameUnderline.BackColor = _grayColor
+        Me.pnlLastNameUnderline.Location = New Point(Me.txtLastName.Left, Me.txtLastName.Bottom + 4)
+        Me.pnlLastNameUnderline.Size = New Size(Me.txtLastName.Width, 2)
+        Me.pnlLastNameUnderline.BackColor = _lightGray
         Me.pnlLastNameUnderline.Name = "pnlLastNameUnderline"
         Me.pnlMain.Controls.Add(Me.pnlLastNameUnderline)
 
+        yPos += spacing
 
         ' 
         ' lblFirstName
         ' 
         Me.lblFirstName.Text = "First Name *"
         Me.lblFirstName.Font = labelFont
-        Me.lblFirstName.ForeColor = _grayColor
-        Me.lblFirstName.Location = New Point(35, yPos)
+        Me.lblFirstName.ForeColor = _textSecondary
+        Me.lblFirstName.Location = New Point(40, yPos)
         Me.lblFirstName.AutoSize = True
         Me.lblFirstName.Name = "lblFirstName"
         Me.pnlMain.Controls.Add(Me.lblFirstName)
@@ -200,7 +212,7 @@ Partial Class frmAddStudent
         ' 
         ' txtFirstName
         ' 
-        Me.txtFirstName.Location = New Point(35, yPos + 22)
+        Me.txtFirstName.Location = New Point(40, yPos + 24)
         Me.txtFirstName.Size = inputSize
         Me.txtFirstName.Font = inputFont
         Me.txtFirstName.BorderStyle = BorderStyle.None
@@ -214,21 +226,21 @@ Partial Class frmAddStudent
         ' 
         ' pnlFirstNameUnderline
         ' 
-        Me.pnlFirstNameUnderline.Location = New Point(Me.txtFirstName.Left, Me.txtFirstName.Bottom + 2)
-        Me.pnlFirstNameUnderline.Size = New Size(Me.txtFirstName.Width, 1)
-        Me.pnlFirstNameUnderline.BackColor = _grayColor
+        Me.pnlFirstNameUnderline.Location = New Point(Me.txtFirstName.Left, Me.txtFirstName.Bottom + 4)
+        Me.pnlFirstNameUnderline.Size = New Size(Me.txtFirstName.Width, 2)
+        Me.pnlFirstNameUnderline.BackColor = _lightGray
         Me.pnlFirstNameUnderline.Name = "pnlFirstNameUnderline"
         Me.pnlMain.Controls.Add(Me.pnlFirstNameUnderline)
 
-        yPos += 75
+        yPos += spacing
 
         ' 
         ' lblStudentNo
         ' 
         Me.lblStudentNo.Text = "Student Number *"
         Me.lblStudentNo.Font = labelFont
-        Me.lblStudentNo.ForeColor = _grayColor
-        Me.lblStudentNo.Location = New Point(35, yPos)
+        Me.lblStudentNo.ForeColor = _textSecondary
+        Me.lblStudentNo.Location = New Point(40, yPos)
         Me.lblStudentNo.AutoSize = True
         Me.lblStudentNo.Name = "lblStudentNo"
         Me.pnlMain.Controls.Add(Me.lblStudentNo)
@@ -236,7 +248,7 @@ Partial Class frmAddStudent
         ' 
         ' txtStudentNo
         ' 
-        Me.txtStudentNo.Location = New Point(35, yPos + 22)
+        Me.txtStudentNo.Location = New Point(40, yPos + 24)
         Me.txtStudentNo.Size = inputSize
         Me.txtStudentNo.Font = inputFont
         Me.txtStudentNo.BorderStyle = BorderStyle.None
@@ -250,21 +262,21 @@ Partial Class frmAddStudent
         ' 
         ' pnlStudentNoUnderline
         ' 
-        Me.pnlStudentNoUnderline.Location = New Point(Me.txtStudentNo.Left, Me.txtStudentNo.Bottom + 2)
-        Me.pnlStudentNoUnderline.Size = New Size(Me.txtStudentNo.Width, 1)
-        Me.pnlStudentNoUnderline.BackColor = _grayColor
+        Me.pnlStudentNoUnderline.Location = New Point(Me.txtStudentNo.Left, Me.txtStudentNo.Bottom + 4)
+        Me.pnlStudentNoUnderline.Size = New Size(Me.txtStudentNo.Width, 2)
+        Me.pnlStudentNoUnderline.BackColor = _lightGray
         Me.pnlStudentNoUnderline.Name = "pnlStudentNoUnderline"
         Me.pnlMain.Controls.Add(Me.pnlStudentNoUnderline)
 
-        yPos += 75
+        yPos += spacing
 
         ' 
         ' lblEmail
         ' 
         Me.lblEmail.Text = "Email Address *"
         Me.lblEmail.Font = labelFont
-        Me.lblEmail.ForeColor = _grayColor
-        Me.lblEmail.Location = New Point(35, yPos)
+        Me.lblEmail.ForeColor = _textSecondary
+        Me.lblEmail.Location = New Point(40, yPos)
         Me.lblEmail.AutoSize = True
         Me.lblEmail.Name = "lblEmail"
         Me.pnlMain.Controls.Add(Me.lblEmail)
@@ -272,7 +284,7 @@ Partial Class frmAddStudent
         ' 
         ' txtEmail
         ' 
-        Me.txtEmail.Location = New Point(35, yPos + 22)
+        Me.txtEmail.Location = New Point(40, yPos + 24)
         Me.txtEmail.Size = inputSize
         Me.txtEmail.Font = inputFont
         Me.txtEmail.BorderStyle = BorderStyle.None
@@ -286,29 +298,29 @@ Partial Class frmAddStudent
         ' 
         ' pnlEmailUnderline
         ' 
-        Me.pnlEmailUnderline.Location = New Point(Me.txtEmail.Left, Me.txtEmail.Bottom + 2)
-        Me.pnlEmailUnderline.Size = New Size(Me.txtEmail.Width, 1)
-        Me.pnlEmailUnderline.BackColor = _grayColor
+        Me.pnlEmailUnderline.Location = New Point(Me.txtEmail.Left, Me.txtEmail.Bottom + 4)
+        Me.pnlEmailUnderline.Size = New Size(Me.txtEmail.Width, 2)
+        Me.pnlEmailUnderline.BackColor = _lightGray
         Me.pnlEmailUnderline.Name = "pnlEmailUnderline"
         Me.pnlMain.Controls.Add(Me.pnlEmailUnderline)
 
-        yPos += 75
+        yPos += spacing
 
         ' 
         ' lblDepartment
         ' 
         Me.lblDepartment.Text = "Department/College *"
         Me.lblDepartment.Font = labelFont
-        Me.lblDepartment.ForeColor = _grayColor
-        Me.lblDepartment.Location = New Point(35, yPos)
+        Me.lblDepartment.ForeColor = _textSecondary
+        Me.lblDepartment.Location = New Point(40, yPos)
         Me.lblDepartment.AutoSize = True
         Me.lblDepartment.Name = "lblDepartment"
         Me.pnlMain.Controls.Add(Me.lblDepartment)
 
         ' 
-        ' cboDepartment
+        ' cboDepartment - Modern Dropdown
         ' 
-        Me.cboDepartment.Location = New Point(35, yPos + 22)
+        Me.cboDepartment.Location = New Point(40, yPos + 24)
         Me.cboDepartment.Size = inputSize
         Me.cboDepartment.Font = inputFont
         Me.cboDepartment.DropDownStyle = ComboBoxStyle.DropDownList
@@ -324,21 +336,21 @@ Partial Class frmAddStudent
         ' 
         ' pnlDepartmentUnderline
         ' 
-        Me.pnlDepartmentUnderline.Location = New Point(Me.cboDepartment.Left, Me.cboDepartment.Bottom + 2)
-        Me.pnlDepartmentUnderline.Size = New Size(Me.cboDepartment.Width, 1)
-        Me.pnlDepartmentUnderline.BackColor = _grayColor
+        Me.pnlDepartmentUnderline.Location = New Point(Me.cboDepartment.Left, Me.cboDepartment.Bottom + 4)
+        Me.pnlDepartmentUnderline.Size = New Size(Me.cboDepartment.Width, 2)
+        Me.pnlDepartmentUnderline.BackColor = _lightGray
         Me.pnlDepartmentUnderline.Name = "pnlDepartmentUnderline"
         Me.pnlMain.Controls.Add(Me.pnlDepartmentUnderline)
 
-        yPos += 75
+        yPos += spacing
 
         ' 
         ' lblCourse
         ' 
         Me.lblCourse.Text = "Course *"
         Me.lblCourse.Font = labelFont
-        Me.lblCourse.ForeColor = _grayColor
-        Me.lblCourse.Location = New Point(35, yPos)
+        Me.lblCourse.ForeColor = _textSecondary
+        Me.lblCourse.Location = New Point(40, yPos)
         Me.lblCourse.AutoSize = True
         Me.lblCourse.Name = "lblCourse"
         Me.pnlMain.Controls.Add(Me.lblCourse)
@@ -346,7 +358,7 @@ Partial Class frmAddStudent
         ' 
         ' cboCourse
         ' 
-        Me.cboCourse.Location = New Point(35, yPos + 22)
+        Me.cboCourse.Location = New Point(40, yPos + 24)
         Me.cboCourse.Size = inputSize
         Me.cboCourse.Font = inputFont
         Me.cboCourse.DropDownStyle = ComboBoxStyle.DropDownList
@@ -363,21 +375,21 @@ Partial Class frmAddStudent
         ' 
         ' pnlCourseUnderline
         ' 
-        Me.pnlCourseUnderline.Location = New Point(Me.cboCourse.Left, Me.cboCourse.Bottom + 2)
-        Me.pnlCourseUnderline.Size = New Size(Me.cboCourse.Width, 1)
-        Me.pnlCourseUnderline.BackColor = _grayColor
+        Me.pnlCourseUnderline.Location = New Point(Me.cboCourse.Left, Me.cboCourse.Bottom + 4)
+        Me.pnlCourseUnderline.Size = New Size(Me.cboCourse.Width, 2)
+        Me.pnlCourseUnderline.BackColor = _lightGray
         Me.pnlCourseUnderline.Name = "pnlCourseUnderline"
         Me.pnlMain.Controls.Add(Me.pnlCourseUnderline)
 
-        yPos += 75
+        yPos += spacing
 
         ' 
         ' lblYearLevel
         ' 
         Me.lblYearLevel.Text = "Year Level *"
         Me.lblYearLevel.Font = labelFont
-        Me.lblYearLevel.ForeColor = _grayColor
-        Me.lblYearLevel.Location = New Point(35, yPos)
+        Me.lblYearLevel.ForeColor = _textSecondary
+        Me.lblYearLevel.Location = New Point(40, yPos)
         Me.lblYearLevel.AutoSize = True
         Me.lblYearLevel.Name = "lblYearLevel"
         Me.pnlMain.Controls.Add(Me.lblYearLevel)
@@ -385,7 +397,7 @@ Partial Class frmAddStudent
         ' 
         ' cboYearLevel
         ' 
-        Me.cboYearLevel.Location = New Point(35, yPos + 22)
+        Me.cboYearLevel.Location = New Point(40, yPos + 24)
         Me.cboYearLevel.Size = inputSize
         Me.cboYearLevel.Font = inputFont
         Me.cboYearLevel.DropDownStyle = ComboBoxStyle.DropDownList
@@ -401,29 +413,29 @@ Partial Class frmAddStudent
         ' 
         ' pnlYearLevelUnderline
         ' 
-        Me.pnlYearLevelUnderline.Location = New Point(Me.cboYearLevel.Left, Me.cboYearLevel.Bottom + 2)
-        Me.pnlYearLevelUnderline.Size = New Size(Me.cboYearLevel.Width, 1)
-        Me.pnlYearLevelUnderline.BackColor = _grayColor
+        Me.pnlYearLevelUnderline.Location = New Point(Me.cboYearLevel.Left, Me.cboYearLevel.Bottom + 4)
+        Me.pnlYearLevelUnderline.Size = New Size(Me.cboYearLevel.Width, 2)
+        Me.pnlYearLevelUnderline.BackColor = _lightGray
         Me.pnlYearLevelUnderline.Name = "pnlYearLevelUnderline"
         Me.pnlMain.Controls.Add(Me.pnlYearLevelUnderline)
 
         ' 
-        ' lblRequired
+        ' lblRequired - Modern Helper Text
         ' 
         Me.lblRequired.Text = "* Required fields"
-        Me.lblRequired.Font = New Font("Segoe UI", 8.0F, FontStyle.Italic)
-        Me.lblRequired.ForeColor = _grayColor
-        Me.lblRequired.Location = New Point(35, 24)
+        Me.lblRequired.Font = New Font("Segoe UI", 8.5F, FontStyle.Italic)
+        Me.lblRequired.ForeColor = _textSecondary
+        Me.lblRequired.Location = New Point(30, 25)
         Me.lblRequired.AutoSize = True
         Me.lblRequired.Name = "lblRequired"
 
         ' 
-        ' btnSave
+        ' btnSave - Modern Primary Button
         ' 
         Me.btnSave.Text = "Save Student"
-        Me.btnSave.Location = New Point(300, 15)
-        Me.btnSave.Size = New Size(120, 35)
-        Me.btnSave.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        Me.btnSave.Location = New Point(305, 20)
+        Me.btnSave.Size = New Size(130, 38)
+        Me.btnSave.Font = buttonFont
         Me.btnSave.BackColor = _successColor
         Me.btnSave.ForeColor = Color.White
         Me.btnSave.FlatStyle = FlatStyle.Flat
@@ -432,12 +444,12 @@ Partial Class frmAddStudent
         Me.btnSave.Name = "btnSave"
 
         ' 
-        ' btnCancel
+        ' btnCancel - Modern Secondary Button
         ' 
         Me.btnCancel.Text = "Cancel"
-        Me.btnCancel.Location = New Point(430, 15)
-        Me.btnCancel.Size = New Size(90, 35)
-        Me.btnCancel.Font = New Font("Segoe UI", 10.0F, FontStyle.Regular)
+        Me.btnCancel.Location = New Point(445, 20)
+        Me.btnCancel.Size = New Size(95, 38)
+        Me.btnCancel.Font = buttonFont
         Me.btnCancel.BackColor = _cancelColor
         Me.btnCancel.ForeColor = Color.White
         Me.btnCancel.FlatStyle = FlatStyle.Flat
@@ -452,7 +464,7 @@ Partial Class frmAddStudent
         Me.Text = "Add New Student"
         Me.FormBorderStyle = FormBorderStyle.None
         Me.StartPosition = FormStartPosition.CenterParent
-        Me.ClientSize = New Size(550, 680)
+        Me.ClientSize = New Size(570, 690)
         Me.BackColor = _bgColor
         Me.Padding = New Padding(0)
         Me.Controls.Add(Me.pnlMain)

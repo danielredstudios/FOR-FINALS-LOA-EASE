@@ -71,7 +71,7 @@ Public Class frmKiosk
         SetRoundedCorners(pnlMainInput, 15)
         SetRoundedCorners(pnlTicketCard, 15)
         SetRoundedCorners(btnGetTicket, 10)
-        SetRoundedCorners(btnNewTransaction, 10)
+
         SetRoundedCorners(gbStudentInfo, 10)
         SetRoundedCorners(gbPurpose, 10)
         SetRoundedCorners(gbDocumentRequest, 10)
@@ -112,18 +112,7 @@ Public Class frmKiosk
         btnGetTicket.Font = New Font("Poppins", 18.0F, FontStyle.Bold)
     End Sub
 
-    Private Sub btnNewTransaction_MouseEnter(sender As Object, e As EventArgs) Handles btnNewTransaction.MouseEnter
-        btnNewTransaction.BackColor = Color.FromArgb(200, 204, 208)
-    End Sub
 
-    Private Sub btnNewTransaction_MouseLeave(sender As Object, e As EventArgs) Handles btnNewTransaction.MouseLeave
-        btnNewTransaction.BackColor = Color.FromArgb(222, 226, 230)
-    End Sub
-
-    Private Sub pnlTicketResult_Resize(sender As Object, e As EventArgs) Handles pnlTicketResult.Resize
-        btnNewTransaction.Left = (pnlTicketResult.Width - btnNewTransaction.Width) \ 2
-        AdjustLabelFont(lblQueueNumber)
-    End Sub
 
     Private Sub AdjustLabelFont(lbl As Label)
         If String.IsNullOrEmpty(lbl.Text) Then Return
@@ -460,7 +449,7 @@ Public Class frmKiosk
         Return String.Join(", ", purposes)
     End Function
 
-    Private Sub btnNewTransaction_Click(sender As Object, e As EventArgs) Handles btnNewTransaction.Click
+    Private Sub btnNewTransaction_Click(sender As Object, e As EventArgs)
         ResetForm()
     End Sub
 

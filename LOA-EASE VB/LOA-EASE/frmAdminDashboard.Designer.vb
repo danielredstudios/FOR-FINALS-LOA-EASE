@@ -2,6 +2,7 @@
 Partial Class frmAdminDashboard
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -13,8 +14,12 @@ Partial Class frmAdminDashboard
         End Try
     End Sub
 
+    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
@@ -103,25 +108,18 @@ Partial Class frmAdminDashboard
         cboReportType = New ComboBox()
         lblReportType = New Label()
         lblReports = New Label()
-        pnlCounterManagement = New Panel()
+        pnlCashierManagement = New Panel()
         dgvCashiers = New DataGridView()
-        Label1 = New Label()
-        dgvCounters = New DataGridView()
-        pnlCounterControls = New Panel()
-        Label2 = New Label()
-        flpCounterUserControls = New FlowLayoutPanel()
+        pnlCashierControls = New Panel()
+        flpCashierControls = New FlowLayoutPanel()
         btnDeleteCashier = New Button()
         btnEditCashier = New Button()
         btnAddCashier = New Button()
         txtSearchCashiers = New TextBox()
         lblSearchCashiers = New Label()
-        flpCounterControls = New FlowLayoutPanel()
-        btnDeleteCounter = New Button()
-        btnEditCounter = New Button()
-        btnAddCounter = New Button()
-        pnlCounterHeader = New Panel()
-        lblCountersTotal = New Label()
-        lblCounterManagement = New Label()
+        lblCashiersTotal = New Label()
+        pnlCashierHeader = New Panel()
+        lblCashierManagement = New Label()
         pnlDashboard = New Panel()
         pnlQueues = New Panel()
         dgvAllQueues = New DataGridView()
@@ -165,13 +163,11 @@ Partial Class frmAdminDashboard
         pnlQueueLogsReport.SuspendLayout()
         CType(dgvReports, ComponentModel.ISupportInitialize).BeginInit()
         pnlReportControls.SuspendLayout()
-        pnlCounterManagement.SuspendLayout()
+        pnlCashierManagement.SuspendLayout()
         CType(dgvCashiers, ComponentModel.ISupportInitialize).BeginInit()
-        CType(dgvCounters, ComponentModel.ISupportInitialize).BeginInit()
-        pnlCounterControls.SuspendLayout()
-        flpCounterUserControls.SuspendLayout()
-        flpCounterControls.SuspendLayout()
-        pnlCounterHeader.SuspendLayout()
+        pnlCashierControls.SuspendLayout()
+        flpCashierControls.SuspendLayout()
+        pnlCashierHeader.SuspendLayout()
         pnlDashboard.SuspendLayout()
         pnlQueues.SuspendLayout()
         CType(dgvAllQueues, ComponentModel.ISupportInitialize).BeginInit()
@@ -184,7 +180,7 @@ Partial Class frmAdminDashboard
         ' 
         ' pnlHeader
         ' 
-        pnlHeader.BackColor = Color.FromArgb(0, 51, 102)
+        pnlHeader.BackColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
         pnlHeader.Controls.Add(lblWelcome)
         pnlHeader.Controls.Add(lblTitle)
         pnlHeader.Controls.Add(btnLogout)
@@ -220,7 +216,7 @@ Partial Class frmAdminDashboard
         ' btnLogout
         ' 
         btnLogout.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnLogout.BackColor = Color.FromArgb(220, 53, 69)
+        btnLogout.BackColor = Color.FromArgb(CByte(220), CByte(53), CByte(69))
         btnLogout.Cursor = Cursors.Hand
         btnLogout.FlatAppearance.BorderSize = 0
         btnLogout.FlatStyle = FlatStyle.Flat
@@ -235,7 +231,7 @@ Partial Class frmAdminDashboard
         ' 
         ' pnlSidebar
         ' 
-        pnlSidebar.BackColor = Color.FromArgb(45, 52, 54)
+        pnlSidebar.BackColor = Color.FromArgb(CByte(45), CByte(52), CByte(54))
         pnlSidebar.Controls.Add(btnQueueLogs)
         pnlSidebar.Controls.Add(btnReports)
         pnlSidebar.Controls.Add(btnCounterManagement)
@@ -299,7 +295,7 @@ Partial Class frmAdminDashboard
         btnCounterManagement.Padding = New Padding(25, 0, 0, 0)
         btnCounterManagement.Size = New Size(220, 53)
         btnCounterManagement.TabIndex = 3
-        btnCounterManagement.Text = ChrW(55358) + ChrW(56991) + " Counters"
+        btnCounterManagement.Text = "👤 Cashiers"
         btnCounterManagement.TextAlign = ContentAlignment.MiddleLeft
         btnCounterManagement.UseVisualStyleBackColor = True
         ' 
@@ -335,13 +331,13 @@ Partial Class frmAdminDashboard
         btnUserManagement.Padding = New Padding(25, 0, 0, 0)
         btnUserManagement.Size = New Size(220, 53)
         btnUserManagement.TabIndex = 1
-        btnUserManagement.Text = "👥 Users"
+        btnUserManagement.Text = "👥 Students"
         btnUserManagement.TextAlign = ContentAlignment.MiddleLeft
         btnUserManagement.UseVisualStyleBackColor = True
         ' 
         ' btnDashboard
         ' 
-        btnDashboard.BackColor = Color.FromArgb(0, 85, 164)
+        btnDashboard.BackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         btnDashboard.Cursor = Cursors.Hand
         btnDashboard.Dock = DockStyle.Top
         btnDashboard.FlatAppearance.BorderSize = 0
@@ -364,7 +360,7 @@ Partial Class frmAdminDashboard
         pnlMainContent.Controls.Add(pnlUserManagement)
         pnlMainContent.Controls.Add(pnlQueueLogs)
         pnlMainContent.Controls.Add(pnlReports)
-        pnlMainContent.Controls.Add(pnlCounterManagement)
+        pnlMainContent.Controls.Add(pnlCashierManagement)
         pnlMainContent.Controls.Add(pnlDashboard)
         pnlMainContent.Dock = DockStyle.Fill
         pnlMainContent.Location = New Point(220, 85)
@@ -397,8 +393,8 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle1.BackColor = Color.White
         DataGridViewCellStyle1.Font = New Font("Poppins", 10.2F, FontStyle.Bold)
-        DataGridViewCellStyle1.ForeColor = Color.FromArgb(33, 37, 41)
-        DataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle1.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
+        DataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle1.SelectionForeColor = Color.White
         DataGridViewCellStyle1.WrapMode = DataGridViewTriState.True
         dgvAdmins.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
@@ -407,14 +403,14 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle2.BackColor = Color.White
         DataGridViewCellStyle2.Font = New Font("Poppins", 9.75F)
-        DataGridViewCellStyle2.ForeColor = Color.FromArgb(108, 117, 125)
-        DataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle2.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
+        DataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle2.SelectionForeColor = Color.White
         DataGridViewCellStyle2.WrapMode = DataGridViewTriState.False
         dgvAdmins.DefaultCellStyle = DataGridViewCellStyle2
         dgvAdmins.Dock = DockStyle.Fill
         dgvAdmins.EnableHeadersVisualStyles = False
-        dgvAdmins.GridColor = Color.FromArgb(233, 236, 239)
+        dgvAdmins.GridColor = Color.FromArgb(CByte(233), CByte(236), CByte(239))
         dgvAdmins.Location = New Point(0, 120)
         dgvAdmins.MultiSelect = False
         dgvAdmins.Name = "dgvAdmins"
@@ -455,7 +451,7 @@ Partial Class frmAdminDashboard
         ' btnDeleteAdmin
         ' 
         btnDeleteAdmin.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnDeleteAdmin.BackColor = Color.FromArgb(220, 53, 69)
+        btnDeleteAdmin.BackColor = Color.FromArgb(CByte(220), CByte(53), CByte(69))
         btnDeleteAdmin.Cursor = Cursors.Hand
         btnDeleteAdmin.FlatAppearance.BorderSize = 0
         btnDeleteAdmin.FlatStyle = FlatStyle.Flat
@@ -471,7 +467,7 @@ Partial Class frmAdminDashboard
         ' btnEditAdmin
         ' 
         btnEditAdmin.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnEditAdmin.BackColor = Color.FromArgb(255, 193, 7)
+        btnEditAdmin.BackColor = Color.FromArgb(CByte(255), CByte(193), CByte(7))
         btnEditAdmin.Cursor = Cursors.Hand
         btnEditAdmin.FlatAppearance.BorderSize = 0
         btnEditAdmin.FlatStyle = FlatStyle.Flat
@@ -487,7 +483,7 @@ Partial Class frmAdminDashboard
         ' btnAddAdmin
         ' 
         btnAddAdmin.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnAddAdmin.BackColor = Color.FromArgb(40, 167, 69)
+        btnAddAdmin.BackColor = Color.FromArgb(CByte(40), CByte(167), CByte(69))
         btnAddAdmin.Cursor = Cursors.Hand
         btnAddAdmin.FlatAppearance.BorderSize = 0
         btnAddAdmin.FlatStyle = FlatStyle.Flat
@@ -536,7 +532,7 @@ Partial Class frmAdminDashboard
         ' 
         lblAdminsTotal.AutoSize = True
         lblAdminsTotal.Font = New Font("Poppins", 11.0F)
-        lblAdminsTotal.ForeColor = Color.FromArgb(108, 117, 125)
+        lblAdminsTotal.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
         lblAdminsTotal.Location = New Point(280, 15)
         lblAdminsTotal.Name = "lblAdminsTotal"
         lblAdminsTotal.Size = New Size(79, 26)
@@ -563,6 +559,7 @@ Partial Class frmAdminDashboard
         pnlUserManagement.Name = "pnlUserManagement"
         pnlUserManagement.Size = New Size(1010, 565)
         pnlUserManagement.TabIndex = 5
+        pnlUserManagement.Visible = False
         ' 
         ' tabUserManagement
         ' 
@@ -598,8 +595,8 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle4.BackColor = Color.White
         DataGridViewCellStyle4.Font = New Font("Poppins", 10.2F, FontStyle.Bold)
-        DataGridViewCellStyle4.ForeColor = Color.FromArgb(33, 37, 41)
-        DataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle4.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
+        DataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle4.SelectionForeColor = Color.White
         DataGridViewCellStyle4.WrapMode = DataGridViewTriState.True
         dgvUsersWithAccount.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle4
@@ -608,14 +605,14 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle5.BackColor = Color.White
         DataGridViewCellStyle5.Font = New Font("Poppins", 9.75F)
-        DataGridViewCellStyle5.ForeColor = Color.FromArgb(108, 117, 125)
-        DataGridViewCellStyle5.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle5.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
+        DataGridViewCellStyle5.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle5.SelectionForeColor = Color.White
         DataGridViewCellStyle5.WrapMode = DataGridViewTriState.False
         dgvUsersWithAccount.DefaultCellStyle = DataGridViewCellStyle5
         dgvUsersWithAccount.Dock = DockStyle.Fill
         dgvUsersWithAccount.EnableHeadersVisualStyles = False
-        dgvUsersWithAccount.GridColor = Color.FromArgb(233, 236, 239)
+        dgvUsersWithAccount.GridColor = Color.FromArgb(CByte(233), CByte(236), CByte(239))
         dgvUsersWithAccount.Location = New Point(3, 3)
         dgvUsersWithAccount.MultiSelect = False
         dgvUsersWithAccount.Name = "dgvUsersWithAccount"
@@ -652,8 +649,8 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle7.BackColor = Color.White
         DataGridViewCellStyle7.Font = New Font("Poppins", 10.2F, FontStyle.Bold)
-        DataGridViewCellStyle7.ForeColor = Color.FromArgb(33, 37, 41)
-        DataGridViewCellStyle7.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle7.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
+        DataGridViewCellStyle7.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle7.SelectionForeColor = Color.White
         DataGridViewCellStyle7.WrapMode = DataGridViewTriState.True
         dgvUsersWithoutAccount.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle7
@@ -662,14 +659,14 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle8.BackColor = Color.White
         DataGridViewCellStyle8.Font = New Font("Poppins", 9.75F)
-        DataGridViewCellStyle8.ForeColor = Color.FromArgb(108, 117, 125)
-        DataGridViewCellStyle8.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle8.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
+        DataGridViewCellStyle8.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle8.SelectionForeColor = Color.White
         DataGridViewCellStyle8.WrapMode = DataGridViewTriState.False
         dgvUsersWithoutAccount.DefaultCellStyle = DataGridViewCellStyle8
         dgvUsersWithoutAccount.Dock = DockStyle.Fill
         dgvUsersWithoutAccount.EnableHeadersVisualStyles = False
-        dgvUsersWithoutAccount.GridColor = Color.FromArgb(233, 236, 239)
+        dgvUsersWithoutAccount.GridColor = Color.FromArgb(CByte(233), CByte(236), CByte(239))
         dgvUsersWithoutAccount.Location = New Point(3, 3)
         dgvUsersWithoutAccount.MultiSelect = False
         dgvUsersWithoutAccount.Name = "dgvUsersWithoutAccount"
@@ -711,7 +708,7 @@ Partial Class frmAdminDashboard
         ' btnDeleteUser
         ' 
         btnDeleteUser.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnDeleteUser.BackColor = Color.FromArgb(220, 53, 69)
+        btnDeleteUser.BackColor = Color.FromArgb(CByte(220), CByte(53), CByte(69))
         btnDeleteUser.Cursor = Cursors.Hand
         btnDeleteUser.FlatAppearance.BorderSize = 0
         btnDeleteUser.FlatStyle = FlatStyle.Flat
@@ -727,7 +724,7 @@ Partial Class frmAdminDashboard
         ' btnEditUser
         ' 
         btnEditUser.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnEditUser.BackColor = Color.FromArgb(255, 193, 7)
+        btnEditUser.BackColor = Color.FromArgb(CByte(255), CByte(193), CByte(7))
         btnEditUser.Cursor = Cursors.Hand
         btnEditUser.FlatAppearance.BorderSize = 0
         btnEditUser.FlatStyle = FlatStyle.Flat
@@ -743,7 +740,7 @@ Partial Class frmAdminDashboard
         ' btnAddUser
         ' 
         btnAddUser.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnAddUser.BackColor = Color.FromArgb(40, 167, 69)
+        btnAddUser.BackColor = Color.FromArgb(CByte(40), CByte(167), CByte(69))
         btnAddUser.Cursor = Cursors.Hand
         btnAddUser.FlatAppearance.BorderSize = 0
         btnAddUser.FlatStyle = FlatStyle.Flat
@@ -792,7 +789,7 @@ Partial Class frmAdminDashboard
         ' 
         lblUsersTotal.AutoSize = True
         lblUsersTotal.Font = New Font("Poppins", 11.0F)
-        lblUsersTotal.ForeColor = Color.FromArgb(108, 117, 125)
+        lblUsersTotal.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
         lblUsersTotal.Location = New Point(310, 15)
         lblUsersTotal.Name = "lblUsersTotal"
         lblUsersTotal.Size = New Size(79, 26)
@@ -867,7 +864,7 @@ Partial Class frmAdminDashboard
         ' btnChangeStatus
         ' 
         btnChangeStatus.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnChangeStatus.BackColor = Color.FromArgb(23, 162, 184)
+        btnChangeStatus.BackColor = Color.FromArgb(CByte(23), CByte(162), CByte(184))
         btnChangeStatus.Cursor = Cursors.Hand
         btnChangeStatus.FlatAppearance.BorderSize = 0
         btnChangeStatus.FlatStyle = FlatStyle.Flat
@@ -940,7 +937,7 @@ Partial Class frmAdminDashboard
         ' 
         lblQueueLogsTotal.AutoSize = True
         lblQueueLogsTotal.Font = New Font("Poppins", 11.0F)
-        lblQueueLogsTotal.ForeColor = Color.FromArgb(108, 117, 125)
+        lblQueueLogsTotal.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
         lblQueueLogsTotal.Location = New Point(185, 15)
         lblQueueLogsTotal.Name = "lblQueueLogsTotal"
         lblQueueLogsTotal.Size = New Size(79, 26)
@@ -1048,7 +1045,7 @@ Partial Class frmAdminDashboard
         ' btnGenerateReport
         ' 
         btnGenerateReport.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnGenerateReport.BackColor = Color.FromArgb(40, 167, 69)
+        btnGenerateReport.BackColor = Color.FromArgb(CByte(40), CByte(167), CByte(69))
         btnGenerateReport.Cursor = Cursors.Hand
         btnGenerateReport.FlatAppearance.BorderSize = 0
         btnGenerateReport.FlatStyle = FlatStyle.Flat
@@ -1130,25 +1127,22 @@ Partial Class frmAdminDashboard
         lblReports.TabIndex = 1
         lblReports.Text = "Reports"
         ' 
-        ' pnlCounterManagement
+        ' pnlCashierManagement
         ' 
-        pnlCounterManagement.Controls.Add(dgvCashiers)
-        pnlCounterManagement.Controls.Add(Label1)
-        pnlCounterManagement.Controls.Add(dgvCounters)
-        pnlCounterManagement.Controls.Add(pnlCounterControls)
-        pnlCounterManagement.Controls.Add(pnlCounterHeader)
-        pnlCounterManagement.Dock = DockStyle.Fill
-        pnlCounterManagement.Location = New Point(25, 25)
-        pnlCounterManagement.Name = "pnlCounterManagement"
-        pnlCounterManagement.Size = New Size(1010, 565)
-        pnlCounterManagement.TabIndex = 6
-        pnlCounterManagement.Visible = False
+        pnlCashierManagement.Controls.Add(dgvCashiers)
+        pnlCashierManagement.Controls.Add(pnlCashierControls)
+        pnlCashierManagement.Controls.Add(pnlCashierHeader)
+        pnlCashierManagement.Dock = DockStyle.Fill
+        pnlCashierManagement.Location = New Point(25, 25)
+        pnlCashierManagement.Name = "pnlCashierManagement"
+        pnlCashierManagement.Size = New Size(1010, 565)
+        pnlCashierManagement.TabIndex = 6
+        pnlCashierManagement.Visible = False
         ' 
         ' dgvCashiers
         ' 
         dgvCashiers.AllowUserToAddRows = False
         dgvCashiers.AllowUserToDeleteRows = False
-        dgvCashiers.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         dgvCashiers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         dgvCashiers.BackgroundColor = Color.White
         dgvCashiers.BorderStyle = BorderStyle.None
@@ -1157,8 +1151,8 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle10.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle10.BackColor = Color.White
         DataGridViewCellStyle10.Font = New Font("Poppins", 10.2F, FontStyle.Bold)
-        DataGridViewCellStyle10.ForeColor = Color.FromArgb(33, 37, 41)
-        DataGridViewCellStyle10.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle10.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
+        DataGridViewCellStyle10.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle10.SelectionForeColor = Color.White
         DataGridViewCellStyle10.WrapMode = DataGridViewTriState.True
         dgvCashiers.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle10
@@ -1167,14 +1161,15 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle11.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle11.BackColor = Color.White
         DataGridViewCellStyle11.Font = New Font("Poppins", 9.75F)
-        DataGridViewCellStyle11.ForeColor = Color.FromArgb(108, 117, 125)
-        DataGridViewCellStyle11.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle11.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
+        DataGridViewCellStyle11.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle11.SelectionForeColor = Color.White
         DataGridViewCellStyle11.WrapMode = DataGridViewTriState.False
         dgvCashiers.DefaultCellStyle = DataGridViewCellStyle11
+        dgvCashiers.Dock = DockStyle.Fill
         dgvCashiers.EnableHeadersVisualStyles = False
-        dgvCashiers.GridColor = Color.FromArgb(233, 236, 239)
-        dgvCashiers.Location = New Point(0, 329)
+        dgvCashiers.GridColor = Color.FromArgb(CByte(233), CByte(236), CByte(239))
+        dgvCashiers.Location = New Point(0, 120)
         dgvCashiers.MultiSelect = False
         dgvCashiers.Name = "dgvCashiers"
         dgvCashiers.ReadOnly = True
@@ -1184,98 +1179,48 @@ Partial Class frmAdminDashboard
         dgvCashiers.RowsDefaultCellStyle = DataGridViewCellStyle12
         dgvCashiers.RowTemplate.Height = 45
         dgvCashiers.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        dgvCashiers.Size = New Size(1010, 235)
+        dgvCashiers.Size = New Size(1010, 445)
         dgvCashiers.TabIndex = 10
         ' 
-        ' Label1
+        ' pnlCashierControls
         ' 
-        Label1.AutoSize = True
-        Label1.Font = New Font("Poppins", 14.0F, FontStyle.Bold)
-        Label1.Location = New Point(5, 297)
-        Label1.Name = "Label1"
-        Label1.Size = New Size(189, 34)
-        Label1.TabIndex = 9
-        Label1.Text = "Cashier Accounts"
+        pnlCashierControls.Controls.Add(flpCashierControls)
+        pnlCashierControls.Dock = DockStyle.Top
+        pnlCashierControls.Location = New Point(0, 60)
+        pnlCashierControls.Name = "pnlCashierControls"
+        pnlCashierControls.Padding = New Padding(0, 5, 0, 5)
+        pnlCashierControls.Size = New Size(1010, 60)
+        pnlCashierControls.TabIndex = 7
         ' 
-        ' dgvCounters
+        ' flpCashierControls
         ' 
-        dgvCounters.AllowUserToAddRows = False
-        dgvCounters.AllowUserToDeleteRows = False
-        dgvCounters.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        dgvCounters.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        dgvCounters.BackgroundColor = Color.White
-        dgvCounters.BorderStyle = BorderStyle.None
-        dgvCounters.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
-        dgvCounters.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
-        dgvCounters.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle7
-        dgvCounters.ColumnHeadersHeight = 40
-        dgvCounters.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
-        dgvCounters.DefaultCellStyle = DataGridViewCellStyle8
-        dgvCounters.EnableHeadersVisualStyles = False
-        dgvCounters.GridColor = Color.FromArgb(233, 236, 239)
-        dgvCounters.Location = New Point(0, 120)
-        dgvCounters.MultiSelect = False
-        dgvCounters.Name = "dgvCounters"
-        dgvCounters.ReadOnly = True
-        dgvCounters.RowHeadersVisible = False
-        dgvCounters.RowHeadersWidth = 51
-        dgvCounters.RowsDefaultCellStyle = DataGridViewCellStyle9
-        dgvCounters.RowTemplate.Height = 45
-        dgvCounters.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        dgvCounters.Size = New Size(1010, 174)
-        dgvCounters.TabIndex = 1
-        ' 
-        ' pnlCounterControls
-        ' 
-        pnlCounterControls.Controls.Add(Label2)
-        pnlCounterControls.Controls.Add(flpCounterUserControls)
-        pnlCounterControls.Controls.Add(flpCounterControls)
-        pnlCounterControls.Dock = DockStyle.Top
-        pnlCounterControls.Location = New Point(0, 60)
-        pnlCounterControls.Name = "pnlCounterControls"
-        pnlCounterControls.Padding = New Padding(0, 5, 0, 5)
-        pnlCounterControls.Size = New Size(1010, 60)
-        pnlCounterControls.TabIndex = 7
-        ' 
-        ' Label2
-        ' 
-        Label2.AutoSize = True
-        Label2.Font = New Font("Poppins", 9.0F)
-        Label2.Location = New Point(10, 31)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(117, 22)
-        Label2.TabIndex = 9
-        Label2.Text = "Cashier Accounts:"
-        ' 
-        ' flpCounterUserControls
-        ' 
-        flpCounterUserControls.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        flpCounterUserControls.Controls.Add(btnDeleteCashier)
-        flpCounterUserControls.Controls.Add(btnEditCashier)
-        flpCounterUserControls.Controls.Add(btnAddCashier)
-        flpCounterUserControls.Controls.Add(txtSearchCashiers)
-        flpCounterUserControls.Controls.Add(lblSearchCashiers)
-        flpCounterUserControls.FlowDirection = FlowDirection.RightToLeft
-        flpCounterUserControls.Location = New Point(185, 28)
-        flpCounterUserControls.Margin = New Padding(3, 2, 3, 2)
-        flpCounterUserControls.Name = "flpCounterUserControls"
-        flpCounterUserControls.Size = New Size(822, 29)
-        flpCounterUserControls.TabIndex = 8
-        flpCounterUserControls.WrapContents = False
+        flpCashierControls.Controls.Add(btnDeleteCashier)
+        flpCashierControls.Controls.Add(btnEditCashier)
+        flpCashierControls.Controls.Add(btnAddCashier)
+        flpCashierControls.Controls.Add(txtSearchCashiers)
+        flpCashierControls.Controls.Add(lblSearchCashiers)
+        flpCashierControls.Controls.Add(lblCashiersTotal)
+        flpCashierControls.Dock = DockStyle.Fill
+        flpCashierControls.FlowDirection = FlowDirection.RightToLeft
+        flpCashierControls.Location = New Point(0, 5)
+        flpCashierControls.Margin = New Padding(3, 2, 3, 2)
+        flpCashierControls.Name = "flpCashierControls"
+        flpCashierControls.Size = New Size(1010, 50)
+        flpCashierControls.TabIndex = 8
+        flpCashierControls.WrapContents = False
         ' 
         ' btnDeleteCashier
         ' 
         btnDeleteCashier.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnDeleteCashier.BackColor = Color.FromArgb(220, 53, 69)
+        btnDeleteCashier.BackColor = Color.FromArgb(CByte(220), CByte(53), CByte(69))
         btnDeleteCashier.Cursor = Cursors.Hand
         btnDeleteCashier.FlatAppearance.BorderSize = 0
         btnDeleteCashier.FlatStyle = FlatStyle.Flat
-        btnDeleteCashier.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+        btnDeleteCashier.Font = New Font("Poppins", 9.0F, FontStyle.Bold)
         btnDeleteCashier.ForeColor = Color.White
-        btnDeleteCashier.Location = New Point(719, 2)
-        btnDeleteCashier.Margin = New Padding(3, 2, 3, 2)
+        btnDeleteCashier.Location = New Point(877, 3)
         btnDeleteCashier.Name = "btnDeleteCashier"
-        btnDeleteCashier.Size = New Size(100, 25)
+        btnDeleteCashier.Size = New Size(130, 36)
         btnDeleteCashier.TabIndex = 4
         btnDeleteCashier.Text = "🗑️ Delete"
         btnDeleteCashier.UseVisualStyleBackColor = False
@@ -1283,16 +1228,15 @@ Partial Class frmAdminDashboard
         ' btnEditCashier
         ' 
         btnEditCashier.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnEditCashier.BackColor = Color.FromArgb(255, 193, 7)
+        btnEditCashier.BackColor = Color.FromArgb(CByte(255), CByte(193), CByte(7))
         btnEditCashier.Cursor = Cursors.Hand
         btnEditCashier.FlatAppearance.BorderSize = 0
         btnEditCashier.FlatStyle = FlatStyle.Flat
-        btnEditCashier.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+        btnEditCashier.Font = New Font("Poppins", 9.0F, FontStyle.Bold)
         btnEditCashier.ForeColor = Color.White
-        btnEditCashier.Location = New Point(613, 2)
-        btnEditCashier.Margin = New Padding(3, 2, 3, 2)
+        btnEditCashier.Location = New Point(741, 3)
         btnEditCashier.Name = "btnEditCashier"
-        btnEditCashier.Size = New Size(100, 25)
+        btnEditCashier.Size = New Size(130, 36)
         btnEditCashier.TabIndex = 3
         btnEditCashier.Text = "✏️ Edit"
         btnEditCashier.UseVisualStyleBackColor = False
@@ -1300,137 +1244,71 @@ Partial Class frmAdminDashboard
         ' btnAddCashier
         ' 
         btnAddCashier.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnAddCashier.BackColor = Color.FromArgb(40, 167, 69)
+        btnAddCashier.BackColor = Color.FromArgb(CByte(40), CByte(167), CByte(69))
         btnAddCashier.Cursor = Cursors.Hand
         btnAddCashier.FlatAppearance.BorderSize = 0
         btnAddCashier.FlatStyle = FlatStyle.Flat
-        btnAddCashier.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
+        btnAddCashier.Font = New Font("Poppins", 9.0F, FontStyle.Bold)
         btnAddCashier.ForeColor = Color.White
-        btnAddCashier.Location = New Point(485, 2)
-        btnAddCashier.Margin = New Padding(3, 2, 3, 2)
+        btnAddCashier.Location = New Point(604, 3)
         btnAddCashier.Name = "btnAddCashier"
-        btnAddCashier.Size = New Size(122, 25)
+        btnAddCashier.Size = New Size(131, 36)
         btnAddCashier.TabIndex = 2
         btnAddCashier.Text = "➕ Add Cashier"
         btnAddCashier.UseVisualStyleBackColor = False
         ' 
         ' txtSearchCashiers
         ' 
-        txtSearchCashiers.Font = New Font("Poppins", 8.0F)
-        txtSearchCashiers.Location = New Point(249, 4)
-        txtSearchCashiers.Margin = New Padding(3, 4, 3, 2)
+        txtSearchCashiers.Font = New Font("Poppins", 9.0F)
+        txtSearchCashiers.Location = New Point(348, 8)
+        txtSearchCashiers.Margin = New Padding(3, 8, 3, 3)
         txtSearchCashiers.Name = "txtSearchCashiers"
         txtSearchCashiers.PlaceholderText = "Search cashiers..."
-        txtSearchCashiers.Size = New Size(230, 23)
+        txtSearchCashiers.Size = New Size(250, 25)
         txtSearchCashiers.TabIndex = 6
         ' 
         ' lblSearchCashiers
         ' 
         lblSearchCashiers.AutoSize = True
-        lblSearchCashiers.Font = New Font("Poppins", 8.0F)
-        lblSearchCashiers.Location = New Point(188, 5)
-        lblSearchCashiers.Margin = New Padding(3, 5, 9, 0)
+        lblSearchCashiers.Font = New Font("Poppins", 9.0F)
+        lblSearchCashiers.Location = New Point(281, 10)
+        lblSearchCashiers.Margin = New Padding(3, 10, 10, 0)
         lblSearchCashiers.Name = "lblSearchCashiers"
-        lblSearchCashiers.Size = New Size(49, 19)
+        lblSearchCashiers.Size = New Size(54, 22)
         lblSearchCashiers.TabIndex = 7
         lblSearchCashiers.Text = "Search:"
         ' 
-        ' flpCounterControls
+        ' lblCashiersTotal
         ' 
-        flpCounterControls.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        flpCounterControls.Controls.Add(btnDeleteCounter)
-        flpCounterControls.Controls.Add(btnEditCounter)
-        flpCounterControls.Controls.Add(btnAddCounter)
-        flpCounterControls.FlowDirection = FlowDirection.RightToLeft
-        flpCounterControls.Location = New Point(0, 0)
-        flpCounterControls.Margin = New Padding(3, 2, 3, 2)
-        flpCounterControls.Name = "flpCounterControls"
-        flpCounterControls.Size = New Size(1007, 29)
-        flpCounterControls.TabIndex = 0
-        flpCounterControls.WrapContents = False
+        lblCashiersTotal.AutoSize = True
+        lblCashiersTotal.Font = New Font("Poppins", 9.0F)
+        lblCashiersTotal.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
+        lblCashiersTotal.Location = New Point(212, 10)
+        lblCashiersTotal.Margin = New Padding(10, 10, 3, 0)
+        lblCashiersTotal.Name = "lblCashiersTotal"
+        lblCashiersTotal.Size = New Size(63, 22)
+        lblCashiersTotal.TabIndex = 5
+        lblCashiersTotal.Text = "(Total: 0)"
         ' 
-        ' btnDeleteCounter
+        ' pnlCashierHeader
         ' 
-        btnDeleteCounter.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnDeleteCounter.BackColor = Color.FromArgb(220, 53, 69)
-        btnDeleteCounter.Cursor = Cursors.Hand
-        btnDeleteCounter.FlatAppearance.BorderSize = 0
-        btnDeleteCounter.FlatStyle = FlatStyle.Flat
-        btnDeleteCounter.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
-        btnDeleteCounter.ForeColor = Color.White
-        btnDeleteCounter.Location = New Point(904, 2)
-        btnDeleteCounter.Margin = New Padding(3, 2, 3, 2)
-        btnDeleteCounter.Name = "btnDeleteCounter"
-        btnDeleteCounter.Size = New Size(100, 25)
-        btnDeleteCounter.TabIndex = 4
-        btnDeleteCounter.Text = "🗑️ Delete"
-        btnDeleteCounter.UseVisualStyleBackColor = False
+        pnlCashierHeader.Controls.Add(lblCashierManagement)
+        pnlCashierHeader.Dock = DockStyle.Top
+        pnlCashierHeader.Location = New Point(0, 0)
+        pnlCashierHeader.Name = "pnlCashierHeader"
+        pnlCashierHeader.Padding = New Padding(0, 0, 0, 10)
+        pnlCashierHeader.Size = New Size(1010, 60)
+        pnlCashierHeader.TabIndex = 6
         ' 
-        ' btnEditCounter
+        ' lblCashierManagement
         ' 
-        btnEditCounter.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnEditCounter.BackColor = Color.FromArgb(255, 193, 7)
-        btnEditCounter.Cursor = Cursors.Hand
-        btnEditCounter.FlatAppearance.BorderSize = 0
-        btnEditCounter.FlatStyle = FlatStyle.Flat
-        btnEditCounter.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
-        btnEditCounter.ForeColor = Color.White
-        btnEditCounter.Location = New Point(798, 2)
-        btnEditCounter.Margin = New Padding(3, 2, 3, 2)
-        btnEditCounter.Name = "btnEditCounter"
-        btnEditCounter.Size = New Size(100, 25)
-        btnEditCounter.TabIndex = 3
-        btnEditCounter.Text = "✏️ Edit"
-        btnEditCounter.UseVisualStyleBackColor = False
-        ' 
-        ' btnAddCounter
-        ' 
-        btnAddCounter.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        btnAddCounter.BackColor = Color.FromArgb(40, 167, 69)
-        btnAddCounter.Cursor = Cursors.Hand
-        btnAddCounter.FlatAppearance.BorderSize = 0
-        btnAddCounter.FlatStyle = FlatStyle.Flat
-        btnAddCounter.Font = New Font("Poppins", 8.0F, FontStyle.Bold)
-        btnAddCounter.ForeColor = Color.White
-        btnAddCounter.Location = New Point(670, 2)
-        btnAddCounter.Margin = New Padding(3, 2, 3, 2)
-        btnAddCounter.Name = "btnAddCounter"
-        btnAddCounter.Size = New Size(122, 25)
-        btnAddCounter.TabIndex = 2
-        btnAddCounter.Text = "➕ Add Counter"
-        btnAddCounter.UseVisualStyleBackColor = False
-        ' 
-        ' pnlCounterHeader
-        ' 
-        pnlCounterHeader.Controls.Add(lblCountersTotal)
-        pnlCounterHeader.Controls.Add(lblCounterManagement)
-        pnlCounterHeader.Dock = DockStyle.Top
-        pnlCounterHeader.Location = New Point(0, 0)
-        pnlCounterHeader.Name = "pnlCounterHeader"
-        pnlCounterHeader.Padding = New Padding(0, 0, 0, 10)
-        pnlCounterHeader.Size = New Size(1010, 60)
-        pnlCounterHeader.TabIndex = 6
-        ' 
-        ' lblCountersTotal
-        ' 
-        lblCountersTotal.AutoSize = True
-        lblCountersTotal.Font = New Font("Poppins", 11.0F)
-        lblCountersTotal.ForeColor = Color.FromArgb(108, 117, 125)
-        lblCountersTotal.Location = New Point(310, 15)
-        lblCountersTotal.Name = "lblCountersTotal"
-        lblCountersTotal.Size = New Size(105, 26)
-        lblCountersTotal.TabIndex = 5
-        lblCountersTotal.Text = "(Working: 0)"
-        ' 
-        ' lblCounterManagement
-        ' 
-        lblCounterManagement.AutoSize = True
-        lblCounterManagement.Font = New Font("Poppins", 18.0F, FontStyle.Bold)
-        lblCounterManagement.Location = New Point(5, 8)
-        lblCounterManagement.Name = "lblCounterManagement"
-        lblCounterManagement.Size = New Size(290, 42)
-        lblCounterManagement.TabIndex = 1
-        lblCounterManagement.Text = "Counter Management"
+        lblCashierManagement.AutoSize = True
+        lblCashierManagement.Font = New Font("Poppins", 18.0F, FontStyle.Bold)
+        lblCashierManagement.Location = New Point(5, 8)
+        lblCashierManagement.Name = "lblCashierManagement"
+        lblCashierManagement.Size = New Size(285, 42)
+        lblCashierManagement.TabIndex = 1
+        lblCashierManagement.Text = "Cashier Management"
         ' 
         ' pnlDashboard
         ' 
@@ -1467,8 +1345,8 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle13.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle13.BackColor = Color.White
         DataGridViewCellStyle13.Font = New Font("Poppins", 10.2F, FontStyle.Bold)
-        DataGridViewCellStyle13.ForeColor = Color.FromArgb(33, 37, 41)
-        DataGridViewCellStyle13.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle13.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
+        DataGridViewCellStyle13.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle13.SelectionForeColor = Color.White
         DataGridViewCellStyle13.WrapMode = DataGridViewTriState.True
         dgvAllQueues.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle13
@@ -1477,14 +1355,14 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle14.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle14.BackColor = Color.White
         DataGridViewCellStyle14.Font = New Font("Poppins", 9.75F)
-        DataGridViewCellStyle14.ForeColor = Color.FromArgb(108, 117, 125)
-        DataGridViewCellStyle14.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle14.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
+        DataGridViewCellStyle14.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle14.SelectionForeColor = Color.White
         DataGridViewCellStyle14.WrapMode = DataGridViewTriState.False
         dgvAllQueues.DefaultCellStyle = DataGridViewCellStyle14
         dgvAllQueues.Dock = DockStyle.Fill
         dgvAllQueues.EnableHeadersVisualStyles = False
-        dgvAllQueues.GridColor = Color.FromArgb(233, 236, 239)
+        dgvAllQueues.GridColor = Color.FromArgb(CByte(233), CByte(236), CByte(239))
         dgvAllQueues.Location = New Point(0, 125)
         dgvAllQueues.MultiSelect = False
         dgvAllQueues.Name = "dgvAllQueues"
@@ -1545,7 +1423,7 @@ Partial Class frmAdminDashboard
         ' 
         lblQueueTotal.AutoSize = True
         lblQueueTotal.Font = New Font("Poppins", 10.0F)
-        lblQueueTotal.ForeColor = Color.FromArgb(108, 117, 125)
+        lblQueueTotal.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
         lblQueueTotal.Location = New Point(230, 20)
         lblQueueTotal.Name = "lblQueueTotal"
         lblQueueTotal.Size = New Size(74, 25)
@@ -1556,7 +1434,7 @@ Partial Class frmAdminDashboard
         ' 
         lblQueueTitle.AutoSize = True
         lblQueueTitle.Font = New Font("Poppins", 14.25F, FontStyle.Bold)
-        lblQueueTitle.ForeColor = Color.FromArgb(33, 37, 41)
+        lblQueueTitle.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
         lblQueueTitle.Location = New Point(20, 15)
         lblQueueTitle.Name = "lblQueueTitle"
         lblQueueTitle.Size = New Size(204, 34)
@@ -1587,8 +1465,8 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle16.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle16.BackColor = Color.White
         DataGridViewCellStyle16.Font = New Font("Poppins", 10.2F, FontStyle.Bold)
-        DataGridViewCellStyle16.ForeColor = Color.FromArgb(33, 37, 41)
-        DataGridViewCellStyle16.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle16.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
+        DataGridViewCellStyle16.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle16.SelectionForeColor = Color.White
         DataGridViewCellStyle16.WrapMode = DataGridViewTriState.True
         dgvCashierStatus.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle16
@@ -1597,14 +1475,14 @@ Partial Class frmAdminDashboard
         DataGridViewCellStyle17.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle17.BackColor = Color.White
         DataGridViewCellStyle17.Font = New Font("Poppins", 9.75F)
-        DataGridViewCellStyle17.ForeColor = Color.FromArgb(108, 117, 125)
-        DataGridViewCellStyle17.SelectionBackColor = Color.FromArgb(0, 85, 164)
+        DataGridViewCellStyle17.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
+        DataGridViewCellStyle17.SelectionBackColor = Color.FromArgb(CByte(0), CByte(85), CByte(164))
         DataGridViewCellStyle17.SelectionForeColor = Color.White
         DataGridViewCellStyle17.WrapMode = DataGridViewTriState.False
         dgvCashierStatus.DefaultCellStyle = DataGridViewCellStyle17
         dgvCashierStatus.Dock = DockStyle.Fill
         dgvCashierStatus.EnableHeadersVisualStyles = False
-        dgvCashierStatus.GridColor = Color.FromArgb(233, 236, 239)
+        dgvCashierStatus.GridColor = Color.FromArgb(CByte(233), CByte(236), CByte(239))
         dgvCashierStatus.Location = New Point(0, 65)
         dgvCashierStatus.MultiSelect = False
         dgvCashierStatus.Name = "dgvCashierStatus"
@@ -1633,7 +1511,7 @@ Partial Class frmAdminDashboard
         ' 
         lblActiveCashiers.AutoSize = True
         lblActiveCashiers.Font = New Font("Poppins", 10.0F)
-        lblActiveCashiers.ForeColor = Color.FromArgb(108, 117, 125)
+        lblActiveCashiers.ForeColor = Color.FromArgb(CByte(108), CByte(117), CByte(125))
         lblActiveCashiers.Location = New Point(187, 20)
         lblActiveCashiers.Name = "lblActiveCashiers"
         lblActiveCashiers.Size = New Size(83, 25)
@@ -1644,7 +1522,7 @@ Partial Class frmAdminDashboard
         ' 
         lblCashierTitle.AutoSize = True
         lblCashierTitle.Font = New Font("Poppins", 14.25F, FontStyle.Bold)
-        lblCashierTitle.ForeColor = Color.FromArgb(33, 37, 41)
+        lblCashierTitle.ForeColor = Color.FromArgb(CByte(33), CByte(37), CByte(41))
         lblCashierTitle.Location = New Point(20, 15)
         lblCashierTitle.Name = "lblCashierTitle"
         lblCashierTitle.Size = New Size(161, 34)
@@ -1660,7 +1538,7 @@ Partial Class frmAdminDashboard
         ' 
         AutoScaleDimensions = New SizeF(7.0F, 15.0F)
         AutoScaleMode = AutoScaleMode.Font
-        BackColor = Color.FromArgb(244, 247, 249)
+        BackColor = Color.FromArgb(CByte(244), CByte(247), CByte(249))
         ClientSize = New Size(1280, 700)
         Controls.Add(pnlMainContent)
         Controls.Add(pnlSidebar)
@@ -1706,17 +1584,13 @@ Partial Class frmAdminDashboard
         CType(dgvReports, ComponentModel.ISupportInitialize).EndInit()
         pnlReportControls.ResumeLayout(False)
         pnlReportControls.PerformLayout()
-        pnlCounterManagement.ResumeLayout(False)
-        pnlCounterManagement.PerformLayout()
+        pnlCashierManagement.ResumeLayout(False)
         CType(dgvCashiers, ComponentModel.ISupportInitialize).EndInit()
-        CType(dgvCounters, ComponentModel.ISupportInitialize).EndInit()
-        pnlCounterControls.ResumeLayout(False)
-        pnlCounterControls.PerformLayout()
-        flpCounterUserControls.ResumeLayout(False)
-        flpCounterUserControls.PerformLayout()
-        flpCounterControls.ResumeLayout(False)
-        pnlCounterHeader.ResumeLayout(False)
-        pnlCounterHeader.PerformLayout()
+        pnlCashierControls.ResumeLayout(False)
+        flpCashierControls.ResumeLayout(False)
+        flpCashierControls.PerformLayout()
+        pnlCashierHeader.ResumeLayout(False)
+        pnlCashierHeader.PerformLayout()
         pnlDashboard.ResumeLayout(False)
         pnlQueues.ResumeLayout(False)
         CType(dgvAllQueues, ComponentModel.ISupportInitialize).EndInit()
@@ -1760,13 +1634,13 @@ Partial Class frmAdminDashboard
     Friend WithEvents btnEditUser As Button
     Friend WithEvents btnDeleteUser As Button
     Friend WithEvents lblUsersTotal As Label
-    Friend WithEvents pnlCounterManagement As Panel
-    Friend WithEvents dgvCounters As DataGridView
-    Friend WithEvents btnAddCounter As Button
-    Friend WithEvents btnEditCounter As Button
-    Friend WithEvents btnDeleteCounter As Button
-    Friend WithEvents lblCounterManagement As Label
-    Friend WithEvents lblCountersTotal As Label
+    Friend WithEvents pnlCashierManagement As Panel ' Renamed
+    ' Removed Friend WithEvents dgvCounters As DataGridView
+    ' Removed Friend WithEvents btnAddCounter As Button
+    ' Removed Friend WithEvents btnEditCounter As Button
+    ' Removed Friend WithEvents btnDeleteCounter As Button
+    Friend WithEvents lblCashierManagement As Label ' Renamed
+    Friend WithEvents lblCashiersTotal As Label ' Renamed
     Friend WithEvents pnlReports As Panel
     Friend WithEvents lblReports As Label
     Friend WithEvents tabReports As TabControl
@@ -1799,8 +1673,8 @@ Partial Class frmAdminDashboard
     Friend WithEvents pnlQueueLogsControls As Panel
     Friend WithEvents pnlUserHeader As Panel
     Friend WithEvents pnlUserControls As Panel
-    Friend WithEvents pnlCounterHeader As Panel
-    Friend WithEvents pnlCounterControls As Panel
+    Friend WithEvents pnlCashierHeader As Panel ' Renamed
+    Friend WithEvents pnlCashierControls As Panel ' Renamed
     Friend WithEvents pnlReportControls As Panel
     Friend WithEvents pnlQueuesControls As Panel
     Friend WithEvents tabUserManagement As TabControl
@@ -1821,7 +1695,7 @@ Partial Class frmAdminDashboard
     Friend WithEvents lblSearchAdmins As Label
     Friend WithEvents dgvAdmins As DataGridView
     Friend WithEvents dgvCashiers As DataGridView
-    Friend WithEvents Label1 As Label
+    ' Removed Friend WithEvents Label1 As Label
     Friend WithEvents btnAddCashier As Button
     Friend WithEvents btnEditCashier As Button
     Friend WithEvents btnDeleteCashier As Button
@@ -1830,8 +1704,8 @@ Partial Class frmAdminDashboard
     Friend WithEvents flpUserControls As FlowLayoutPanel
     Friend WithEvents flpAdminControls As FlowLayoutPanel
     Friend WithEvents flpQueueLogControls As FlowLayoutPanel
-    Friend WithEvents flpCounterControls As FlowLayoutPanel
-    Friend WithEvents Label2 As Label
-    Friend WithEvents flpCounterUserControls As FlowLayoutPanel
+    ' Removed Friend WithEvents flpCounterControls As FlowLayoutPanel
+    ' Removed Friend WithEvents Label2 As Label
+    Friend WithEvents flpCashierControls As FlowLayoutPanel ' Renamed
 End Class
 
