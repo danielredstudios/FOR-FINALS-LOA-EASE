@@ -12,6 +12,7 @@ Public Class frmKiosk
     Private selectedCashierName As String = ""
     Private selectedDateTime As DateTime
     Private studentId As Integer = -1
+    Private isVisitorMode As Boolean = False
     Private WithEvents tmrResetView As New Timer()
     Private resetStep As Integer = 0
     Private soundPlayer As New SoundPlayer()
@@ -30,9 +31,7 @@ Public Class frmKiosk
         tcKiosk.SizeMode = TabSizeMode.Fixed
         Me.ResizeRedraw = True
         ApplyRoundedCorners()
-
         LoadSoundFile()
-
         CenterPanel()
     End Sub
 
@@ -62,7 +61,6 @@ Public Class frmKiosk
                 soundPlayer.Play()
             End If
         Catch ex As Exception
-            ' Silently handle sound playback errors to not disrupt the user flow
             Debug.WriteLine("Error playing sound: " & ex.Message)
         End Try
     End Sub
@@ -71,10 +69,42 @@ Public Class frmKiosk
         SetRoundedCorners(pnlMainInput, 15)
         SetRoundedCorners(pnlTicketCard, 15)
         SetRoundedCorners(btnGetTicket, 10)
+        SetRoundedCorners(btnNewVisitor, 10)
 
         SetRoundedCorners(gbStudentInfo, 10)
         SetRoundedCorners(gbPurpose, 10)
         SetRoundedCorners(gbDocumentRequest, 10)
+    End Sub
+
+    Private Sub btnNewVisitor_Click(sender As Object, e As EventArgs) Handles btnNewVisitor.Click
+        If isVisitorMode Then
+            ResetForm()
+        Else
+            isVisitorMode = True
+            ResetForm()
+            isVisitorMode = True
+
+            gbStudentInfo.Text = "Visitor Information"
+            btnNewVisitor.Text = "I am a Student"
+            btnNewVisitor.BackColor = Color.FromArgb(220, 53, 69)
+
+            txtStudentID.Visible = False
+            Label1.Visible = False
+            txtCourse.Visible = False
+            Label4.Visible = False
+            txtYearLevel.Visible = False
+            Label5.Visible = False
+
+            chkPromissory.Visible = False
+
+            txtLastName.ReadOnly = False
+            txtFirstName.ReadOnly = False
+
+            txtLastName.Location = New Point(155, 42)
+            Label2.Location = New Point(20, 44)
+            txtFirstName.Location = New Point(155, 79)
+            Label3.Location = New Point(20, 81)
+        End If
     End Sub
 
     Private Sub SetRoundedCorners(ctrl As Control, radius As Integer)
@@ -147,6 +177,7 @@ Public Class frmKiosk
         chkEnrollment.Checked = False
         chkPromissory.Checked = False
         chkDocRequest.Checked = False
+        chkClearance.Checked = False
         chkDiploma.Checked = False
         chkTOR.Checked = False
         chkGMC.Checked = False
@@ -157,6 +188,40 @@ Public Class frmKiosk
         selectedCashierName = ""
         btnGetTicket.Enabled = False
         tcKiosk.SelectedTab = tpMain
+
+        isVisitorMode = False
+        gbStudentInfo.Text = "Student Information"
+        If btnNewVisitor IsNot Nothing Then
+            btnNewVisitor.Text = "New Visitor"
+            btnNewVisitor.BackColor = Color.FromArgb(0, 123, 255)
+        End If
+
+        txtStudentID.Visible = True
+        Label1.Visible = True
+        txtCourse.Visible = True
+        Label4.Visible = True
+        txtYearLevel.Visible = True
+        Label5.Visible = True
+
+        chkTuition.Visible = True
+        chkEnrollment.Visible = True
+        chkPromissory.Visible = True
+        chkDocRequest.Visible = True
+        chkClearance.Visible = True
+
+        txtLastName.ReadOnly = True
+        txtFirstName.ReadOnly = True
+
+        txtStudentID.Location = New Point(155, 42)
+        Label1.Location = New Point(20, 44)
+        txtLastName.Location = New Point(155, 79)
+        Label2.Location = New Point(20, 81)
+        txtFirstName.Location = New Point(155, 116)
+        Label3.Location = New Point(20, 118)
+        txtCourse.Location = New Point(155, 153)
+        Label4.Location = New Point(20, 155)
+        txtYearLevel.Location = New Point(155, 190)
+        Label5.Location = New Point(20, 192)
     End Sub
 
     Private Sub FindBestCounterAndTimeSlot()
@@ -193,7 +258,7 @@ Public Class frmKiosk
                         End While
                     End Using
                 End Using
-                If purpose.Contains("Document Request") Then
+                If purpose.Contains("Document Request") Or purpose.Contains("Clearance Signing") Then
                     If counterStatuses.ContainsKey(4) AndAlso counterStatuses(4).Item1 AndAlso counterStatuses(4).Item2 = "open" Then
                         Return 4
                     Else
@@ -311,8 +376,19 @@ Public Class frmKiosk
     End Sub
 
     Private Sub UpdateUIWithSelection()
-        btnGetTicket.Enabled = (selectedCounterId <> -1 AndAlso Not String.IsNullOrEmpty(selectedTimeSlot) AndAlso selectedTimeSlot <> "No available slots")
-        If Not btnGetTicket.Enabled AndAlso studentId <> -1 Then
+        Dim purposeSelected As Boolean = chkTuition.Checked Or chkEnrollment.Checked Or chkPromissory.Checked Or chkDocRequest.Checked Or chkClearance.Checked
+        Dim hasSlot As Boolean = (selectedCounterId <> -1 AndAlso Not String.IsNullOrEmpty(selectedTimeSlot) AndAlso selectedTimeSlot <> "No available slots")
+        Dim validVisitor As Boolean = False
+
+        If isVisitorMode Then
+            validVisitor = (Not String.IsNullOrWhiteSpace(txtLastName.Text) AndAlso Not String.IsNullOrWhiteSpace(txtFirstName.Text))
+        End If
+
+        Dim validStudent As Boolean = (Not isVisitorMode AndAlso studentId <> -1)
+
+        btnGetTicket.Enabled = (validStudent Or validVisitor) AndAlso purposeSelected AndAlso hasSlot
+
+        If Not hasSlot AndAlso (validStudent Or validVisitor) AndAlso purposeSelected Then
             MessageBox.Show("All counters for your purpose are currently unavailable or fully booked. Please try again later.", "No Slots Available", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
@@ -325,9 +401,14 @@ Public Class frmKiosk
             Dim result = cmd.ExecuteScalar()
             If result IsNot Nothing AndAlso Not IsDBNull(result) Then
                 course = result.ToString()
+            Else
+                course = "GEN"
             End If
         End Using
+
         Select Case course
+            Case "Visitor"
+                Return "VIS"
             Case "Bachelor of Science in Psychology"
                 Return "CAS"
             Case "Bachelor of Science in Accountancy", "Bachelor of Science in Customs Administration", "Bachelor of Science in Business Administration", "Major in Marketing Management", "Major in Financial Management", "Major in Human Resource Development Management"
@@ -371,10 +452,6 @@ Public Class frmKiosk
     End Function
 
     Private Sub btnGetTicket_Click(sender As Object, e As EventArgs) Handles btnGetTicket.Click
-        If studentId = -1 Then
-            MessageBox.Show("Please enter a valid Student ID.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
         Dim purpose As String = GetPurposeString()
         If String.IsNullOrWhiteSpace(purpose) Then
             MessageBox.Show("Please select a purpose for your visit.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -384,10 +461,40 @@ Public Class frmKiosk
             MessageBox.Show("Please select at least one type of document to request.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
-        If HasActiveTicket(studentId) Then
-            MessageBox.Show("You already have an active transaction. Please complete your current transaction before getting a new ticket.", "Active Transaction Found", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
+
+        If isVisitorMode Then
+            If String.IsNullOrWhiteSpace(txtLastName.Text) Or String.IsNullOrWhiteSpace(txtFirstName.Text) Then
+                MessageBox.Show("Please enter your First and Last Name.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+            Try
+                Using conn As New MySqlConnection(DatabaseHelper.GetConnectionString())
+                    conn.Open()
+                    Dim visitorStudentNumber = "VIS-" & DateTime.Now.ToString("yyyyMMddHHmmssfff")
+                    Dim insertStudentQuery = "INSERT INTO students (student_number, last_name, first_name, course, year_level) VALUES (@student_number, @last_name, @first_name, 'Visitor', 'N/A')"
+                    Using cmd As New MySqlCommand(insertStudentQuery, conn)
+                        cmd.Parameters.AddWithValue("@student_number", visitorStudentNumber)
+                        cmd.Parameters.AddWithValue("@last_name", txtLastName.Text.Trim())
+                        cmd.Parameters.AddWithValue("@first_name", txtFirstName.Text.Trim())
+                        cmd.ExecuteNonQuery()
+                        studentId = CInt(cmd.LastInsertedId)
+                    End Using
+                End Using
+            Catch ex As Exception
+                MessageBox.Show("Failed to register visitor. " & ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return
+            End Try
+        Else
+            If studentId = -1 Then
+                MessageBox.Show("Please enter a valid Student ID.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+            If HasActiveTicket(studentId) Then
+                MessageBox.Show("You already have an active transaction." & vbCrLf & "Please complete your current transaction before getting a new ticket.", "Active Transaction Found", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
         End If
+
         FindBestCounterAndTimeSlot()
         If selectedCounterId = -1 OrElse selectedTimeSlot = "No available slots" Then
             MessageBox.Show("No available slots. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -436,6 +543,7 @@ Public Class frmKiosk
         If chkTuition.Checked Then purposes.Add("Tuition Payment")
         If chkEnrollment.Checked Then purposes.Add("Enrollment Concern")
         If chkPromissory.Checked Then purposes.Add("Promissory Note")
+        If chkClearance.Checked Then purposes.Add("Clearance Signing")
         Dim docRequests As New List(Of String)
         If chkDocRequest.Checked Then
             purposes.Add("Document Request")
@@ -454,21 +562,31 @@ Public Class frmKiosk
     End Sub
 
     Private Sub txtStudentID_TextChanged(sender As Object, e As EventArgs) Handles txtStudentID.TextChanged
+        If isVisitorMode Then Return
+
         txtLastName.Clear()
         txtFirstName.Clear()
         txtCourse.Clear()
         txtYearLevel.Clear()
+
         chkIsPriority.Checked = False
         chkTuition.Checked = False
         chkEnrollment.Checked = False
         chkPromissory.Checked = False
         chkDocRequest.Checked = False
+        chkClearance.Checked = False
         studentId = -1
         selectedCounterId = -1
         selectedTimeSlot = ""
         btnGetTicket.Enabled = False
+
+        txtLastName.ReadOnly = True
+        txtFirstName.ReadOnly = True
+
         If txtStudentID.Text.Length > 4 Then
             FetchStudentDetails(txtStudentID.Text.Trim())
+        Else
+            UpdateUIWithSelection()
         End If
     End Sub
 
@@ -496,6 +614,11 @@ Public Class frmKiosk
                             End If
 
                             FindBestCounterAndTimeSlot()
+                        Else
+                            studentId = -1
+                            txtLastName.ReadOnly = True
+                            txtFirstName.ReadOnly = True
+                            UpdateUIWithSelection()
                         End If
                     End Using
                 End Using
@@ -507,18 +630,14 @@ Public Class frmKiosk
 
     Private Sub chkDocRequest_CheckedChanged(sender As Object, e As EventArgs) Handles chkDocRequest.CheckedChanged
         gbDocumentRequest.Visible = chkDocRequest.Checked
-        If studentId <> -1 Then
-            FindBestCounterAndTimeSlot()
-        End If
+        FindBestCounterAndTimeSlot()
     End Sub
 
-    Private Sub Purpose_CheckedChanged(sender As Object, e As EventArgs) Handles chkTuition.CheckedChanged, chkEnrollment.CheckedChanged, chkPromissory.CheckedChanged, chkIsPriority.CheckedChanged
+    Private Sub Purpose_CheckedChanged(sender As Object, e As EventArgs) Handles chkTuition.CheckedChanged, chkEnrollment.CheckedChanged, chkPromissory.CheckedChanged, chkIsPriority.CheckedChanged, txtLastName.TextChanged, txtFirstName.TextChanged, chkDiploma.CheckedChanged, chkTOR.CheckedChanged, chkGMC.CheckedChanged, chkClearance.CheckedChanged
         If TypeOf sender Is CheckBox AndAlso DirectCast(sender, CheckBox).Name = "chkIsPriority" AndAlso chkIsPriority.Checked Then
             MessageBox.Show("Priority lane is intended for pregnant, PWD, and senior citizens.", "Priority Lane", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
-        If studentId <> -1 Then
-            FindBestCounterAndTimeSlot()
-        End If
+        FindBestCounterAndTimeSlot()
     End Sub
 
     Private Sub ShowTicket(queueNumber As String)
@@ -552,7 +671,5 @@ Public Class frmKiosk
         End If
     End Sub
 
-    Private Sub pnlHeader_Paint(sender As Object, e As PaintEventArgs) Handles pnlHeader.Paint
-
-    End Sub
 End Class
+

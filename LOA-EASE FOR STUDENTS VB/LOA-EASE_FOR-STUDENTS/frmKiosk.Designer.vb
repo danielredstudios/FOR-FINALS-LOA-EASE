@@ -2,7 +2,6 @@
 Partial Class frmKiosk
     Inherits System.Windows.Forms.Form
 
-    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -14,24 +13,22 @@ Partial Class frmKiosk
         End Try
     End Sub
 
-    'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
 
-    'NOTE: The following procedure is required by the Windows Form Designer
-    'It can be modified using the Windows Form Designer.  
-    'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmKiosk))
         tcKiosk = New TabControl()
         tpMain = New TabPage()
         pnlMainInput = New Panel()
+        btnNewVisitor = New Button()
         tlpPurpose = New TableLayoutPanel()
         gbDocumentRequest = New GroupBox()
         chkGMC = New CheckBox()
         chkTOR = New CheckBox()
         chkDiploma = New CheckBox()
         gbPurpose = New GroupBox()
+        chkClearance = New CheckBox()
         chkIsPriority = New CheckBox()
         chkDocRequest = New CheckBox()
         chkPromissory = New CheckBox()
@@ -100,6 +97,7 @@ Partial Class frmKiosk
         ' 
         pnlMainInput.Anchor = AnchorStyles.None
         pnlMainInput.BackColor = Color.White
+        pnlMainInput.Controls.Add(btnNewVisitor)
         pnlMainInput.Controls.Add(tlpPurpose)
         pnlMainInput.Controls.Add(btnGetTicket)
         pnlMainInput.Controls.Add(gbStudentInfo)
@@ -109,18 +107,34 @@ Partial Class frmKiosk
         pnlMainInput.Size = New Size(800, 604)
         pnlMainInput.TabIndex = 0
         ' 
+        ' btnNewVisitor
+        ' 
+        btnNewVisitor.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        btnNewVisitor.BackColor = Color.FromArgb(CByte(0), CByte(123), CByte(255))
+        btnNewVisitor.Cursor = Cursors.Hand
+        btnNewVisitor.FlatAppearance.BorderSize = 0
+        btnNewVisitor.FlatStyle = FlatStyle.Flat
+        btnNewVisitor.Font = New Font("Poppins", 9.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        btnNewVisitor.ForeColor = Color.White
+        btnNewVisitor.Location = New Point(660, 20)
+        btnNewVisitor.Name = "btnNewVisitor"
+        btnNewVisitor.Size = New Size(115, 28)
+        btnNewVisitor.TabIndex = 5
+        btnNewVisitor.Text = "New Visitor"
+        btnNewVisitor.UseVisualStyleBackColor = False
+        ' 
         ' tlpPurpose
         ' 
         tlpPurpose.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         tlpPurpose.ColumnCount = 2
-        tlpPurpose.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50F))
-        tlpPurpose.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50F))
+        tlpPurpose.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0F))
+        tlpPurpose.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0F))
         tlpPurpose.Controls.Add(gbDocumentRequest, 1, 0)
         tlpPurpose.Controls.Add(gbPurpose, 0, 0)
         tlpPurpose.Location = New Point(25, 270)
         tlpPurpose.Name = "tlpPurpose"
         tlpPurpose.RowCount = 1
-        tlpPurpose.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
+        tlpPurpose.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
         tlpPurpose.Size = New Size(750, 220)
         tlpPurpose.TabIndex = 4
         ' 
@@ -182,6 +196,7 @@ Partial Class frmKiosk
         ' 
         ' gbPurpose
         ' 
+        gbPurpose.Controls.Add(chkClearance)
         gbPurpose.Controls.Add(chkIsPriority)
         gbPurpose.Controls.Add(chkDocRequest)
         gbPurpose.Controls.Add(chkPromissory)
@@ -198,6 +213,19 @@ Partial Class frmKiosk
         gbPurpose.TabIndex = 1
         gbPurpose.TabStop = False
         gbPurpose.Text = "Purpose of Visit"
+        ' 
+        ' chkClearance
+        ' 
+        chkClearance.AutoSize = True
+        chkClearance.Cursor = Cursors.Hand
+        chkClearance.Font = New Font("Poppins", 10.5F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        chkClearance.Location = New Point(190, 95)
+        chkClearance.Name = "chkClearance"
+        chkClearance.Padding = New Padding(5, 5, 0, 5)
+        chkClearance.Size = New Size(157, 39)
+        chkClearance.TabIndex = 5
+        chkClearance.Text = "Clearance Signing"
+        chkClearance.UseVisualStyleBackColor = True
         ' 
         ' chkIsPriority
         ' 
@@ -272,7 +300,7 @@ Partial Class frmKiosk
         btnGetTicket.Cursor = Cursors.Hand
         btnGetTicket.FlatAppearance.BorderSize = 0
         btnGetTicket.FlatStyle = FlatStyle.Flat
-        btnGetTicket.Font = New Font("Poppins", 18F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        btnGetTicket.Font = New Font("Poppins", 18.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         btnGetTicket.ForeColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
         btnGetTicket.Location = New Point(25, 529)
         btnGetTicket.Name = "btnGetTicket"
@@ -451,7 +479,7 @@ Partial Class frmKiosk
         ' lblMessage
         ' 
         lblMessage.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        lblMessage.Font = New Font("Poppins", 13F, FontStyle.Italic, GraphicsUnit.Point, CByte(0))
+        lblMessage.Font = New Font("Poppins", 13.0F, FontStyle.Italic, GraphicsUnit.Point, CByte(0))
         lblMessage.ForeColor = Color.DimGray
         lblMessage.Location = New Point(30, 360)
         lblMessage.Name = "lblMessage"
@@ -464,7 +492,7 @@ Partial Class frmKiosk
         ' lblAssignedCashier
         ' 
         lblAssignedCashier.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        lblAssignedCashier.Font = New Font("Poppins", 18F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        lblAssignedCashier.Font = New Font("Poppins", 18.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         lblAssignedCashier.ForeColor = Color.FromArgb(CByte(51), CByte(51), CByte(51))
         lblAssignedCashier.Location = New Point(30, 300)
         lblAssignedCashier.Name = "lblAssignedCashier"
@@ -476,7 +504,7 @@ Partial Class frmKiosk
         ' lblAssignedCounter
         ' 
         lblAssignedCounter.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        lblAssignedCounter.Font = New Font("Poppins", 18F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        lblAssignedCounter.Font = New Font("Poppins", 18.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         lblAssignedCounter.ForeColor = Color.FromArgb(CByte(51), CByte(51), CByte(51))
         lblAssignedCounter.Location = New Point(30, 250)
         lblAssignedCounter.Name = "lblAssignedCounter"
@@ -513,7 +541,7 @@ Partial Class frmKiosk
         ' lblAppName
         ' 
         lblAppName.AutoSize = True
-        lblAppName.Font = New Font("Poppins", 26F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        lblAppName.Font = New Font("Poppins", 26.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         lblAppName.ForeColor = Color.FromArgb(CByte(255), CByte(199), CByte(44))
         lblAppName.Location = New Point(130, 55)
         lblAppName.Name = "lblAppName"
@@ -524,7 +552,7 @@ Partial Class frmKiosk
         ' lblSystemName
         ' 
         lblSystemName.AutoSize = True
-        lblSystemName.Font = New Font("Poppins", 15F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        lblSystemName.Font = New Font("Poppins", 15.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         lblSystemName.ForeColor = Color.White
         lblSystemName.Location = New Point(135, 18)
         lblSystemName.Name = "lblSystemName"
@@ -544,7 +572,7 @@ Partial Class frmKiosk
         ' 
         ' frmKiosk
         ' 
-        AutoScaleDimensions = New SizeF(13F, 37F)
+        AutoScaleDimensions = New SizeF(13.0F, 37.0F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.FromArgb(CByte(0), CByte(51), CByte(102))
         ClientSize = New Size(1264, 861)
@@ -610,4 +638,7 @@ Partial Class frmKiosk
     Friend WithEvents lblSystemName As Label
     Friend WithEvents pbLogo As PictureBox
     Friend WithEvents pnlTicketCard As Panel
+    Friend WithEvents btnNewVisitor As Button
+    Friend WithEvents chkClearance As CheckBox
 End Class
+
