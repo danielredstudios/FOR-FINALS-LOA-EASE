@@ -123,7 +123,6 @@ if (isset($_SESSION['user_id'])) {
                             Proceed to Queueing
                             <i data-lucide="arrow-right" class="ms-2"></i>
                         </a>
-                        <a href="visitor_login.php" class="btn btn-visitor d-inline-flex align-items-center justify-content-center px-4 py-2">Are you a Visitor?</a>
                     </div>
                 </div>
             </div>

@@ -38,48 +38,103 @@ $conn->close();
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.2/fetch.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
     <style>
         .purpose-badge { font-size: 0.9em; padding: 0.5em 0.75em; }
-        .styled-card {
-            background: rgba(255, 255, 255, 0.7); border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 51, 102, 0.2); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            animation: fadeInFromBottom 1s ease-out;
+        #active_ticket_notification { display: none; animation: fadeInFromBottom 0.8s ease-out; }
+        
+        /* Lane Status Styles */
+        .lane-status-compact {
+            background: linear-gradient(135deg, var(--input-bg) 0%, rgba(255,255,255,0.1) 100%);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-       @keyframes fadeInFromBottom { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(-45deg, #eef2f7, #0055a4, #eef2f7, #003366);
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+        
+        .lane-status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
         }
-       @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .card-content { padding: 2.5rem; }
-        .btn-primary-modern {
-            background: #003366; border: none; border-radius: 50px; padding: 0.8rem 2rem;
-            font-size: 1.1rem; font-weight: 600; color: white; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
-       }
-       .btn-primary-modern:hover {
-            background-color: #FFC72C; color: #003366; transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(255, 199, 44, 0.5);
-       }
-       #active_ticket_notification { display: none; animation: fadeInFromBottom 0.8s ease-out; }
-       @media (max-width: 576px) {
-            .card-content { padding: 1.5rem; }
-            #lane-status-graph {
-                flex-wrap: wrap;
-                gap: 1rem;
+        
+        .lane-status-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .lane-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .lane-status-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .lane-status-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .lane-status-indicator {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background-color: #e9ecef;
+        }
+        
+        .lane-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+        
+        .lane-status-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 576px) {
+            .lane-status-compact {
+                padding: 0.75rem 1rem;
+                margin-bottom: 1rem;
             }
-            #lane-status-graph .text-center {
-                flex-basis: 45%;
+            
+            .lane-status-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
             }
-            #lane-status-graph .progress {
-                width: 80px;
-                height: 15px;
+            
+            .lane-status-item {
+                padding: 0.5rem;
             }
-            #lane-status-graph .small {
-                font-size: 0.8rem;
+            
+            .lane-status-indicator {
+                height: 6px;
             }
-       }
+            
+            .lane-name {
+                font-size: 0.75rem;
+            }
+            
+            .lane-status-text {
+                font-size: 0.7rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -87,17 +142,27 @@ $conn->close();
     <div class="styled-card" style="max-width: 700px; margin: auto;">
         <div class="card-content">
             
-            <div class="text-center mb-5">
+            <div class="theme-toggle" id="theme-toggle" title="Toggle theme">
+                <i data-lucide="moon" class="icon-moon"></i>
+                <i data-lucide="sun" class="icon-sun"></i>
+            </div>
+
+            <div class="text-center mb-4">
                 <h2 class="fw-bold"><?php echo $greeting . ", " . htmlspecialchars(explode(' ', $_SESSION['full_name'])[0]); ?>!</h2>
                 <p class="text-muted mb-0">Student Number: <?php echo htmlspecialchars($_SESSION['student_number']); ?></p>
             </div>
             
-            <div class="styled-card mb-4">
-                <div class="card-content">
-                    <h3 class="fw-bold text-center mb-3">Lane Status</h3>
-                    <div id="lane-status-graph" class="d-flex justify-content-around p-3 rounded" style="background-color: #f8f9fa;">
-                         <p class="text-muted">Loading lane status...</p>
-                    </div>
+            <!-- Lane Status - Moved to prominent position -->
+            <div class="lane-status-compact">
+                <div class="lane-status-header">
+                    <h3 class="lane-status-title">
+                        <i data-lucide="activity" style="width: 16px; height: 16px;"></i>
+                        Service Status
+                    </h3>
+                    <span class="badge bg-secondary" style="font-size: 0.7rem;">Live</span>
+                </div>
+                <div id="lane-status-graph" class="lane-status-grid">
+                    <p class="text-muted text-center">Loading service status...</p>
                 </div>
             </div>
 
@@ -107,7 +172,7 @@ $conn->close();
                     <h4 class="alert-heading fw-bold">You Have an Active Ticket!</h4>
                     <p>You can view your ticket details or make changes to your appointment.</p>
                     <hr>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
                         <button id="view_edit_button" class="btn btn-primary"><i data-lucide="edit-3" class="me-2"></i>View / Edit Your Ticket</button>
                          <a href="ticket.php" class="btn btn-outline-secondary"><i data-lucide="eye" class="me-2"></i>View QR Code</a>
                     </div>
@@ -117,7 +182,7 @@ $conn->close();
             <div id="queue_form_container">
                 <div class="text-center mb-4">
                     <h3 class="mb-0 fw-bold" id="form_title">Get a Queue Ticket</h3>
-                    <p class="mb-0 opacity-75">Schedule your visit easily</p>
+                    <p class="mb-0 text-muted">Schedule your visit easily</p>
                 </div>
                 <div id="message"></div>
                 <form id="queueForm">
@@ -154,7 +219,7 @@ $conn->close();
                          <label class="form-check-label" for="is_priority">Priority Lane (For PWD, Senior Citizens, Pregnant Women)</label>
                      </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn-primary-modern" id="submit_button">
+                        <button type="submit" class="btn-primary-modern" id="submit_button" style="padding: 0.8rem 2rem;"> 
                             <i data-lucide="ticket" class="me-2"></i><span id="button_text">Get My Ticket</span>
                         </button>
                     </div>
@@ -175,8 +240,8 @@ $conn->close();
     
     <div class="modal fade" id="docuRequestModal" tabindex="-1" aria-labelledby="docuRequestModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content" style="background-color: var(--card-bg); backdrop-filter: blur(10px);">
+          <div class="modal-header" style="border-bottom-color: var(--input-border);">
             <h5 class="modal-title" id="docuRequestModalLabel">Select Documents to Request</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -196,7 +261,7 @@ $conn->close();
                 </div>
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" style="border-top-color: var(--input-border);">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-primary" id="add_documents_btn">Add Selected</button>
           </div>
@@ -206,7 +271,7 @@ $conn->close();
 
     <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="background: #f8f9fa;">
+        <div class="modal-content border-0 shadow-lg" style="background: var(--card-bg);">
           <div class="modal-body text-center p-5">
             <i data-lucide="bell-ring" class="text-success mb-3" style="width: 80px; height: 80px;"></i>
             <h2 class="modal-title fw-bold" id="notificationModalLabel">It's Your Turn!</h2>
@@ -224,6 +289,21 @@ $conn->close();
         lucide.createIcons();
         
         document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                let theme = 'light';
+                if (document.body.classList.contains('dark-mode')) {
+                    theme = 'dark';
+                }
+                localStorage.setItem('theme', theme);
+                lucide.createIcons(); 
+            });
+
             const purposeSelect = document.getElementById('purpose_select');
             const selectedContainer = document.getElementById('selected_purposes_container');
             const hiddenInput = document.getElementById('purpose_hidden');
@@ -279,6 +359,7 @@ $conn->close();
                     .then(function(data) {
                         const graphContainer = document.getElementById('lane-status-graph');
                         graphContainer.innerHTML = '';
+                        
                         if (data.counters && data.counters.length > 0) {
                             data.counters.forEach(function(counter) {
                                 const oldStatus = currentLaneStatus[counter.counter_id];
@@ -318,23 +399,24 @@ $conn->close();
                                     statusText = 'On Break';
                                 }
 
-                                const laneHtml = '<div class="text-center">' +
-                                    '<div class="progress" style="height: 20px; width: 100px; margin: auto; background-color: #e9ecef;">' +
-                                    '<div class="progress-bar" role="progressbar" style="width: 100%; background-color: ' + color + ';" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>' +
-                                    '</div>' +
-                                    '<div class="mt-2 small">' + counter.counter_name + '</div>' +
-                                    '<div class="small text-muted">' + statusText + '</div>' +
-                                    '</div>';
-                                graphContainer.innerHTML += laneHtml;
+                                // Create lane status item with new compact design
+                                const laneItem = document.createElement('div');
+                                laneItem.className = 'lane-status-item';
+                                laneItem.innerHTML = 
+                                    '<div class="lane-status-indicator" style="background-color: ' + color + ';"></div>' +
+                                    '<div class="lane-name">' + counter.counter_name + '</div>' +
+                                    '<div class="lane-status-text">' + statusText + '</div>';
+                                
+                                graphContainer.appendChild(laneItem);
                             });
                         } else {
-                            graphContainer.innerHTML = '<p class="text-muted">No lane status available.</p>';
+                            graphContainer.innerHTML = '<p class="text-muted text-center">No service status available.</p>';
                         }
                     })
                     .catch(function(error) {
                         console.error('Error fetching lane status:', error);
                         const graphContainer = document.getElementById('lane-status-graph');
-                        graphContainer.innerHTML = '<p class="text-danger">Failed to load lane status.</p>';
+                        graphContainer.innerHTML = '<p class="text-danger text-center">Failed to load service status.</p>';
                     });
             }
             

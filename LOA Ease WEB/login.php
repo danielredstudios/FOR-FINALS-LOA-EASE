@@ -74,42 +74,57 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Link to the stylesheet -->
+    <link rel="stylesheet" href="styles.css">
     <style>
+        /* Styles from original file */
         :root {
             --loa-blue: #003366; --loa-yellow: #FFC72C; --loa-blue-light: #0055a4;
+            /* These are now fallbacks, main values are in styles.css */
             --light-bg: #eef2f7; --dark-text: #212529; --card-bg: rgba(255, 255, 255, 0.7);
             --card-shadow: 0 8px 32px 0 rgba(0, 51, 102, 0.2); --font-family: 'Poppins', sans-serif;
         }
         body {
-            font-family: var(--font-family); background: linear-gradient(-45deg, var(--light-bg), var(--loa-blue-light), var(--light-bg), var(--loa-blue));
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite; display: flex;
+            /* font-family: var(--font-family); background: linear-gradient(-45deg, var(--light-bg), var(--loa-blue-light), var(--light-bg), var(--loa-blue));
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;  -- REMOVED, handled by styles.css */
+            display: flex;
             justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; perspective: 1000px;
         }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .styled-card {
+        /* @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } } -- REMOVED */
+        
+        /* .styled-card { -- MOVED to styles.css
             background: var(--card-bg); border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: var(--card-shadow); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             width: 100%; max-width: 500px; overflow: hidden; animation: fadeInFromBottom 1s ease-out; transition: transform 0.1s ease;
-        }
-        @keyframes fadeInFromBottom { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .card-content { padding: 3rem; }
-        .btn-primary-modern {
+        } */
+        /* @keyframes fadeInFromBottom { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } } -- MOVED */
+        
+        .styled-card .card-content { padding: 3rem; } /* Override default padding */
+
+        /* .btn-primary-modern { -- MOVED to styles.css
             background: var(--loa-blue); border: none; border-radius: 50px; padding: 0.8rem 2rem;
             font-size: 1.1rem; font-weight: 600; color: white; transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
         }
-        .btn-primary-modern:hover {
+        .btn-primary-modern:hover { -- MOVED to styles.css
             background-color: var(--loa-yellow); color: var(--loa-blue); transform: translateY(-4px) scale(1.05);
             box-shadow: 0 8px 25px rgba(255, 199, 44, 0.5);
-        }
+        } */
         @media (max-width: 576px) {
-            .card-content {
+            .styled-card .card-content {
                 padding: 2rem;
             }
         }
     </style>
 </head>
 <body>
+
+    <!-- Dark Mode Toggle Button -->
+    <div class="theme-toggle" id="theme-toggle" title="Toggle theme">
+        <i data-lucide="moon" class="icon-moon"></i>
+        <i data-lucide="sun" class="icon-sun"></i>
+    </div>
+
     <div class="styled-card">
         <div class="card-content">
             <div class="text-center mb-4">
@@ -155,6 +170,7 @@ $conn->close();
     <script>
         lucide.createIcons();
 
+        // Password Toggle
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
         const eyeIcon = togglePassword.querySelector('i');
@@ -170,6 +186,26 @@ $conn->close();
             }
             lucide.createIcons();
         });
+
+        // Dark Mode Toggle
+        (function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                let theme = 'light';
+                if (document.body.classList.contains('dark-mode')) {
+                    theme = 'dark';
+                }
+                localStorage.setItem('theme', theme);
+                lucide.createIcons(); // Re-render icons if needed
+            });
+        })();
     </script>
 </body>
 </html>

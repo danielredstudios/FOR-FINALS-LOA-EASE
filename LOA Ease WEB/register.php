@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-    $visitor_queue_number = trim($_POST['visitor_queue_number']);
 
     if (empty($student_number) || empty($last_name) || empty($first_name) || empty($course) || empty($email) || empty($username) || empty($password)) {
         $message = '<div class="alert alert-warning d-flex align-items-center"><i data-lucide="alert-triangle" class="me-2"></i>All fields are required.</div>';
@@ -35,22 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($student_result->num_rows === 1) {
             $student_data = $student_result->fetch_assoc();
             $student_id = $student_data['student_id'];
-
-            if (!empty($visitor_queue_number)) {
-                $visitor_stmt = $conn->prepare("SELECT visitor_id FROM queues WHERE queue_number = ? AND visitor_id IS NOT NULL LIMIT 1");
-                $visitor_stmt->bind_param("s", $visitor_queue_number);
-                $visitor_stmt->execute();
-                $visitor_result = $visitor_stmt->get_result();
-                if($visitor_data = $visitor_result->fetch_assoc()){
-                    $visitor_id = $visitor_data['visitor_id'];
-                    $link_stmt = $conn->prepare("UPDATE students SET visitor_id = ? WHERE student_id = ?");
-                    $link_stmt->bind_param("ii", $visitor_id, $student_id);
-                    $link_stmt->execute();
-                    $link_stmt->close();
-                }
-                $visitor_stmt->close();
-            }
-
+            
             $stmt = $conn->prepare("INSERT INTO users (student_id, username, password_hash) VALUES (?, ?, ?)");
             $stmt->bind_param("iss", $student_id, $username, $password_hash);
 
@@ -84,37 +68,29 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
     <style>
-         :root {
-            --loa-blue: #003366; --loa-yellow: #FFC72C; --loa-blue-light: #0055a4;
-            --light-bg: #eef2f7; --dark-text: #212529; --card-bg: rgba(255, 255, 255, 0.7);
-            --card-shadow: 0 8px 32px 0 rgba(0, 51, 102, 0.2); --font-family: 'Poppins', sans-serif;
-        }
         body {
-            font-family: var(--font-family); background: linear-gradient(-45deg, var(--light-bg), var(--loa-blue-light), var(--light-bg), var(--loa-blue));
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite; display: flex;
-            justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; perspective: 1000px;
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 1rem; 
+            perspective: 1000px;
         }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .styled-card {
-            background: var(--card-bg); border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: var(--card-shadow); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            width: 100%; max-width: 700px; overflow: hidden; animation: fadeInFromBottom 1s ease-out; transition: transform 0.1s ease;
+            max-width: 700px; 
         }
-        @keyframes fadeInFromBottom { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .card-content { padding: 2.5rem; }
-        .btn-primary-modern {
-            background: var(--loa-blue); border: none; border-radius: 50px; padding: 0.8rem 2rem;
-            font-size: 1.1rem; font-weight: 600; color: white; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.3);
-        }
-        .btn-primary-modern:hover {
-            background-color: var(--loa-yellow); color: var(--loa-blue); transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(255, 199, 44, 0.5);
+        .card-content { 
+            padding: 2.5rem; 
         }
         .form-control[readonly] {
             background-color: #e9ecef;
             cursor: not-allowed;
+        }
+        body.dark-mode .form-control[readonly] {
+            background-color: var(--input-bg);
+            opacity: 0.7;
         }
         @media (max-width: 768px) {
             .card-content {
@@ -124,8 +100,13 @@ $conn->close();
     </style>
 </head>
 <body>
+
    <div class="styled-card">
         <div class="card-content">
+            <div class="theme-toggle" id="theme-toggle" title="Toggle theme">
+                <i data-lucide="moon" class="icon-moon"></i>
+                <i data-lucide="sun" class="icon-sun"></i>
+            </div>
             <div class="text-center mb-4">
                 <h2 class="fw-bold">Create Your Account</h2>
                 <p class="text-muted">Join the LOA-EASE system today.</p>
@@ -162,12 +143,7 @@ $conn->close();
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required readonly>
-                </div>
-
-                <div class="mb-3">
-                    <label for="visitor_queue_number" class="form-label">Temporary Visitor ID (Optional)</label>
-                    <input type="text" class="form-control" id="visitor_queue_number" name="visitor_queue_number" placeholder="Enter if you have a VISITOR-XXXX number">
+                    <input type="email" class="form-control" id="email" name="email" required>
                 </div>
                 
                 <hr>
@@ -179,9 +155,14 @@ $conn->close();
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required
-                               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
-                               title="Must contain at least one number, one uppercase and lowercase letter, one special character, and at least 8 or more characters">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" required
+                                   pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
+                                   title="Must contain at least one number, one uppercase and lowercase letter, one special character, and at least 8 or more characters">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -198,6 +179,41 @@ $conn->close();
         lucide.createIcons();
 
         document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                let theme = 'light';
+                if (document.body.classList.contains('dark-mode')) {
+                    theme = 'dark';
+                }
+                localStorage.setItem('theme', theme);
+                lucide.createIcons();
+            });
+
+            const togglePassword = document.querySelector('#togglePassword');
+            const password = document.querySelector('#password');
+            
+            if(togglePassword && password) {
+                togglePassword.addEventListener('click', function () {
+                    const eyeIcon = togglePassword.querySelector('i');
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+                    
+                    if (type === 'password') {
+                        eyeIcon.setAttribute('data-lucide', 'eye');
+                    } else {
+                        eyeIcon.setAttribute('data-lucide', 'eye-off');
+                    }
+                    lucide.createIcons();
+                });
+            }
+
             const studentNumberInput = document.getElementById('student_number');
             const lastNameInput = document.getElementById('last_name');
             const firstNameInput = document.getElementById('first_name');
@@ -244,10 +260,12 @@ $conn->close();
                                     apiMessageDiv.innerHTML = '';
                                     statusIndicator.innerHTML = '<i data-lucide="check" class="text-success"></i>';
                                     registerButton.disabled = false;
+                                    emailInput.readOnly = false;
                                 } else {
                                     apiMessageDiv.innerHTML = `<div class="alert alert-danger py-2">${result.message}</div>`;
                                     statusIndicator.innerHTML = '<i data-lucide="x" class="text-danger"></i>';
                                     registerButton.disabled = true;
+                                    emailInput.readOnly = true;
                                 }
                                 lucide.createIcons();
                             })
@@ -273,8 +291,10 @@ $conn->close();
                 apiMessageDiv.innerHTML = '';
                 statusIndicator.innerHTML = '';
                 registerButton.disabled = false;
+                emailInput.readOnly = true;
             }
         });
     </script>
 </body>
 </html>
+

@@ -7,8 +7,6 @@ if (!isset($_SESSION['student_id'])) {
 }
 
 $student_id = $_SESSION['student_id'];
-// This query now ONLY gets the active queue number.
-// All other details will be fetched by the JavaScript to ensure consistency.
 $stmt = $conn->prepare("
     SELECT q.queue_number
     FROM queues q
@@ -31,6 +29,7 @@ $conn->close();
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.2/fetch.min.js"></script>
+    <link rel="stylesheet" href="styles.css"> 
     <style>
         :root {
             --loa-blue: #003366; --loa-yellow: #FFC72C; --loa-blue-light: #0055a4;
@@ -38,27 +37,43 @@ $conn->close();
             --card-shadow: 0 8px 32px 0 rgba(0, 51, 102, 0.2); --font-family: 'Poppins', sans-serif;
         }
         body {
-            font-family: var(--font-family); background: linear-gradient(-45deg, var(--light-bg), var(--loa-blue-light), var(--light-bg), var(--loa-blue));
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite; display: flex;
-            justify-content: center; align-items: center; min-height: 100vh; padding: 2rem;
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 2rem;
         }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .styled-card {
-            background: var(--card-bg); border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: var(--card-shadow); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            width: 100%; overflow: hidden; animation: fadeInFromBottom 1s ease-out;
-        }
-        @keyframes fadeInFromBottom { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .card-content { padding: 2.5rem; }
-        .purpose-item-container { padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px dotted #aab8c2; }
+        .purpose-item-container { 
+            padding-bottom: 0.75rem; 
+            margin-bottom: 0.75rem; 
+            border-bottom: 1px dotted var(--hr-color); 
+        }
         .purpose-item-container:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .purpose-main-title { font-size: 1rem; font-weight: 500; display: block; color: var(--dark-text); }
+        .purpose-main-title { 
+            font-size: 1rem; 
+            font-weight: 500; 
+            display: block; 
+            color: var(--text-color); 
+        }
         .purpose-sub-list { padding-left: 0.5rem; margin-top: 0.25rem; }
-        .purpose-sub-item { display: block; color: #495057; font-size: 0.9rem; }
+        .purpose-sub-item { 
+            display: block; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+        }
+        .list-group-item.bg-transparent {
+            background-color: transparent !important; 
+        }
     </style>
 </head>
 <body>
     <div class="styled-card text-center" style="max-width: 500px;">
+        <div class="theme-toggle" id="theme-toggle" title="Toggle theme">
+            <i data-lucide="moon" class="icon-moon"></i>
+            <i data-lucide="sun" class="icon-sun"></i>
+        </div>
+
         <div class="card-content">
             <?php if ($ticket): ?>
                 <div id="ticket-view-container">
@@ -72,7 +87,7 @@ $conn->close();
                     <i data-lucide="ticket-x" class="text-muted" style="width: 80px; height: 80px;"></i>
                     <h3 class="mt-3">No Active Ticket</h3>
                     <p class="text-muted">You don't have a ticket yet. Get one from the dashboard.</p>
-                    <a href="dashboard.php" class="btn btn-primary mt-3 d-inline-flex align-items-center"><i data-lucide="plus-circle" class="me-2"></i>Get a Ticket Now</a>
+                    <a href="dashboard.php" class="btn btn-primary-modern mt-3 d-inline-flex align-items-center"><i data-lucide="plus-circle" class="me-2"></i>Get a Ticket Now</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -82,6 +97,21 @@ $conn->close();
 
     <script>
         lucide.createIcons();
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            let theme = 'light';
+            if (document.body.classList.contains('dark-mode')) {
+                theme = 'dark';
+            }
+            localStorage.setItem('theme', theme);
+            lucide.createIcons(); 
+        });
 
         if ('Notification' in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
             Notification.requestPermission();
@@ -106,7 +136,7 @@ $conn->close();
                     '<i data-lucide="ticket-check" class="text-success" style="width: 80px; height: 80px;"></i>' +
                     '<h3 class="mt-3">Ticket Processed</h3>' +
                     '<p class="text-muted">Your transaction is complete or has been cancelled.</p>' +
-                    '<a href="dashboard.php" class="btn btn-primary mt-3 d-inline-flex align-items-center">Back to Dashboard</a>' +
+                    '<a href="dashboard.php" class="btn btn-primary-modern mt-3 d-inline-flex align-items-center">Back to Dashboard</a>' +
                     '</div>';
                 lucide.createIcons();
                 return;
@@ -139,7 +169,6 @@ $conn->close();
                     return;
             }
 
-            // Format Purposes
             var purposeHTML = '';
             var all_purposes = purpose.split(', ');
             var doc_requests = [];
@@ -179,10 +208,10 @@ $conn->close();
                 '<div class="text-start">' +
                     '<h5 class="fw-bold mb-3 text-center">Appointment Details</h5>' +
                     '<ul class="list-group list-group-flush">' +
-                        '<li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="landmark" class="me-3"></i><div><strong class="d-block">Counter/Office</strong>' + counter_name + '</div></li>' +
-                        '<li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="calendar-check" class="me-3"></i><div><strong class="d-block">Scheduled Date</strong>' + scheduleDate + '</div></li>' +
+                        '<li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="landmark" class="me-3"></i><div class="text-muted"><strong class="d-block">Counter/Office</strong>' + counter_name + '</div></li>' +
+                        '<li class="list-group-item d-flex align-items-center bg-transparent"><i data-lucide="calendar-check" class="me-3"></i><div class="text-muted"><strong class="d-block">Scheduled Date</strong>' + scheduleDate + '</div></li>' +
                         '<li class="list-group-item bg-transparent">' +
-                            '<div class="d-flex align-items-center"><i data-lucide="edit" class="me-3"></i><strong class="d-block">Purpose(s)</strong></div>' +
+                            '<div class="d-flex align-items-center text-muted"><i data-lucide="edit" class="me-3"></i><strong class="d-block">Purpose(s)</strong></div>' +
                             '<div class="ps-4 ms-3 mt-2">' + purposeHTML + '</div>' +
                         '</li>' +
                     '</ul>' +
@@ -190,6 +219,7 @@ $conn->close();
                 alertHTML +
                 '<div class="text-center mt-4">' +
                     (showEditButton ? '<a href="dashboard.php" class="btn btn-outline-secondary btn-sm"><i data-lucide="edit-3" style="width:14px; height:14px;"></i> Edit Ticket</a>' : '') +
+                    '<a href="dashboard.php" class="btn btn-link-secondary btn-sm ms-2">Back to Dashboard</a>' + 
                 '</div>';
             
             lucide.createIcons();
@@ -229,7 +259,14 @@ $conn->close();
 
         document.addEventListener('DOMContentLoaded', function() {
             if (notificationSound) {
-                notificationSound.play().catch(function(e) { console.error("Audio play failed. User may need to interact with the page first."); });
+                var playPromise = notificationSound.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        notificationSound.pause();
+                    }).catch(error => {
+                        console.log("Audio priming failed, user interaction will be required.");
+                    });
+                }
             }
 
             fetchTicketDetails();
@@ -239,3 +276,4 @@ $conn->close();
     </script>
 </body>
 </html>
+
